@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Database (Exact same as school-inventory)
+  db:
+    image: postgres:15-alpine
+    container_name: school_bitulim_db_prod
+    environment:
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-admin123}
+      POSTGRES_DB: ${DB_NAME:-school_bitulim}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_bitulim_data_prod:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - horev-bitulim-network
+
+  # 2. API Backend & Mailer Service (Port 4050)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: school_bitulim_api_prod
+    environment:
+      - PORT=4050
+      - NODE_ENV=production
+      - GMAIL_USER=${GMAIL_USER:-bitulim@horev.org.il}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+      - TREASURER_EMAIL=${TREASURER_EMAIL:-chagi@horev.org.il}
+      - SECRETARY_EMAIL=${SECRETARY_EMAIL:-esters@horev.org.il}
+      - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD:-admin123}@db:5432/${DB_NAME:-school_bitulim}
+    ports:
+      - "4050:4050"
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - horev-bitulim-network
+
+  # 3. Web Frontend UI (Port 8080)
+  web:
+    image: nginx:alpine
+    container_name: school_bitulim_web_prod
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/usr/share/nginx/html
+    restart: unless-stopped
+    networks:
+      - horev-bitulim-network
+
+  # 4. Cloudflare Named Tunnel (bitulim.horev.org.il)
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: school_bitulim_tunnel_prod
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - horev-bitulim-network
+
+volumes:
+  postgres_bitulim_data_prod:
+
+networks:
+  horev-bitulim-network:
+    driver: bridge

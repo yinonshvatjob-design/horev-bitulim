@@ -1,0 +1,232 @@
+{
+  "admins": [
+    {
+      "id": "0542065606",
+      "name": "ינון",
+      "role": "מנהל תוכנה (Admin)",
+      "email": "yinonshvat@horev.org.il",
+      "pass": "yinon2026"
+    },
+    {
+      "id": "0584220463",
+      "name": "חגי היקר",
+      "role": "גזבר המוסד (Admin)",
+      "email": "chagi@horev.org.il",
+      "pass": "hagai2026"
+    },
+    {
+      "id": "05455408280",
+      "name": "אסתר",
+      "role": "מזכירת המוסד (Admin)",
+      "email": "esters@horev.org.il",
+      "pass": "esther2026"
+    },
+    {
+      "id": "0545540828",
+      "name": "אסתר",
+      "role": "מזכירת המוסד (Admin)",
+      "email": "esters@horev.org.il",
+      "pass": "esther2026"
+    }
+  ],
+  "coordinators": [
+    {
+      "id": "021395694",
+      "name": "אהרנפלד אוהד",
+      "email": "ohadhadas@horev.org.il"
+    },
+    {
+      "id": "033963430",
+      "name": "אורבך נתן",
+      "email": "natanaue@horev.org.il"
+    },
+    {
+      "id": "308000000",
+      "name": "בוהרון מנשה",
+      "email": "menasheb@horev.org.il"
+    },
+    {
+      "id": "040975641",
+      "name": "בולבין צבי",
+      "email": "zb0527155@horev.org.il"
+    },
+    {
+      "id": "025018417",
+      "name": "ברוך אושרי",
+      "email": "oshrib547@horev.org.il"
+    },
+    {
+      "id": "037670692",
+      "name": "גרינברג שמואל",
+      "email": "mbibeg@horev.org.il"
+    },
+    {
+      "id": "057332009",
+      "name": "דור יצחק",
+      "email": "dorledor@horev.org.il"
+    },
+    {
+      "id": "033212911",
+      "name": "דנטלסקי צביקה",
+      "email": "tzvika.yesh@horev.org.il"
+    },
+    {
+      "id": "036194520",
+      "name": "זהבי חן",
+      "email": "123chen1@horev.org.il"
+    },
+    {
+      "id": "058281403",
+      "name": "טויבר עופר",
+      "email": "ofertb@horev.org.il"
+    },
+    {
+      "id": "060936481",
+      "name": "ירדני אלעד",
+      "email": "nahumy7@horev.org.il"
+    },
+    {
+      "id": "059641555",
+      "name": "כהן נחמיה",
+      "email": "mnkohen@horev.org.il"
+    },
+    {
+      "id": "057654667",
+      "name": "ליבוביץ דוד",
+      "email": "dudilei@horev.org.il"
+    },
+    {
+      "id": "023642846",
+      "name": "מורביה חיים",
+      "email": "hmor10@horev.org.il"
+    },
+    {
+      "id": "312000000",
+      "name": "מסילתי עמנואל",
+      "email": "amitmesi9@horev.org.il"
+    },
+    {
+      "id": "206000000",
+      "name": "מסינג נתנאל",
+      "email": "netanelme@horev.org.il"
+    },
+    {
+      "id": "029517455",
+      "name": "נגיד איתי",
+      "email": "naitay@horev.org.il"
+    },
+    {
+      "id": "204000000",
+      "name": "נמיר נריה",
+      "email": "nreya56@horev.org.il"
+    },
+    {
+      "id": "066171638",
+      "name": "פיג'ו קובי",
+      "email": "kmpecho@horev.org.il"
+    },
+    {
+      "id": "066385527",
+      "name": "פיינגולד נריה",
+      "email": "neriyafg@horev.org.il"
+    },
+    {
+      "id": "303000000",
+      "name": "צדק איתמר",
+      "email": "itamartzed@horev.org.il"
+    },
+    {
+      "id": "025352881",
+      "name": "קורש רון",
+      "email": "koreshhore@horev.org.il"
+    },
+    {
+      "id": "040119331",
+      "name": "קליין מיכאל",
+      "email": "mklain80@horev.org.il"
+    },
+    {
+      "id": "028635092",
+      "name": "שוחטמן מוטי",
+      "email": "motis@horev.org.il"
+    },
+    {
+      "id": "059805002",
+      "name": "שטיינר אברהם",
+      "email": "maleip@horev.org.il"
+    },
+    {
+      "id": "028536654",
+      "name": "שלוסברג שמואל",
+      "email": "s.shlosberg@horev.org.il"
+    },
+    {
+      "id": "203084637",
+      "name": "ינון שבט",
+      "email": "yinonshvatjob@gmail.com"
+    }
+  ],
+  "requests": [
+    {
+      "id": "REQ-101",
+      "applicantId": "021395694",
+      "applicantName": "אהרנפלד אוהד",
+      "applicantEmail": "ohadhadas@horev.org.il",
+      "group": "שכבה ט'",
+      "startDate": "2026-09-05",
+      "endDate": "2026-09-07",
+      "requestedMeals": [
+        "ארוחת בוקר",
+        "ארוחת צהריים"
+      ],
+      "reason": "טיול שנתי מדבר יהודה למשך 3 ימים",
+      "submittedAt": "2.9.2026 07:50",
+      "status": "REJECTED",
+      "approvedRefund": 0,
+      "approvedDetails": null,
+      "adminNotes": "",
+      "handledBy": "ינון",
+      "handledAt": "2.9.2026 13:42",
+      "timeline": [
+        {
+          "time": "2.9.2026 07:50",
+          "title": "הגשת בקשה",
+          "desc": "הבקשה הוגשה ע\"י הרכז אהרנפלד אוהד עבור שכבה ט'",
+          "type": "info"
+        },
+        {
+          "time": "2.9.2026 07:56",
+          "title": "שליחת אימייל התראה לחגי היקר ואסתר",
+          "desc": "נשלח אימייל התראה ל-chagi@horev.org.il ול-esters@horev.org.il",
+          "type": "info"
+        },
+        {
+          "time": "2.9.2026 13:42",
+          "title": "נדחה ע\"י ינון",
+          "desc": "סיבת דחייה: לא צוינה סיבה",
+          "type": "danger"
+        },
+        {
+          "time": "2.9.2026 13:42",
+          "title": "שליחת אימייל עדכון לרכז/ת",
+          "desc": "נשלח אימייל עדכון ל-ohadhadas@horev.org.il",
+          "type": "info"
+        }
+      ]
+    }
+  ],
+  "emailLogs": [
+    {
+      "time": "2.9.2026 13:42",
+      "to": "ohadhadas@horev.org.il",
+      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-101 - נדחתה (סכום החזר: ₪0)",
+      "status": "שגיאת שליחה: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-48448ed2e9fsm5714329f8f.20 - gsmtp"
+    },
+    {
+      "time": "2.9.2026 12:50",
+      "to": "chagi@horev.org.il",
+      "subject": "מערכת ביטול ארוחות מוסדות חורב אותחלה בהצלחה",
+      "status": "נשלח בהצלחה (Gmail)"
+    }
+  ]
+}

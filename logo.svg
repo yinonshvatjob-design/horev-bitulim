@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@700;800;900&amp;display=swap');
+      .shield-bg { fill: #1b779e; }
+      .gold-banner { fill: #c49619; }
+      .white-ribbon { fill: #ffffff; }
+      .horev-text { font-family: 'Rubik', sans-serif; font-weight: 900; fill: #ffffff; font-size: 110px; text-anchor: middle; letter-spacing: 2px; }
+      .jerusalem-text { font-family: 'Rubik', sans-serif; font-weight: 800; fill: #ffffff; font-size: 52px; text-anchor: middle; letter-spacing: 1px; }
+      .motto-text { font-family: 'Rubik', sans-serif; font-weight: 800; fill: #1b779e; font-size: 26px; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <!-- Shield Top Arches (Horev Emblem Shape) -->
+  <path class="shield-bg" d="M 80,360 L 80,180 C 80,80 160,50 220,130 C 235,150 245,150 250,150 C 255,150 265,150 280,130 C 340,50 420,80 420,180 L 420,360 Q 250,390 80,360 Z" />
+
+  <!-- White Main Text: HOREV -->
+  <text x="250" y="225" class="horev-text">חורב</text>
+
+  <!-- White Sub Text: JERUSALEM -->
+  <text x="250" y="295" class="jerusalem-text">ירושלים</text>
+
+  <!-- Golden Open Book Base -->
+  <path class="gold-banner" d="M 30,355 Q 250,320 470,355 L 485,385 C 380,440 120,440 15,385 Z" />
+
+  <!-- White Scroll Ribbon for Motto -->
+  <path class="white-ribbon" d="M 70,365 Q 250,335 430,365 L 440,395 Q 250,425 60,395 Z" />
+
+  <!-- Ribbon Left Tail -->
+  <polygon points="70,365 40,380 70,395 55,380" class="white-ribbon" />
+  
+  <!-- Ribbon Right Tail -->
+  <polygon points="430,365 460,380 430,395 445,380" class="white-ribbon" />
+
+  <!-- Motto Text: Torah Im Derech Eretz -->
+  <text x="250" y="388" class="motto-text">תורה עם דרך ארץ</text>
+</svg>
