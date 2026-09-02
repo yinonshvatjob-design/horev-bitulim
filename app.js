@@ -2,7 +2,7 @@
    פלטפורמת ביטול ארוחות - לוגיקה עסקית וממשק משתמש (App Engine 2.0)
    ========================================================================== */
 
-const API_BASE_URL = 'http://localhost:4050/api';
+const API_BASE_URL = window.location.origin.includes('localhost') ? 'http://localhost:4050/api' : '/api';
 
 // Local State Store
 const AppStore = {
