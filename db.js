@@ -1,9 +1,10 @@
 /* ==========================================================================
-   פלטפורמת ביטול ארוחות - מוסדות חורב (Database Layer)
+   פלטפורמת ביטול ארוחות - מוסדות חורב (Database Layer עם תמיכת PostgreSQL ענני)
    ========================================================================== */
 
 const fs = require('fs');
 const path = require('path');
+const { Pool } = require('pg');
 
 // Initial Admins (Yinon, Hagai, Esther)
 const SEED_ADMINS = [
@@ -78,7 +79,18 @@ class DatabaseManager {
         { time: this.formatDate(new Date()), to: "chagi@horev.org.il", subject: "מערכת ביטול ארוחות מוסדות חורב אותחלה בהצלחה", status: "נשלח בהצלחה (Gmail)" }
       ]
     };
-    this.load();
+
+    this.pool = null;
+    if (process.env.DATABASE_URL) {
+      console.log('Connecting to PostgreSQL Managed Database...');
+      this.pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
+      });
+      this.initPg();
+    } else {
+      this.load();
+    }
   }
 
   getFutureDate(daysAhead) {
@@ -91,6 +103,45 @@ class DatabaseManager {
     return d.toLocaleDateString('he-IL') + ' ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
   }
 
+  async initPg() {
+    if (!this.pool) return;
+    try {
+      await this.pool.query(`
+        CREATE TABLE IF NOT EXISTS system_store (
+          id VARCHAR(50) PRIMARY KEY,
+          payload JSONB NOT NULL,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
+      const res = await this.pool.query(`SELECT payload FROM system_store WHERE id = 'main_store';`);
+      if (res.rows.length > 0) {
+        this.data = res.rows[0].payload;
+        console.log('Loaded live data successfully from PostgreSQL Cloud Database!');
+      } else {
+        await this.savePg();
+        console.log('Initialized initial database store in PostgreSQL Cloud Database!');
+      }
+    } catch (err) {
+      console.error('PostgreSQL Connection Error, falling back to local file:', err.message);
+      this.load();
+    }
+  }
+
+  async savePg() {
+    if (!this.pool) return;
+    try {
+      await this.pool.query(
+        `INSERT INTO system_store (id, payload, updated_at)
+         VALUES ('main_store', $1, NOW())
+         ON CONFLICT (id) DO UPDATE SET payload = $1, updated_at = NOW();`,
+        [JSON.stringify(this.data)]
+      );
+    } catch (err) {
+      console.error('Error saving to PostgreSQL:', err.message);
+    }
+  }
+
   load() {
     try {
       if (fs.existsSync(DB_FILE)) {
@@ -99,67 +150,145 @@ class DatabaseManager {
       } else {
         this.save();
       }
-    } catch (e) {
-      console.error("Failed to load database.json, initializing defaults", e);
-      this.save();
+    } catch (err) {
+      console.error('Error loading database.json:', err.message);
     }
   }
 
   save() {
     try {
       fs.writeFileSync(DB_FILE, JSON.stringify(this.data, null, 2), 'utf-8');
-    } catch (e) {
-      console.error("Failed to save database.json", e);
+      if (this.pool) {
+        this.savePg().catch(err => console.error('Background PG save error:', err));
+      }
+    } catch (err) {
+      console.error('Error saving database.json:', err.message);
     }
   }
 
-  // Auth queries
+  // --- Admins & Coordinators ---
   findAdmin(id, pass) {
-    const cleanId = id.replace(/[^0-9]/g, '');
-    return this.data.admins.find(a => (a.id === cleanId || a.id === id) && a.pass === pass);
+    return this.data.admins.find(a => a.id === id && a.pass === pass);
   }
 
   findCoordinator(id) {
-    const cleanId = id.replace(/[^0-9]/g, '');
-    return this.data.coordinators.find(c => c.id === cleanId || c.id === id);
+    return this.data.coordinators.find(c => c.id === id);
   }
 
-  // Requests
+  getAllCoordinators() {
+    return this.data.coordinators;
+  }
+
+  addCoordinator(newCoord) {
+    if (this.data.coordinators.some(c => c.id === newCoord.id)) {
+      return { success: false, message: 'רכז עמי קיים במערכת עם תעודת זהות זו' };
+    }
+    this.data.coordinators.push(newCoord);
+    this.save();
+    return { success: true, coordinator: newCoord };
+  }
+
+  // --- Cancellation Requests ---
   getAllRequests() {
     return this.data.requests;
   }
 
+  getRequestById(id) {
+    return this.data.requests.find(r => r.id === id);
+  }
+
+  getRequestsByApplicant(applicantId) {
+    return this.data.requests.filter(r => r.applicantId === applicantId);
+  }
+
   addRequest(reqData) {
-    this.data.requests.unshift(reqData);
+    const nextIdNumber = 100 + this.data.requests.length + 1;
+    const newReq = {
+      id: `REQ-${nextIdNumber}`,
+      applicantId: reqData.applicantId,
+      applicantName: reqData.applicantName,
+      applicantEmail: reqData.applicantEmail,
+      group: reqData.group,
+      startDate: reqData.startDate,
+      endDate: reqData.endDate,
+      requestedMeals: reqData.requestedMeals || [],
+      reason: reqData.reason,
+      submittedAt: this.formatDate(new Date()),
+      status: "PENDING",
+      approvedRefund: 0,
+      approvedDetails: null,
+      adminNotes: "",
+      handledBy: null,
+      handledAt: null,
+      timeline: [
+        {
+          time: this.formatDate(new Date()),
+          title: "הגשת בקשת ביטול",
+          desc: `הבקשה הוגשה ע"י ${reqData.applicantName} עבור ${reqData.group}`,
+          type: "info"
+        }
+      ]
+    };
+
+    this.data.requests.unshift(newReq);
     this.save();
-    return reqData;
+    return newReq;
   }
 
-  updateRequest(reqId, updateFields) {
-    const idx = this.data.requests.findIndex(r => r.id === reqId);
-    if (idx !== -1) {
-      this.data.requests[idx] = { ...this.data.requests[idx], ...updateFields };
-      this.save();
-      return this.data.requests[idx];
-    }
-    return null;
+  approveRequest(id, refundAmount, adminNotes, handledByName) {
+    const req = this.getRequestById(id);
+    if (!req) return null;
+
+    req.status = "APPROVED";
+    req.approvedRefund = parseFloat(refundAmount) || 0;
+    req.adminNotes = adminNotes || "";
+    req.handledBy = handledByName;
+    req.handledAt = this.formatDate(new Date());
+    req.timeline.push({
+      time: this.formatDate(new Date()),
+      title: `אושר ע"י ${handledByName}`,
+      desc: `הבקשה אושרה בסכום החזר של ₪${req.approvedRefund}. הערות: ${adminNotes || 'אין'}`,
+      type: "success"
+    });
+
+    this.save();
+    return req;
   }
 
-  // Coordinators Management
-  addCoordinator(coord) {
-    this.data.coordinators.push(coord);
+  rejectRequest(id, reason, handledByName) {
+    const req = this.getRequestById(id);
+    if (!req) return null;
+
+    req.status = "REJECTED";
+    req.adminNotes = reason || "";
+    req.handledBy = handledByName;
+    req.handledAt = this.formatDate(new Date());
+    req.timeline.push({
+      time: this.formatDate(new Date()),
+      title: `נדחה ע"י ${handledByName}`,
+      desc: `סיבת הדחייה: ${reason || 'לא צוינה'}`,
+      type: "danger"
+    });
+
     this.save();
+    return req;
   }
 
-  removeCoordinator(id) {
-    this.data.coordinators = this.data.coordinators.filter(c => c.id !== id);
+  // --- Email Logs ---
+  addEmailLog(to, subject, status) {
+    const entry = {
+      time: this.formatDate(new Date()),
+      to,
+      subject,
+      status
+    };
+    this.data.emailLogs.unshift(entry);
     this.save();
+    return entry;
   }
 
-  // Email Logs
-  addEmailLog(logItem) {
-    this.data.emailLogs.unshift(logItem);
-    this.save();
+  getEmailLogs() {
+    return this.data.emailLogs;
   }
 }
 
