@@ -20,7 +20,7 @@ class MailerService {
     return new Promise((resolve) => {
       const payload = JSON.stringify({
         to: Array.isArray(to) ? to.join(',') : to,
-        cc: Array.isArray(cc) ? cc : (cc ? [cc] : []),
+        cc: Array.isArray(cc) ? cc.join(',') : (cc || ''),
         subject: subject,
         html: html
       });
@@ -44,10 +44,11 @@ class MailerService {
         };
 
         const req = https.request(options, (res) => {
-          // Handle Google Apps Script 302/301 Redirect
+          // Handle Google Apps Script 302/301 Redirect (Preserving POST method)
           if (res.statusCode === 302 || res.statusCode === 301 || res.statusCode === 307) {
             const redirectUrl = res.headers.location;
             if (redirectUrl) {
+              // Note: Google Apps Script redirects to script.googleusercontent.com which accepts GET or POST
               sendRequest(redirectUrl, redirectCount + 1);
               return;
             }
