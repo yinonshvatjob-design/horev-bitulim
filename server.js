@@ -262,6 +262,32 @@ app.get('/api/users', (req, res) => {
   res.json({ success: true, coordinators: db.data.coordinators });
 });
 
+// GET /api/admins
+app.get('/api/admins', (req, res) => {
+  res.json({ success: true, admins: db.getAllAdmins() });
+});
+
+// PUT /api/admins/:id (Edit admin credentials: name, ID/username, email, pass)
+app.put('/api/admins/:id', (req, res) => {
+  const { id } = req.params;
+  const { newId, name, email, pass, roleTitle } = req.body;
+
+  const cleanId = (newId || id).replace(/[^0-9]/g, '');
+  const updatedFields = {
+    id: cleanId,
+    name,
+    email,
+    pass,
+    roleTitle: roleTitle || 'אדמין מוסדות חורב'
+  };
+
+  const updated = db.updateAdmin(id, updatedFields);
+  if (!updated) {
+    return res.status(404).json({ success: false, message: 'אדמין לא נמצא' });
+  }
+  res.json({ success: true, admin: updated, message: 'פרטי האדמין והסיסמה עודכנו בהצלחה!' });
+});
+
 // POST /api/users
 app.post('/api/users', (req, res) => {
   const { id, name, email } = req.body;
@@ -276,8 +302,9 @@ app.post('/api/users', (req, res) => {
 // PUT /api/users/:id (Edit coordinator)
 app.put('/api/users/:id', (req, res) => {
   const { id } = req.params;
-  const { name, email } = req.body;
-  const updated = db.updateCoordinator(id, { name, email });
+  const { newId, name, email } = req.body;
+  const cleanId = (newId || id).replace(/[^0-9]/g, '');
+  const updated = db.updateCoordinator(id, { id: cleanId, name, email });
   if (!updated) {
     return res.status(404).json({ success: false, message: 'רכז/ת לא נמצא/ה' });
   }

@@ -112,9 +112,10 @@ function bindEvents() {
     document.getElementById('addUserModal').style.display = 'flex';
   });
 
-  // Manage Users - Submit Form
+  // Manage Users & Admins - Submit Form
   document.getElementById('addNewUserForm')?.addEventListener('submit', handleAddUserSubmit);
   document.getElementById('editUserForm')?.addEventListener('submit', handleEditUserSubmit);
+  document.getElementById('editAdminForm')?.addEventListener('submit', handleEditAdminSubmit);
 
   // Filters Events in Reports
   document.getElementById('filterCoordinator')?.addEventListener('change', renderReports);
@@ -679,8 +680,28 @@ function exportToCSV() {
   showToast('דוח CSV הורד בהצלחה!', 'success');
 }
 
+async function fetchUsersData() {
+  try {
+    const resCoordinators = await fetch(`${API_BASE_URL}/users`);
+    const dataCoordinators = await resCoordinators.json();
+    if (dataCoordinators.success) {
+      AppStore.coordinators = dataCoordinators.coordinators;
+    }
+
+    const resAdmins = await fetch(`${API_BASE_URL}/admins`);
+    const dataAdmins = await resAdmins.json();
+    if (dataAdmins.success) {
+      AppStore.admins = dataAdmins.admins;
+    }
+  } catch (error) {
+    console.error('Error fetching users/admins data', error);
+  }
+}
+
 async function renderUsersTable() {
   if (AppStore.currentUser.role !== 'ADMIN') return;
+
+  renderAdminsTable();
 
   const tbody = document.getElementById('usersTbody');
   if (!tbody) return;
@@ -701,6 +722,89 @@ async function renderUsersTable() {
       </td>
     </tr>
   `).join('');
+}
+
+function renderAdminsTable() {
+  const tbody = document.getElementById('adminsTbody');
+  if (!tbody || !AppStore.admins) return;
+
+  tbody.innerHTML = AppStore.admins.map(a => `
+    <tr>
+      <td><span class="badge badge-primary">${a.roleTitle || 'אדמין מוסדות חורב'}</span></td>
+      <td><strong>${a.name}</strong></td>
+      <td><code>${a.id}</code></td>
+      <td>
+        <span id="passText_${a.id}" style="letter-spacing: 2px;">••••••••</span>
+        <button class="btn btn-sm btn-link text-secondary py-0" onclick="togglePassVisibility('${a.id}', '${a.pass}')" title="הצג/הסתר סיסמה">
+          <i class="fa-solid fa-eye" id="passEye_${a.id}"></i>
+        </button>
+      </td>
+      <td>${a.email}</td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="openEditAdminModal('${a.id}')">
+          <i class="fa-solid fa-user-gear"></i> ערוך פרטים וסיסמה
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.togglePassVisibility = function(id, pass) {
+  const textEl = document.getElementById(`passText_${id}`);
+  const eyeEl = document.getElementById(`passEye_${id}`);
+  if (!textEl) return;
+
+  if (textEl.innerText === '••••••••') {
+    textEl.innerText = pass;
+    eyeEl.className = 'fa-solid fa-eye-slash';
+  } else {
+    textEl.innerText = '••••••••';
+    eyeEl.className = 'fa-solid fa-eye';
+  }
+};
+
+window.openEditAdminModal = function(id) {
+  const admin = (AppStore.admins || []).find(a => a.id === id);
+  if (!admin) return;
+
+  document.getElementById('editOriginalAdminId').value = admin.id;
+  document.getElementById('editAdminRoleTitle').value = admin.roleTitle || '';
+  document.getElementById('editAdminName').value = admin.name;
+  document.getElementById('editAdminId').value = admin.id;
+  document.getElementById('editAdminPass').value = admin.pass;
+  document.getElementById('editAdminEmail').value = admin.email;
+  document.getElementById('editAdminModal').style.display = 'flex';
+};
+
+async function handleEditAdminSubmit(e) {
+  e.preventDefault();
+  if (AppStore.currentUser.role !== 'ADMIN') return;
+
+  const originalId = document.getElementById('editOriginalAdminId').value;
+  const newId = document.getElementById('editAdminId').value.trim();
+  const name = document.getElementById('editAdminName').value.trim();
+  const pass = document.getElementById('editAdminPass').value.trim();
+  const email = document.getElementById('editAdminEmail').value.trim();
+  const roleTitle = document.getElementById('editAdminRoleTitle').value.trim();
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admins/${originalId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ newId, name, pass, email, roleTitle })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('פרטי האדמין והסיסמה עודכנו בהצלחה!', 'success');
+      document.getElementById('editAdminModal').style.display = 'none';
+      await fetchUsersData();
+      renderUsersTable();
+    } else {
+      showToast(data.message || 'שגיאה בעדכון פרטי האדמין', 'danger');
+    }
+  } catch (err) {
+    showToast('שגיאה בתקשורת עם השרת', 'danger');
+  }
 }
 
 window.openEditUserModal = function(id) {

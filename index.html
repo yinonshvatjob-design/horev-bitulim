@@ -396,8 +396,36 @@
       </div>
     </section>
 
-    <!-- VIEW 4: Manage Coordinators -->
+    <!-- VIEW 4: Manage Coordinators & Admin Users -->
     <section id="manageUsersView" class="tab-content">
+      <!-- Admin Credentials Management Card -->
+      <div class="card card-primary mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2><i class="fa-solid fa-user-shield"></i> ניהול ועריכת אדמינים וסיסמאות (גזברות / מזכירות / מנהל תוכנה)</h2>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">באפשרותך לערוך ולעדכן את תעודות הזהות (שם המשתמש להתחברות), השמות, האימיילים והסיסמאות של האדמינים.</p>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="adminsTable">
+              <thead>
+                <tr>
+                  <th>תפקיד במערכת</th>
+                  <th>שם המנהל/ת</th>
+                  <th>שם משתמש (ת"ז / טלפון)</th>
+                  <th>סיסמה (Password)</th>
+                  <th>כתובת אימייל</th>
+                  <th>פעולות ניהול</th>
+                </tr>
+              </thead>
+              <tbody id="adminsTbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coordinators Management Card -->
       <div class="card card-purple">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h2><i class="fa-solid fa-users-gear"></i> ניהול רכזים מורשים במוסדות חורב ירושלים</h2>
@@ -559,6 +587,44 @@
           </div>
           <button type="submit" class="btn btn-primary btn-block mt-3">
             <i class="fa-solid fa-floppy-disk"></i> שמור שינויים
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Edit Admin Credentials & Password -->
+  <div id="editAdminModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-gear"></i> עריכת פרטי אדמין וסיסמה</h3>
+        <button class="close-modal-btn" data-close="editAdminModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editAdminForm">
+          <input type="hidden" id="editOriginalAdminId">
+          <div class="form-group">
+            <label for="editAdminRoleTitle">תפקיד במערכת</label>
+            <input type="text" id="editAdminRoleTitle" class="form-control" placeholder="לדוגמה: גזבר המוסד (Admin)">
+          </div>
+          <div class="form-group">
+            <label for="editAdminName">שם המנהל/ת *</label>
+            <input type="text" id="editAdminName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="editAdminId">שם משתמש להתחברות (ת"ז / טלפון) *</label>
+            <input type="text" id="editAdminId" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="editAdminPass">סיסמה להתחברות (Password) *</label>
+            <input type="text" id="editAdminPass" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="editAdminEmail">כתובת אימייל לקבלת התראות *</label>
+            <input type="email" id="editAdminEmail" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block mt-3">
+            <i class="fa-solid fa-floppy-disk"></i> שמור פרטי אדמין וסיסמה
           </button>
         </form>
       </div>

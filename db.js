@@ -188,6 +188,33 @@ class DatabaseManager {
     return this.data.admins.find(a => a.id === id && a.pass === pass);
   }
 
+  getAllAdmins() {
+    return this.data.admins;
+  }
+
+  findAdminById(id) {
+    return this.data.admins.find(a => a.id === id);
+  }
+
+  updateAdmin(id, updatedFields) {
+    const admin = this.findAdminById(id);
+    if (!admin) return null;
+    Object.assign(admin, updatedFields);
+    this.save();
+    return admin;
+  }
+
+  addAdmin(newAdmin) {
+    const existingIndex = this.data.admins.findIndex(a => a.id === newAdmin.id);
+    if (existingIndex !== -1) {
+      this.data.admins[existingIndex] = { ...this.data.admins[existingIndex], ...newAdmin };
+    } else {
+      this.data.admins.push({ ...newAdmin, role: 'ADMIN' });
+    }
+    this.save();
+    return newAdmin;
+  }
+
   findCoordinator(id) {
     return this.data.coordinators.find(c => c.id === id);
   }
