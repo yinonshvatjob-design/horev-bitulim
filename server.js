@@ -254,6 +254,17 @@ app.post('/api/users', (req, res) => {
   res.json({ success: true, message: 'הרכז/ת הוסף/ה בהצלחה לרשימת המורשים!' });
 });
 
+// PUT /api/users/:id (Edit coordinator)
+app.put('/api/users/:id', (req, res) => {
+  const { id } = req.params;
+  const { name, email } = req.body;
+  const updated = db.updateCoordinator(id, { name, email });
+  if (!updated) {
+    return res.status(404).json({ success: false, message: 'רכז/ת לא נמצא/ה' });
+  }
+  res.json({ success: true, coordinator: updated, message: 'פרטי הרכז/ת עודכנו בהצלחה!' });
+});
+
 // DELETE /api/users/:id
 app.delete('/api/users/:id', (req, res) => {
   const { id } = req.params;

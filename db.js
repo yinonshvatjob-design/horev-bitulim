@@ -180,12 +180,29 @@ class DatabaseManager {
   }
 
   addCoordinator(newCoord) {
-    if (this.data.coordinators.some(c => c.id === newCoord.id)) {
-      return { success: false, message: 'רכז עמי קיים במערכת עם תעודת זהות זו' };
+    const existingIndex = this.data.coordinators.findIndex(c => c.id === newCoord.id);
+    if (existingIndex !== -1) {
+      this.data.coordinators[existingIndex] = { ...this.data.coordinators[existingIndex], ...newCoord };
+    } else {
+      this.data.coordinators.push(newCoord);
     }
-    this.data.coordinators.push(newCoord);
     this.save();
     return { success: true, coordinator: newCoord };
+  }
+
+  updateCoordinator(id, updatedFields) {
+    const coord = this.findCoordinator(id);
+    if (!coord) return null;
+    Object.assign(coord, updatedFields);
+    this.save();
+    return coord;
+  }
+
+  removeCoordinator(id) {
+    const initialLength = this.data.coordinators.length;
+    this.data.coordinators = this.data.coordinators.filter(c => c.id !== id);
+    this.save();
+    return this.data.coordinators.length < initialLength;
   }
 
   // --- Cancellation Requests ---
