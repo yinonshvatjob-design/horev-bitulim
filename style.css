@@ -204,24 +204,17 @@ body {
   font-weight: 600;
 }
 
-/* Login Overlay & Cards */
+/* Login Container & Cards */
 .login-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(8px);
+  min-height: 75vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 5000;
-  padding: 1.5rem;
+  padding: 2rem 1rem;
 }
 
 .login-overlay[style*="display: none"] {
   display: none !important;
-  pointer-events: none !important;
-  z-index: -9999 !important;
-  visibility: hidden !important;
 }
 
 .login-card {
@@ -232,7 +225,9 @@ body {
   max-width: 480px;
   padding: 2.2rem;
   border: 1px solid var(--border-color);
-  animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 10;
 }
 
 @keyframes modalSlideUp {
@@ -281,7 +276,8 @@ body {
   font-weight: 600;
   font-size: 0.9rem;
   border-radius: var(--radius-sm);
-  cursor: pointer;
+  cursor: pointer !important;
+  pointer-events: auto !important;
   transition: var(--transition);
   display: flex;
   align-items: center;
