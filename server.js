@@ -269,9 +269,26 @@ app.get('/api/email-logs', (req, res) => {
 // --------------------------------------------------------------------------
 // Start Server on Port 4050
 // --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
+// 6. Keep-Alive Self Pinger (מניעת הירדמות השרת 24/7)
+// --------------------------------------------------------------------------
+const https = require('https');
+const http = require('http');
+
+setInterval(() => {
+  const targetUrl = process.env.RENDER_EXTERNAL_URL || 'https://horev-bitulim-1.onrender.com';
+  console.log(`[Keep-Alive Pinger] Pinging ${targetUrl} to maintain 24/7 instant response...`);
+  const client = targetUrl.startsWith('https') ? https : http;
+  client.get(`${targetUrl}/api/requests`, (res) => {
+    res.on('data', () => {});
+  }).on('error', (err) => {
+    console.log('[Keep-Alive Error]:', err.message);
+  });
+}, 5 * 60 * 1000); // 5 minutes
+
 app.listen(PORT, () => {
-  console.log(`=======================================================`);
-  console.log(`  פלטפורמת ביטול ארוחות — מוסדות חורב ירושלים`);
-  console.log(`  שרת ה-API הופעל בהצלחה בפורט ענני מבודד: ${PORT}`);
-  console.log(`=======================================================`);
+  console.log(`==================================================`);
+  console.log(`פלטפורמת ביטול ארוחות - מוסדות חורב ירושלים`);
+  console.log(`השרת מופעל בסביבה עננית בפורט: ${PORT}`);
+  console.log(`==================================================`);
 });
