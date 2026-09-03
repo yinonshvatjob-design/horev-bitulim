@@ -11,12 +11,23 @@ class MailerService {
     this.treasurerEmail = process.env.TREASURER_EMAIL || 'chagi@horev.org.il';
     this.secretaryEmail = process.env.SECRETARY_EMAIL || 'esters@horev.org.il';
     
-    // Transporter Config
+    const cleanPass = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+
+    // Transporter Config using Port 587 STARTTLS for Cloud compatibility
     this.transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, // STARTTLS
+      requireTLS: true,
       auth: {
         user: this.user,
-        pass: process.env.GMAIL_APP_PASSWORD || 'secret'
+        pass: cleanPass
+      },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+      tls: {
+        rejectUnauthorized: false
       }
     });
   }
@@ -46,7 +57,7 @@ class MailerService {
             </table>
 
             <div style="text-align: center; margin: 30px 0 10px 0;">
-              <a href="http://localhost:8080" style="background: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 16px;">
+              <a href="https://bitulim.horevit.com" style="background: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 16px;">
                 🔘 מעבר לאישור הבקשה בפלטפורמה
               </a>
             </div>
@@ -112,7 +123,7 @@ class MailerService {
             </div>
 
             <div style="text-align: center; margin-top: 25px;">
-              <a href="http://localhost:8080" style="background: #1b779e; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 8px; font-weight: bold; display: inline-block;">
+              <a href="https://bitulim.horevit.com" style="background: #1b779e; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 8px; font-weight: bold; display: inline-block;">
                 👉 לצפייה בפרטי הבקשה ובציר הזמן
               </a>
             </div>
@@ -164,8 +175,8 @@ class MailerService {
     const nowStr = db.formatDate(new Date());
 
     try {
-      // Send Real Mail via Nodemailer Transporter if App Password configured
-      if (process.env.GMAIL_APP_PASSWORD && process.env.GMAIL_APP_PASSWORD !== 'secret' && process.env.GMAIL_APP_PASSWORD !== 'horev_app_pass_secret') {
+      const hasPass = process.env.GMAIL_APP_PASSWORD && process.env.GMAIL_APP_PASSWORD !== 'secret';
+      if (hasPass) {
         const info = await this.transporter.sendMail({
           from: `"מוסדות חורב — ביטול ארוחות" <${this.user}>`,
           to: to,
@@ -176,22 +187,12 @@ class MailerService {
         console.log(`[REAL GMAIL SENT] ID: ${info.messageId} to ${to}`);
       }
 
-      db.addEmailLog({
-        time: nowStr,
-        to: to,
-        subject: subject,
-        status: `נשלח בהצלחה מ-${this.user}`
-      });
+      db.addEmailLog(this.user, subject, `נשלח בהצלחה ל-${to}`);
 
       return { success: true, to, subject };
     } catch (error) {
-      console.error("[MAILER ERROR]", error);
-      db.addEmailLog({
-        time: nowStr,
-        to: to,
-        subject: subject,
-        status: "שגיאת שליחה: " + error.message
-      });
+      console.error("[MAILER ERROR]", error.message);
+      db.addEmailLog(this.user, subject, "שגיאת שליחה: " + error.message);
       return { success: false, error };
     }
   }
