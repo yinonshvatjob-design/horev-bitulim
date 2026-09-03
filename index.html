@@ -52,7 +52,7 @@
             <span class="user-name" id="userName">משתמש</span>
             <span class="user-role-badge" id="userRoleBadge">רכז/ת</span>
           </div>
-          <button id="logoutBtn" class="btn btn-outline-danger btn-sm" title="התנתק">
+          <button id="logoutBtn" class="btn btn-outline-danger btn-sm" title="התנתק" onclick="handleLogout()">
             <i class="fa-solid fa-right-from-bracket"></i> התנתק
           </button>
         </div>
@@ -118,28 +118,28 @@
     <nav class="app-nav">
       <ul class="nav-tabs">
         <li class="nav-item">
-          <button class="nav-link active" data-target="submitView">
+          <button class="nav-link active" data-target="submitView" onclick="switchTab('submitView')">
             <i class="fa-solid fa-paper-plane"></i> הגשת בקשת ביטול
           </button>
         </li>
         <li class="nav-item admin-only">
-          <button class="nav-link" data-target="pendingView">
+          <button class="nav-link" data-target="pendingView" onclick="switchTab('pendingView')">
             <i class="fa-solid fa-clock-history"></i> בקשות ממתינות לאישור
             <span class="badge badge-danger" id="pendingBadge">0</span>
           </button>
         </li>
         <li class="nav-item admin-only">
-          <button class="nav-link" data-target="reportsView">
+          <button class="nav-link" data-target="reportsView" onclick="switchTab('reportsView')">
             <i class="fa-solid fa-chart-pie"></i> פלט הזמנות ודוחות
           </button>
         </li>
         <li class="nav-item admin-only">
-          <button class="nav-link" data-target="manageUsersView">
+          <button class="nav-link" data-target="manageUsersView" onclick="switchTab('manageUsersView')">
             <i class="fa-solid fa-users-gear"></i> ניהול רכזים
           </button>
         </li>
         <li class="nav-item admin-only">
-          <button class="nav-link" data-target="emailSettingsView">
+          <button class="nav-link" data-target="emailSettingsView" onclick="switchTab('emailSettingsView')">
             <i class="fa-solid fa-envelope-circle-check"></i> הגדרות Google/Gmail
           </button>
         </li>
@@ -697,6 +697,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=9.0"></script>
+  <script src="app.js?v=10.0"></script>
 </body>
 </html>

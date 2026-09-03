@@ -151,46 +151,44 @@ function bindEvents() {
 
     // Main Nav Tabs
     document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-      const target = e.currentTarget.dataset.target;
-      switchTab(target);
+      link.addEventListener('click', (e) => {
+        const target = e.currentTarget.dataset.target;
+        switchTab(target);
+      });
     });
-  });
 
-  // Submission Form Submit
-  document.getElementById('cancellationForm').addEventListener('submit', handleFormSubmit);
+    // Submission Form Submit & Date Checks
+    document.getElementById('cancellationForm')?.addEventListener('submit', handleFormSubmit);
+    document.getElementById('startDateInput')?.addEventListener('change', validateDateCutoff);
 
-  // Date Range Cutoff Check
-  document.getElementById('startDateInput').addEventListener('change', validateDateCutoff);
-
-  // Close Modals
-  document.querySelectorAll('.close-modal-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const modalId = e.currentTarget.dataset.close;
-      document.getElementById(modalId).style.display = 'none';
+    // Close Modals
+    document.querySelectorAll('.close-modal-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const modalId = e.currentTarget.dataset.close;
+        document.getElementById(modalId).style.display = 'none';
+      });
     });
-  });
 
-  // Manage Users - Show Modal
-  document.getElementById('showAddUserModalBtn')?.addEventListener('click', () => {
-    document.getElementById('addUserModal').style.display = 'flex';
-  });
+    // Manage Users - Show Modal
+    document.getElementById('showAddUserModalBtn')?.addEventListener('click', () => {
+      document.getElementById('addUserModal').style.display = 'flex';
+    });
 
-  // Manage Users & Admins - Submit Form
-  document.getElementById('addNewUserForm')?.addEventListener('submit', handleAddUserSubmit);
-  document.getElementById('editUserForm')?.addEventListener('submit', handleEditUserSubmit);
-  document.getElementById('editAdminForm')?.addEventListener('submit', handleEditAdminSubmit);
+    // Manage Users & Admins - Submit Form
+    document.getElementById('addNewUserForm')?.addEventListener('submit', handleAddUserSubmit);
+    document.getElementById('editUserForm')?.addEventListener('submit', handleEditUserSubmit);
+    document.getElementById('editAdminForm')?.addEventListener('submit', handleEditAdminSubmit);
 
-  // Filters Events in Reports
-  document.getElementById('filterCoordinator')?.addEventListener('change', renderReports);
-  document.getElementById('filterStatus')?.addEventListener('change', renderReports);
-  document.getElementById('filterStartDate')?.addEventListener('change', renderReports);
-  document.getElementById('filterEndDate')?.addEventListener('change', renderReports);
-  document.getElementById('resetFiltersBtn')?.addEventListener('click', resetFilters);
-  document.getElementById('exportCsvBtn')?.addEventListener('click', exportToCSV);
+    // Filters Events in Reports
+    document.getElementById('filterCoordinator')?.addEventListener('change', renderReports);
+    document.getElementById('filterStatus')?.addEventListener('change', renderReports);
+    document.getElementById('filterStartDate')?.addEventListener('change', renderReports);
+    document.getElementById('filterEndDate')?.addEventListener('change', renderReports);
+    document.getElementById('resetFiltersBtn')?.addEventListener('click', resetFilters);
+    document.getElementById('exportCsvBtn')?.addEventListener('click', exportToCSV);
 
-  // Live Email Verification Test Submit
-  document.getElementById('testEmailForm')?.addEventListener('submit', handleTestEmailSubmit);
+    // Live Email Verification Test Submit
+    document.getElementById('testEmailForm')?.addEventListener('submit', handleTestEmailSubmit);
   } catch (err) {
     console.error('Error binding events:', err);
   }
@@ -305,17 +303,21 @@ async function handleLogin(role, id, pass = '') {
   }
 }
 
-function handleLogout() {
+window.handleLogout = function() {
   AppStore.currentUser = null;
   localStorage.removeItem('horev_current_user');
   showLoginScreen();
   showToast('התנתקת בהצלחה מהמערכת', 'info');
-}
+};
 
 function showLoginScreen() {
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('appMain').style.display = 'none';
-  document.getElementById('userBadgeContainer').style.display = 'none';
+  const loginScreen = document.getElementById('loginScreen');
+  const appMain = document.getElementById('appMain');
+  const userBadgeContainer = document.getElementById('userBadgeContainer');
+
+  if (loginScreen) loginScreen.style.display = 'flex';
+  if (appMain) appMain.style.display = 'none';
+  if (userBadgeContainer) userBadgeContainer.style.display = 'none';
 }
 
 function showMainApp() {
@@ -356,7 +358,12 @@ function showMainApp() {
   fetchUsersData();
 }
 
-function switchTab(tabId) {
+window.switchTab = function(tabId) {
+  if (!AppStore.currentUser) {
+    showLoginScreen();
+    return;
+  }
+
   // STRICT ACCESS GUARD: Block non-admins from opening admin tabs
   const isAdminTab = tabId !== 'submitView';
   if (isAdminTab && AppStore.currentUser.role !== 'ADMIN') {
