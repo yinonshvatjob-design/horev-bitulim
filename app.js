@@ -4,9 +4,26 @@
 
 const API_BASE_URL = window.location.origin.includes('localhost') ? 'http://localhost:4050/api' : '/api';
 
+// Safe Local Storage Reader
+function getInitialUser() {
+  try {
+    const saved = localStorage.getItem('horev_current_user');
+    if (!saved || saved === 'undefined' || saved === 'null') return null;
+    const parsed = JSON.parse(saved);
+    if (parsed && typeof parsed === 'object' && parsed.id && parsed.name) {
+      return parsed;
+    }
+    return null;
+  } catch (e) {
+    console.error('Error parsing localStorage user:', e);
+    try { localStorage.removeItem('horev_current_user'); } catch (err) {}
+    return null;
+  }
+}
+
 // Local State Store
 const AppStore = {
-  currentUser: JSON.parse(localStorage.getItem('horev_current_user')) || null,
+  currentUser: getInitialUser(),
   activeTab: 'submitView',
   requests: [],
   coordinators: [],
@@ -14,16 +31,26 @@ const AppStore = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  initApp();
+  try {
+    initApp();
+  } catch (err) {
+    console.error('initApp fatal error fallback:', err);
+    showLoginScreen();
+  }
 });
 
 function initApp() {
   bindEvents();
   setupDateLimits();
 
-  if (AppStore.currentUser) {
-    showMainApp();
-    checkDeepLinkParams();
+  if (AppStore.currentUser && AppStore.currentUser.id && AppStore.currentUser.name) {
+    try {
+      showMainApp();
+      checkDeepLinkParams();
+    } catch (err) {
+      console.error('showMainApp error, resetting user session:', err);
+      handleLogout();
+    }
   } else {
     showLoginScreen();
     checkDeepLinkParams();
@@ -268,14 +295,27 @@ function showLoginScreen() {
 }
 
 function showMainApp() {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('appMain').style.display = 'block';
-  document.getElementById('userBadgeContainer').style.display = 'flex';
+  if (!AppStore.currentUser || !AppStore.currentUser.name) {
+    showLoginScreen();
+    return;
+  }
+
+  const loginScreen = document.getElementById('loginScreen');
+  const appMain = document.getElementById('appMain');
+  const userBadgeContainer = document.getElementById('userBadgeContainer');
+
+  if (loginScreen) loginScreen.style.display = 'none';
+  if (appMain) appMain.style.display = 'block';
+  if (userBadgeContainer) userBadgeContainer.style.display = 'flex';
 
   // Update Header User Details
-  document.getElementById('userName').textContent = AppStore.currentUser.name;
-  document.getElementById('userAvatar').textContent = AppStore.currentUser.name.charAt(0);
-  document.getElementById('userRoleBadge').textContent = AppStore.currentUser.roleTitle || (AppStore.currentUser.role === 'ADMIN' ? 'אדמין / גזבר' : 'רכז/ת');
+  const userNameEl = document.getElementById('userName');
+  const userAvatarEl = document.getElementById('userAvatar');
+  const userRoleBadgeEl = document.getElementById('userRoleBadge');
+
+  if (userNameEl) userNameEl.textContent = AppStore.currentUser.name;
+  if (userAvatarEl) userAvatarEl.textContent = AppStore.currentUser.name ? AppStore.currentUser.name.charAt(0) : 'מ';
+  if (userRoleBadgeEl) userRoleBadgeEl.textContent = AppStore.currentUser.roleTitle || (AppStore.currentUser.role === 'ADMIN' ? 'אדמין / גזבר' : 'רכז/ת');
 
   // STRICT ROLE GUARD: Hide ALL admin tabs for Coordinators
   const adminLinks = document.querySelectorAll('.admin-only');
