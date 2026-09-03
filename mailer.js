@@ -15,22 +15,17 @@ class MailerService {
     this.secretaryEmail = process.env.SECRETARY_EMAIL || 'esters@horev.org.il';
   }
 
-  // Send Email via Official Google Apps Script Webhook
+  // Send Email via Official Google Apps Script Webhook (POST + GET Redirect)
   async sendMailViaGoogleWebhook(to, subject, html, cc = []) {
     return new Promise((resolve) => {
-      const toStr = Array.isArray(to) ? to.join(',') : (to || '');
-      const ccStr = Array.isArray(cc) ? cc.join(',') : (cc || '');
-      
-      const queryParams = new URLSearchParams({
-        to: toStr,
-        cc: ccStr,
+      const payload = JSON.stringify({
+        to: Array.isArray(to) ? to.join(',') : (to || ''),
+        cc: Array.isArray(cc) ? cc.join(',') : (cc || ''),
         subject: subject || 'עדכון מוסדות חורב',
         html: html || ''
-      }).toString();
+      });
 
-      const fullUrl = `${GOOGLE_WEBHOOK_URL}?${queryParams}`;
-
-      const sendRequest = (urlStr, redirectCount = 0) => {
+      const sendRequest = (urlStr, isRedirect = false, redirectCount = 0) => {
         if (redirectCount > 5) {
           resolve({ success: false, error: new Error('Too many redirects') });
           return;
@@ -40,18 +35,20 @@ class MailerService {
         const options = {
           hostname: url.hostname,
           path: url.pathname + url.search,
-          method: 'GET',
+          method: isRedirect ? 'GET' : 'POST',
+          rejectUnauthorized: false,
+          headers: isRedirect ? {} : {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(payload)
+          },
           timeout: 15000
         };
 
         const req = https.request(options, (res) => {
-          // Handle Google Apps Script 302 Redirect
-          if (res.statusCode === 302 || res.statusCode === 301 || res.statusCode === 307) {
-            const redirectUrl = res.headers.location;
-            if (redirectUrl) {
-              sendRequest(redirectUrl, redirectCount + 1);
-              return;
-            }
+          // Handle Google Apps Script 302 Redirect (Switch to GET for redirect URL)
+          if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+            sendRequest(res.headers.location, true, redirectCount + 1);
+            return;
           }
 
           let body = '';
@@ -60,7 +57,7 @@ class MailerService {
             try {
               const data = JSON.parse(body);
               if (data.result === 'success') {
-                console.log(`[GOOGLE GMAIL SENT SUCCESSFULLY] to ${toStr}`);
+                console.log(`[GOOGLE GMAIL SENT SUCCESSFULLY] to ${to}`);
                 resolve({ success: true, body: data });
               } else {
                 console.error(`[GOOGLE GMAIL ERROR]`, data);
@@ -86,10 +83,13 @@ class MailerService {
           resolve({ success: false, error: new Error('Google Mailer Timeout') });
         });
 
+        if (!isRedirect) {
+          req.write(payload);
+        }
         req.end();
       };
 
-      sendRequest(fullUrl);
+      sendRequest(GOOGLE_WEBHOOK_URL, false, 0);
     });
   }
 
