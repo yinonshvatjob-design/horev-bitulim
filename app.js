@@ -74,15 +74,21 @@ function checkDeepLinkParams() {
 }
 
 window.switchRoleTab = function(role) {
+  const alertBox = document.getElementById('loginAlertBox');
+  if (alertBox) alertBox.style.display = 'none';
+
   document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  const coordForm = document.getElementById('coordinatorLoginForm');
+  const adminForm = document.getElementById('adminLoginForm');
+
   if (role === 'coordinator') {
     document.getElementById('tabRoleCoord')?.classList.add('active');
-    document.getElementById('coordinatorLoginForm').style.display = 'block';
-    document.getElementById('adminLoginForm').style.display = 'none';
+    if (coordForm) coordForm.style.setProperty('display', 'block', 'important');
+    if (adminForm) adminForm.style.setProperty('display', 'none', 'important');
   } else {
     document.getElementById('tabRoleAdmin')?.classList.add('active');
-    document.getElementById('coordinatorLoginForm').style.display = 'none';
-    document.getElementById('adminLoginForm').style.display = 'block';
+    if (coordForm) coordForm.style.setProperty('display', 'none', 'important');
+    if (adminForm) adminForm.style.setProperty('display', 'block', 'important');
   }
 };
 

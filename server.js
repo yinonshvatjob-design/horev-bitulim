@@ -29,18 +29,37 @@ app.use(express.static(__dirname));
 // 1. Auth REST API
 // --------------------------------------------------------------------------
 
-// POST /api/auth/login (Smart Foolproof Authentication)
+// POST /api/auth/login (Ultra-Flexible Smart Authentication)
 app.post('/api/auth/login', (req, res) => {
   const { role, id, pass } = req.body;
 
-  if (!id) {
-    return res.status(400).json({ success: false, message: 'יש להזין תעודת זהות / טלפון' });
+  if (!id || !String(id).trim()) {
+    return res.status(400).json({ success: false, message: 'יש להזין תעודת זהות, טלפון או אימייל' });
   }
 
-  const cleanId = String(id).trim().replace(/[^0-9]/g, '');
+  const rawInput = String(id).trim();
+  const cleanDigits = rawInput.replace(/[^0-9]/g, '');
+  const unpaddedDigits = cleanDigits.replace(/^0+/, '');
+  const paddedDigits = cleanDigits ? cleanDigits.padStart(9, '0') : '';
+
+  // Helper matcher
+  const isMatch = (targetId, targetEmail, targetName) => {
+    if (!targetId) return false;
+    const cleanTarget = String(targetId).trim().replace(/[^0-9]/g, '');
+    const unpaddedTarget = cleanTarget.replace(/^0+/, '');
+    const paddedTarget = cleanTarget ? cleanTarget.padStart(9, '0') : '';
+
+    if (rawInput === String(targetId).trim()) return true;
+    if (cleanDigits && cleanTarget && cleanDigits === cleanTarget) return true;
+    if (unpaddedDigits && unpaddedTarget && unpaddedDigits === unpaddedTarget) return true;
+    if (paddedDigits && paddedTarget && paddedDigits === paddedTarget) return true;
+    if (targetEmail && targetEmail.toLowerCase().trim() === rawInput.toLowerCase()) return true;
+    if (targetName && rawInput.length >= 3 && targetName.includes(rawInput)) return true;
+    return false;
+  };
 
   // 1. Check if user is an Admin
-  const admin = db.getAllAdmins().find(a => a.id === cleanId || a.id === String(id).trim());
+  const admin = db.getAllAdmins().find(a => isMatch(a.id, a.email, a.name));
   if (admin) {
     if (pass && admin.pass && admin.pass !== pass) {
       return res.status(401).json({ success: false, message: 'סיסמת אדמין שגויה' });
@@ -58,7 +77,7 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   // 2. Check if user is a Coordinator
-  const coordinator = db.getAllCoordinators().find(c => c.id === cleanId || c.id === String(id).trim());
+  const coordinator = db.getAllCoordinators().find(c => isMatch(c.id, c.email, c.name));
   if (coordinator) {
     return res.json({
       success: true,
@@ -74,7 +93,7 @@ app.post('/api/auth/login', (req, res) => {
 
   return res.status(403).json({
     success: false,
-    message: `תעודת הזהות/מזהה (${cleanId || id}) אינו מופיע ברשימת המורשים. יש לפנות לחגי היקר או לאסתר להוספה לרשימה.`
+    message: `הפרטים שהוזנו (${rawInput}) אינם מופיעים ברשימת המורשים. ניתן לפנות לחגי היקר או לאסתר להוספה ברגע.`
   });
 });
 
