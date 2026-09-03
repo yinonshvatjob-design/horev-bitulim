@@ -1,8 +1,9 @@
 /* ==========================================================================
-   פלטפורמת ביטול ארוחות - שרת דיוור אימייל Google/Gmail (Mailer Service)
+   פלטפורמת ביטול ארוחות - שרת דיוור אימייל Google/Gmail/HTTPS REST API (Mailer Service)
    ========================================================================== */
 
 const nodemailer = require('nodemailer');
+const https = require('https');
 const db = require('./db');
 
 class MailerService {
@@ -13,7 +14,7 @@ class MailerService {
     
     const cleanPass = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
 
-    // Transporter Config using Port 587 STARTTLS for Cloud compatibility
+    // Standard Nodemailer Transporter
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
@@ -23,12 +24,67 @@ class MailerService {
         user: this.user,
         pass: cleanPass
       },
-      connectionTimeout: 15000,
-      greetingTimeout: 15000,
-      socketTimeout: 20000,
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 10000,
       tls: {
         rejectUnauthorized: false
       }
+    });
+  }
+
+  // Helper method to send via HTTPS REST API (Port 443 - Never blocked by Cloud Providers)
+  async sendViaHttpApi(to, subject, html, cc = []) {
+    const apiKey = process.env.RESEND_API_KEY || process.env.BREVO_API_KEY;
+    if (!apiKey) return null;
+
+    return new Promise((resolve) => {
+      const payload = JSON.stringify({
+        from: `מוסדות חורב — ביטול ארוחות <${this.user}>`,
+        to: Array.isArray(to) ? to : [to],
+        cc: cc.length ? cc : undefined,
+        subject: subject,
+        html: html
+      });
+
+      const options = {
+        hostname: 'api.resend.com',
+        path: '/emails',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Length': Buffer.byteLength(payload)
+        },
+        timeout: 10000
+      };
+
+      const req = https.request(options, (res) => {
+        let body = '';
+        res.on('data', chunk => body += chunk);
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            console.log(`[HTTPS API MAIL SENT] to ${to}`);
+            resolve({ success: true, body });
+          } else {
+            console.error(`[HTTPS API MAIL ERROR] Status ${res.statusCode}: ${body}`);
+            resolve({ success: false, error: new Error(`HTTP ${res.statusCode}: ${body}`) });
+          }
+        });
+      });
+
+      req.on('error', (err) => {
+        console.error('[HTTPS API MAIL FAILED]', err.message);
+        resolve({ success: false, error: err });
+      });
+
+      req.on('timeout', () => {
+        req.destroy();
+        resolve({ success: false, error: new Error('HTTPS API Request Timeout') });
+      });
+
+      req.write(payload);
+      req.end();
     });
   }
 
@@ -170,13 +226,34 @@ class MailerService {
     return this.sendMail(recipientEmail, subject, htmlContent);
   }
 
-  // General Send Mail Helper
+  // General Send Mail Helper with Timeout & HTTPS Fallback
   async sendMail(to, subject, html, cc = []) {
     const nowStr = db.formatDate(new Date());
 
-    try {
-      const hasPass = process.env.GMAIL_APP_PASSWORD && process.env.GMAIL_APP_PASSWORD !== 'secret';
-      if (hasPass) {
+    // First try HTTPS REST API if key configured
+    if (process.env.RESEND_API_KEY || process.env.BREVO_API_KEY) {
+      const httpRes = await this.sendViaHttpApi(to, subject, html, cc);
+      if (httpRes && httpRes.success) {
+        db.addEmailLog(this.user, subject, `נשלח בהצלחה ל-${to} (HTTPS API)`);
+        return { success: true, to, subject };
+      }
+    }
+
+    // Standard SMTP Send with 10s Promise Timeout
+    return new Promise(async (resolve) => {
+      let resolved = false;
+
+      const timer = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          const errMsg = "Connection timeout: Render blocks outbound SMTP ports 465/587. Please add RESEND_API_KEY for HTTPS Port 443 delivery.";
+          console.error("[MAILER TIMEOUT]", errMsg);
+          db.addEmailLog(this.user, subject, "שגיאת שליחה: " + errMsg);
+          resolve({ success: false, error: new Error(errMsg) });
+        }
+      }, 10000);
+
+      try {
         const info = await this.transporter.sendMail({
           from: `"מוסדות חורב — ביטול ארוחות" <${this.user}>`,
           to: to,
@@ -184,17 +261,24 @@ class MailerService {
           subject: subject,
           html: html
         });
-        console.log(`[REAL GMAIL SENT] ID: ${info.messageId} to ${to}`);
+
+        if (!resolved) {
+          resolved = true;
+          clearTimeout(timer);
+          console.log(`[REAL GMAIL SENT] ID: ${info.messageId} to ${to}`);
+          db.addEmailLog(this.user, subject, `נשלח בהצלחה ל-${to}`);
+          resolve({ success: true, to, subject });
+        }
+      } catch (error) {
+        if (!resolved) {
+          resolved = true;
+          clearTimeout(timer);
+          console.error("[MAILER ERROR]", error.message);
+          db.addEmailLog(this.user, subject, "שגיאת שליחה: " + error.message);
+          resolve({ success: false, error });
+        }
       }
-
-      db.addEmailLog(this.user, subject, `נשלח בהצלחה ל-${to}`);
-
-      return { success: true, to, subject };
-    } catch (error) {
-      console.error("[MAILER ERROR]", error.message);
-      db.addEmailLog(this.user, subject, "שגיאת שליחה: " + error.message);
-      return { success: false, error };
-    }
+    });
   }
 }
 
