@@ -391,6 +391,8 @@ async function fetchRequestsData() {
   }
 
   renderMySubmissions();
+  renderPendingRequests();
+  renderReports();
   updatePendingCounter();
 }
 
@@ -419,18 +421,14 @@ function renderMySubmissions() {
 
   tbody.innerHTML = myReqs.map(r => `
     <tr>
-      <td><strong>${r.id}</strong></td>
+      <td><strong>#${r.id}</strong></td>
       <td>${r.group}</td>
       <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
-      <td>${r.requestedMeals.join(', ')}</td>
+      <td>${r.approvedDetails || r.requestedMeals.join(', ')}</td>
       <td>${r.submittedAt}</td>
       <td><span class="badge ${getStatusBadgeClass(r.status)}">${getStatusHebrew(r.status)}</span></td>
       <td class="text-success font-weight-bold">₪${(r.approvedRefund || 0).toLocaleString()}</td>
-      <td>
-        <button class="btn btn-sm btn-outline-primary" onclick="openTimelineModal('${r.id}')">
-          <i class="fa-solid fa-timeline"></i> הצג ציר זמן
-        </button>
-      </td>
+      <td><button class="btn btn-sm btn-outline-primary" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i> ציר זמן</button></td>
     </tr>
   `).join('');
 }
@@ -551,8 +549,18 @@ async function approveRequest(id) {
     const data = await res.json();
     if (data.success) {
       showToast(data.message, 'success');
-      fetchRequestsData();
-      renderPendingRequests();
+
+      // Update memory store immediately
+      const targetReq = AppStore.requests.find(r => r.id === id);
+      if (targetReq) {
+        targetReq.status = 'APPROVED';
+        targetReq.approvedRefund = parseFloat(approvedRefund) || 0;
+        targetReq.approvedDetails = approvedMeals || targetReq.requestedMeals.join(', ');
+        targetReq.adminNotes = adminNotes;
+        targetReq.handledBy = AppStore.currentUser.name;
+      }
+
+      await fetchRequestsData();
     }
   } catch (e) {
     showToast('אושר בהצלחה!', 'success');
