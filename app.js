@@ -251,6 +251,23 @@ async function handleTestEmailSubmit(e) {
 // 2. Authentication Logic & Strict Role Guards
 // --------------------------------------------------------------------------
 async function handleLogin(role, id, pass = '') {
+  const alertBox = document.getElementById('loginAlertBox');
+  const coordBtn = document.getElementById('coordLoginBtn');
+  const adminBtn = document.getElementById('adminLoginBtn');
+
+  if (alertBox) alertBox.style.display = 'none';
+
+  if (!id) {
+    if (alertBox) {
+      alertBox.textContent = 'יש להזין מספר תעודת זהות או טלפון';
+      alertBox.style.display = 'block';
+    }
+    return;
+  }
+
+  if (coordBtn) { coordBtn.disabled = true; coordBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> מתחבר למערכת...'; }
+  if (adminBtn) { adminBtn.disabled = true; adminBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> מתחבר כמנהל/ת...'; }
+
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
@@ -260,6 +277,10 @@ async function handleLogin(role, id, pass = '') {
 
     const data = await response.json();
     if (!data.success) {
+      if (alertBox) {
+        alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${data.message}`;
+        alertBox.style.display = 'block';
+      }
       showToast(data.message, 'danger');
       return;
     }
@@ -278,6 +299,9 @@ async function handleLogin(role, id, pass = '') {
     }
     localStorage.setItem('horev_current_user', JSON.stringify(AppStore.currentUser));
     showMainApp();
+  } finally {
+    if (coordBtn) { coordBtn.disabled = false; coordBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> הכנס למערכת'; }
+    if (adminBtn) { adminBtn.disabled = false; adminBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> התחבר כמנהל/ת'; }
   }
 }
 
