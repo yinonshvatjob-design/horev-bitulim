@@ -128,6 +128,37 @@ class MailerService {
     return this.sendMail(reqData.applicantEmail, subject, htmlContent);
   }
 
+  // 3. Send Live Test Email to Custom Recipient
+  async sendTestEmail(recipientEmail) {
+    const subject = `[בדיקת מערכת] מייל בדיקה תקין ממוסדות חורב ירושלים — ביטול ארוחות`;
+    const htmlContent = `
+      <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          <div style="background: #059669; color: #ffffff; padding: 20px; text-align: center;">
+            <h2 style="margin: 0; font-size: 22px;">✓ מייל בדיקה נשלח בהצלחה!</h2>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">מוסדות חורב ירושלים — פלטפורמת ביטול ארוחות</p>
+          </div>
+          <div style="padding: 25px;">
+            <p style="font-size: 16px; line-height: 1.6;">
+              שלום רב,<br><br>
+              מייל זה נשלח כחלק מבדיקת תקינות של מערכת הדיוור המוסדית (Gmail Engine).<br>
+              אם קיבלת הודעה זו — פירושו ששרת הדואר, הסיסמה המאובטחת ואישורי השליחה מוגדרים בצורה תקינה 100%!
+            </p>
+            <div style="background: #ecfdf5; border-right: 4px solid #10b981; padding: 12px 15px; margin: 20px 0; border-radius: 4px;">
+              <strong>📧 שולח המייל:</strong> bitulim@horev.org.il<br>
+              <strong>נמען הבדיקה:</strong> ${recipientEmail}<br>
+              <strong>זמן השליחה:</strong> ${db.formatDate(new Date())}
+            </div>
+          </div>
+          <div style="background: #f1f5f9; padding: 15px; text-align: center; font-size: 12px; color: #64748b;">
+            מוסדות חורב ירושלים — תורה עם דרך ארץ
+          </div>
+        </div>
+      </div>
+    `;
+    return this.sendMail(recipientEmail, subject, htmlContent);
+  }
+
   // General Send Mail Helper
   async sendMail(to, subject, html, cc = []) {
     const nowStr = db.formatDate(new Date());

@@ -122,6 +122,60 @@ function bindEvents() {
   document.getElementById('filterEndDate')?.addEventListener('change', renderReports);
   document.getElementById('resetFiltersBtn')?.addEventListener('click', resetFilters);
   document.getElementById('exportCsvBtn')?.addEventListener('click', exportToCSV);
+
+  // Live Email Verification Test Submit
+  document.getElementById('testEmailForm')?.addEventListener('submit', handleTestEmailSubmit);
+}
+
+async function handleTestEmailSubmit(e) {
+  e.preventDefault();
+  const recipientInput = document.getElementById('testEmailRecipientInput');
+  const recipientEmail = recipientInput.value.trim();
+  const statusDiv = document.getElementById('testEmailStatus');
+  const btn = document.getElementById('sendTestEmailBtn');
+
+  if (!recipientEmail) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> שולח מייל בדיקה בלייב...';
+  statusDiv.style.display = 'block';
+  statusDiv.style.background = 'rgba(59, 130, 246, 0.1)';
+  statusDiv.style.color = '#2563eb';
+  statusDiv.style.border = '1px solid #93c5fd';
+  statusDiv.innerHTML = `⏳ שולח מייל בדיקה לכתובת <strong>${recipientEmail}</strong> מ-bitulim@horev.org.il...`;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/email/test`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recipientEmail })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      statusDiv.style.background = '#ecfdf5';
+      statusDiv.style.color = '#047857';
+      statusDiv.style.border = '1px solid #6ee7b7';
+      statusDiv.innerHTML = `✅ <strong>הצלחה!</strong> המייל נשלח בהצלחה לכתובת <strong>${recipientEmail}</strong>. בדוק את תיבת הדואר הנכנס / דואר זבל.`;
+      showToast('מייל בדיקה נשלח בהצלחה!', 'success');
+      loadEmailLogs(); // Refresh activity log
+    } else {
+      statusDiv.style.background = '#fef2f2';
+      statusDiv.style.color = '#b91c1c';
+      statusDiv.style.border = '1px solid #fca5a5';
+      statusDiv.innerHTML = `❌ <strong>שגיאה בשליחה:</strong> ${data.message}`;
+      showToast('שגיאה בשליחת מייל הבדיקה', 'danger');
+    }
+  } catch (err) {
+    statusDiv.style.background = '#fef2f2';
+    statusDiv.style.color = '#b91c1c';
+    statusDiv.style.border = '1px solid #fca5a5';
+    statusDiv.innerHTML = `❌ <strong>שגיאת תקשורת:</strong> ${err.message}`;
+    showToast('שגיאה בתקשורת עם השרת', 'danger');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> שלח מייל בדיקה בלייב';
+  }
 }
 
 // --------------------------------------------------------------------------

@@ -277,6 +277,21 @@ app.get('/api/email-logs', (req, res) => {
   res.json({ success: true, logs: db.data.emailLogs });
 });
 
+// POST /api/email/test (Live Email Verification Test)
+app.post('/api/email/test', async (req, res) => {
+  const { recipientEmail } = req.body;
+  if (!recipientEmail) {
+    return res.status(400).json({ success: false, message: 'יש להזין כתובת אימייל לבדיקה' });
+  }
+
+  const result = await mailer.sendTestEmail(recipientEmail);
+  if (result.success) {
+    res.json({ success: true, message: `מייל בדיקה נשלח בהצלחה לכתובת: ${recipientEmail}` });
+  } else {
+    res.status(500).json({ success: false, message: `שגיאה בשליחת מייל בדיקה: ${result.error ? result.error.message : 'לא ידוע'}` });
+  }
+});
+
 // --------------------------------------------------------------------------
 // Start Server on Port 4050
 // --------------------------------------------------------------------------
