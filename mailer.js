@@ -6,7 +6,7 @@
 const https = require('https');
 const db = require('./db');
 
-const GOOGLE_WEBHOOK_URL = process.env.GOOGLE_MAILER_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbzUMmjY9jbnAU0InhelviUInt48Zjpn5tD75BQoaxYT97u7W0fwSwRmxehhyCv707TN/exec';
+const GOOGLE_WEBHOOK_URL = process.env.GOOGLE_MAILER_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbzUMmjY9jbnAU0lnhelviUInt48Zjpn5tD75BQoaxYT97u7W0fwSwRmxehhyCv707TN/exec';
 
 class MailerService {
   constructor() {
@@ -44,7 +44,7 @@ class MailerService {
         };
 
         const req = https.request(options, (res) => {
-          // Handle Google Apps Script 302 Redirect
+          // Handle Google Apps Script 302/301 Redirect
           if (res.statusCode === 302 || res.statusCode === 301 || res.statusCode === 307) {
             const redirectUrl = res.headers.location;
             if (redirectUrl) {
