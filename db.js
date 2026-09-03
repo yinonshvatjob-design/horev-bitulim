@@ -343,6 +343,55 @@ class DatabaseManager {
     return req;
   }
 
+  addReceiptToRequest(id, receiptData) {
+    const req = this.getRequestById(id);
+    if (!req) return null;
+
+    const nowStr = this.formatDate(new Date());
+    const receiptObj = {
+      amount: parseFloat(receiptData.amount) || 0,
+      store: receiptData.store || "לא צוין ספק",
+      notes: receiptData.notes || "",
+      fileName: receiptData.fileName || "receipt.png",
+      fileData: receiptData.fileData || null,
+      uploadedAt: nowStr
+    };
+
+    req.receipt = receiptObj;
+    if (!req.timeline) req.timeline = [];
+    req.timeline.push({
+      time: nowStr,
+      title: "📸 הועלתה קבלה / חשבונית ע\"י הרכז/ת",
+      desc: `הועלתה קבלה ע"ס ₪${receiptObj.amount} (ספק/חנות: ${receiptObj.store}). נשלחה התראה לאסתר במזכירות.`,
+      type: "success"
+    });
+
+    this.save();
+    return req;
+  }
+
+  deleteRequest(id) {
+    const initialLength = this.data.requests.length;
+    this.data.requests = this.data.requests.filter(r => r.id !== id);
+    this.save();
+    return this.data.requests.length < initialLength;
+  }
+
+  deleteBatchRequests(ids = []) {
+    const idSet = new Set(ids);
+    const initialLength = this.data.requests.length;
+    this.data.requests = this.data.requests.filter(r => !idSet.has(r.id));
+    this.save();
+    return initialLength - this.data.requests.length;
+  }
+
+  clearAllRequests() {
+    const count = this.data.requests.length;
+    this.data.requests = [];
+    this.save();
+    return count;
+  }
+
   // --- Email Logs ---
   addEmailLog(to, subject, status) {
     const entry = {

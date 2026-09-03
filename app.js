@@ -23,8 +23,26 @@ function initApp() {
 
   if (AppStore.currentUser) {
     showMainApp();
+    checkDeepLinkParams();
   } else {
     showLoginScreen();
+    checkDeepLinkParams();
+  }
+}
+
+function checkDeepLinkParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const action = urlParams.get('action');
+  const reqId = urlParams.get('reqId');
+
+  if (action === 'upload_receipt' && reqId) {
+    if (AppStore.currentUser) {
+      setTimeout(() => {
+        openUploadReceiptModal(reqId);
+      }, 500);
+    } else {
+      showToast('אנא התחבר למערכת כדי להעלות קבלה לבקשה #' + reqId, 'info');
+    }
   }
 }
 
@@ -48,6 +66,15 @@ function bindEvents() {
       }
     });
   });
+
+  // Receipt & Delete Form Submits
+  document.getElementById('uploadReceiptForm')?.addEventListener('submit', handleUploadReceiptSubmit);
+  document.getElementById('selectAllRequestsCb')?.addEventListener('change', (e) => {
+    document.querySelectorAll('.req-select-cb').forEach(cb => cb.checked = e.target.checked);
+    updateSelectedCount();
+  });
+  document.getElementById('deleteSelectedRequestsBtn')?.addEventListener('click', deleteSelectedRequests);
+  document.getElementById('clearAllHistoryBtn')?.addEventListener('click', clearAllHistory);
 
   // Coordinator Login Submit
   document.getElementById('coordinatorLoginForm').addEventListener('submit', async (e) => {
@@ -389,7 +416,6 @@ async function fetchRequestsData() {
     const data = await res.json();
     if (data.success) {
       AppStore.requests = data.requests;
-    }
   } catch (e) {
     console.log('Using local store fallback');
   }
@@ -419,22 +445,34 @@ function renderMySubmissions() {
     : AppStore.requests.filter(r => r.applicantId === AppStore.currentUser.id);
 
   if (!myReqs.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">עדיין לא הוגשו בקשות ביטול.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted">עדיין לא הוגשו בקשות ביטול.</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = myReqs.map(r => `
-    <tr>
-      <td><strong>#${r.id}</strong></td>
-      <td>${r.group}</td>
-      <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
-      <td>${r.approvedDetails || r.requestedMeals.join(', ')}</td>
-      <td>${r.submittedAt}</td>
-      <td><span class="badge ${getStatusBadgeClass(r.status)}">${getStatusHebrew(r.status)}</span></td>
-      <td class="text-success font-weight-bold">₪${(r.approvedRefund || 0).toLocaleString()}</td>
-      <td><button class="btn btn-sm btn-outline-primary" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i> ציר זמן</button></td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = myReqs.map(r => {
+    let receiptBtn = '-';
+    if (r.status === 'APPROVED') {
+      if (r.receipt) {
+        receiptBtn = `<button class="btn btn-sm btn-outline-success" onclick="openViewReceiptModal('${r.id}')"><i class="fa-solid fa-receipt"></i> קבלה הועלתה (₪${r.receipt.amount})</button>`;
+      } else {
+        receiptBtn = `<button class="btn btn-sm btn-success" onclick="openUploadReceiptModal('${r.id}')"><i class="fa-solid fa-upload"></i> 📸 העלה קבלה לאסתר</button>`;
+      }
+    }
+
+    return `
+      <tr>
+        <td><strong>#${r.id}</strong></td>
+        <td>${r.group}</td>
+        <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
+        <td>${r.approvedDetails || r.requestedMeals.join(', ')}</td>
+        <td>${r.submittedAt}</td>
+        <td><span class="badge ${getStatusBadgeClass(r.status)}">${getStatusHebrew(r.status)}</span></td>
+        <td class="text-success font-weight-bold">₪${(r.approvedRefund || 0).toLocaleString()}</td>
+        <td>${receiptBtn}</td>
+        <td><button class="btn btn-sm btn-outline-primary" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i> ציר זמן</button></td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function updatePendingCounter() {
@@ -450,7 +488,6 @@ function updatePendingCounter() {
 // 6. Admin Pending Requests & Custom Approval Logic
 // --------------------------------------------------------------------------
 function renderPendingRequests() {
-  // Guard
   if (AppStore.currentUser.role !== 'ADMIN') return;
 
   const container = document.getElementById('pendingRequestsContainer');
@@ -459,55 +496,12 @@ function renderPendingRequests() {
   const pendingList = AppStore.requests.filter(r => r.status === 'PENDING');
 
   if (!pendingList.length) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <i class="fa-solid fa-circle-check text-success" style="font-size: 48px;"></i>
-        <h3 class="mt-3">אין בקשות ממתינות!</h3>
-        <p class="text-muted">כל בקשות הביטול טופלו ע"י חגי היקר והגזברות.</p>
-      </div>
-    `;
+    container.innerHTML = `<div class="alert alert-success text-center py-4"><strong>✓ אין בקשות ביטול ממתינות לאישור כרגע!</strong><br><small class="text-muted">כל הבקשות טופלו ע"י הגזברות.</small></div>`;
     return;
   }
 
   container.innerHTML = pendingList.map(r => {
     const urgency = getUrgencyLevel(r.startDate);
-    return `
-      <div class="pending-card ${urgency.class}">
-        <div class="pending-card-header">
-          <div>
-            <span class="urgency-badge ${urgency.badgeClass}"><i class="fa-solid ${urgency.icon}"></i> ${urgency.label}</span>
-            <span class="req-id">#${r.id}</span>
-          </div>
-          <span class="req-date"><i class="fa-solid fa-clock"></i> תאריך אירוע: <strong>${r.startDate}</strong></span>
-        </div>
-
-        <div class="pending-card-body">
-          <div class="info-row">
-            <div><strong>רכז/ת מגיש/ה:</strong> ${r.applicantName} (${r.applicantEmail})</div>
-            <div><strong>כיתה/שכבה:</strong> ${r.group}</div>
-          </div>
-          <div class="info-row mt-2">
-            <div><strong>ארוחות מבוקשות:</strong> ${r.requestedMeals.join(', ')}</div>
-            <div><strong>סיבת הביטול:</strong> ${r.reason}</div>
-          </div>
-
-          <!-- Custom Approval Controls for Hagai -->
-          <div class="admin-approval-controls mt-3">
-            <h5 class="controls-title"><i class="fa-solid fa-sliders"></i> אישור מותאם אישית לחגי (Custom Approval):</h5>
-            
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label>ארוחות מאושרות לזיכוי:</label>
-                <input type="text" id="approvedMeals_${r.id}" class="form-control" value="${r.requestedMeals.join(', ')}">
-              </div>
-              <div class="form-group col-md-6">
-                <label style="color: #059669; font-weight: bold;">💰 קבע סכום החזר ב-₪ לרכז/ת *:</label>
-                <input type="number" id="approvedRefund_${r.id}" class="form-control" placeholder="הכנס סכום ב-₪ (למשל: 450)" min="0" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>הערות חגי היקר לרכז/ת:</label>
               <input type="text" id="adminNotes_${r.id}" class="form-control" placeholder="רשום הערה שתופיע במייל של הרכז/ת...">
             </div>
 

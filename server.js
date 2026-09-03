@@ -253,6 +253,63 @@ app.post('/api/requests/:id/reject', async (req, res) => {
   }
 });
 
+// POST /api/requests/:id/receipt (Upload receipt and send alert to Esther)
+app.post('/api/requests/:id/receipt', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount, store, notes, fileName, fileData } = req.body;
+
+    const request = db.getRequestById(id);
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
+    }
+
+    const updatedReq = db.addReceiptToRequest(id, { amount, store, notes, fileName, fileData });
+
+    // Send Notification Email to Esther with CC to Hagai
+    try {
+      await mailer.sendReceiptNotificationToEsther(updatedReq, updatedReq.receipt);
+    } catch (mailErr) {
+      console.error("Receipt email notification error:", mailErr.message);
+    }
+
+    res.json({
+      success: true,
+      request: updatedReq,
+      message: 'הקבלה הועלתה בהצלחה ונשלחה הודעת התראה לאסתר במזכירות (עם עותק לחגי)!'
+    });
+  } catch (err) {
+    console.error("Receipt upload route error:", err);
+    res.status(500).json({ success: false, message: "שגיאה בהעלאת הקבלה: " + err.message });
+  }
+});
+
+// DELETE /api/requests/:id (Delete single request)
+app.delete('/api/requests/:id', (req, res) => {
+  const { id } = req.params;
+  const deleted = db.deleteRequest(id);
+  if (!deleted) {
+    return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
+  }
+  res.json({ success: true, message: `בקשה #${id} נמחקה בהצלחה מהיסטוריית הבקשות.` });
+});
+
+// POST /api/requests/delete-batch (Delete selected requests)
+app.post('/api/requests/delete-batch', (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ success: false, message: 'יש לבחור לפחות בקשה אחת למחיקה' });
+  }
+  const deletedCount = db.deleteBatchRequests(ids);
+  res.json({ success: true, count: deletedCount, message: `${deletedCount} בקשות נמחקו בהצלחה מהמערכת.` });
+});
+
+// DELETE /api/requests (Clear all request history)
+app.delete('/api/requests', (req, res) => {
+  const clearedCount = db.clearAllRequests();
+  res.json({ success: true, count: clearedCount, message: `כל היסטוריית הבקשות (${clearedCount} בקשות) אופסה ונמחקה בהצלחה.` });
+});
+
 // --------------------------------------------------------------------------
 // 3. User & Admin Management REST API
 // --------------------------------------------------------------------------

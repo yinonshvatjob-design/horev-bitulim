@@ -203,7 +203,18 @@ class MailerService {
               </ol>
             </div>
 
-            <div style="text-align: center; margin-top: 25px;">
+            ${isApproved ? `
+              <!-- Direct Receipt Upload Button for Pilot -->
+              <div style="text-align: center; margin: 25px 0; background: #f0fdf4; border: 2px dashed #10b981; padding: 20px; border-radius: 12px;">
+                <h4 style="color: #065f46; margin: 0 0 10px 0;">📸 פיילוט העלאת קבלות וחשבוניות:</h4>
+                <p style="color: #047857; margin-bottom: 15px; font-size: 14px;">ניתן להעלות כעת תמונה/קובץ של הקבלה שקנית עבור האירוע, והיא תישלח ישירות לאסתר במזכירות!</p>
+                <a href="https://bitulim.horevit.com?action=upload_receipt&reqId=${reqData.id}" style="background: #059669; color: #ffffff; text-decoration: none; padding: 12px 26px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
+                  📸 לחץ כאן להעלאת קבלה/חשבונית לאסתר
+                </a>
+              </div>
+            ` : ''}
+
+            <div style="text-align: center; margin-top: 15px;">
               <a href="https://bitulim.horevit.com" style="background: #1b779e; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 8px; font-weight: bold; display: inline-block;">
                 👉 לצפייה בפרטי הבקשה ובציר הזמן
               </a>
@@ -219,6 +230,54 @@ class MailerService {
 
     // Send to Coordinator with CC to Treasurer & Secretary for confirmation
     return this.sendMail(targetEmail, subject, htmlContent, [this.treasurerEmail, this.secretaryEmail]);
+  }
+
+  // 3. Send Receipt Upload Alert to Esther (with CC to Hagai)
+  async sendReceiptNotificationToEsther(reqData, receiptObj) {
+    const subject = `[קבלה חדשה] התקבלה קבלה לבקשה #${reqData.id} מאת ${reqData.applicantName} (₪${(receiptObj.amount || 0).toLocaleString()})`;
+
+    const htmlContent = `
+      <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          
+          <div style="background: #4f46e5; color: #ffffff; padding: 20px; text-align: center;">
+            <h2 style="margin: 0; font-size: 22px;">🧾 התקבלה קבלה/חשבונית חדשה במזכירות!</h2>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">מוסדות חורב ירושלים — פיילוט קבלות דיגיטלי</p>
+          </div>
+
+          <div style="padding: 25px;">
+            <h3 style="color: #4f46e5; margin-top: 0;">📌 פרטי הקבלה שהועלתה:</h3>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>מספר בקשה:</strong></td><td style="padding: 8px 0; font-weight: bold;">#${reqData.id} (${reqData.group})</td></tr>
+              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>הרכז/ת המעלה:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.applicantName}</td></tr>
+              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>ספק / שם החנות:</strong></td><td style="padding: 8px 0; font-weight: bold;">${receiptObj.store || 'לא צוין ספק'}</td></tr>
+              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #059669;"><strong>סכום בקבלה:</strong></td><td style="padding: 8px 0; font-weight: bold; color: #059669; font-size: 18px;">₪${(receiptObj.amount || 0).toLocaleString()}</td></tr>
+              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>זמן העלאה:</strong></td><td style="padding: 8px 0; font-weight: bold;">${receiptObj.uploadedAt}</td></tr>
+            </table>
+
+            ${receiptObj.notes ? `
+              <div style="background: #f8fafc; border-right: 4px solid #4f46e5; padding: 12px 15px; margin-bottom: 20px;">
+                <strong>💬 הערת הרכז/ת לאסתר:</strong><br>
+                <span style="color: #334155;">"${receiptObj.notes}"</span>
+              </div>
+            ` : ''}
+
+            <div style="text-align: center; margin: 30px 0 10px 0;">
+              <a href="https://bitulim.horevit.com" style="background: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 16px;">
+                🔎 פתח את המערכת לצפייה בקבלה
+              </a>
+            </div>
+          </div>
+
+          <div style="background: #f1f5f9; padding: 15px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
+            מוסדות חורב ירושלים — תורה עם דרך ארץ
+          </div>
+        </div>
+      </div>
+    `;
+
+    return this.sendMail(this.secretaryEmail, subject, htmlContent, [this.treasurerEmail]);
   }
 
   // 3. Send Live Test Email to Custom Recipient
