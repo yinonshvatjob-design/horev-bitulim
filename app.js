@@ -138,31 +138,19 @@ function bindEvents() {
         await handleLogin(type, id, pass);
       });
     });
-  } catch (err) {
-    console.error('Error binding events:', err);
-  }
-}
-    btn.addEventListener('click', async (e) => {
-      const type = e.currentTarget.dataset.type;
-      const id = e.currentTarget.dataset.id;
-      const pass = e.currentTarget.dataset.pass || '';
-      await handleLogin(type, id, pass);
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+
+    // Theme Switcher Toggle
+    document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      document.body.classList.toggle('light-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      document.getElementById('themeToggleBtn').innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
     });
-  });
 
-  // Logout
-  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-
-  // Theme Switcher Toggle
-  document.getElementById('themeToggleBtn').addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    document.body.classList.toggle('light-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    document.getElementById('themeToggleBtn').innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-  });
-
-  // Main Nav Tabs
-  document.querySelectorAll('.nav-link').forEach(link => {
+    // Main Nav Tabs
+    document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', (e) => {
       const target = e.currentTarget.dataset.target;
       switchTab(target);
@@ -203,6 +191,9 @@ function bindEvents() {
 
   // Live Email Verification Test Submit
   document.getElementById('testEmailForm')?.addEventListener('submit', handleTestEmailSubmit);
+  } catch (err) {
+    console.error('Error binding events:', err);
+  }
 }
 
 async function handleTestEmailSubmit(e) {
@@ -502,6 +493,7 @@ async function fetchRequestsData() {
     const data = await res.json();
     if (data.success) {
       AppStore.requests = data.requests;
+    }
   } catch (e) {
     console.log('Using local store fallback');
   }
@@ -588,15 +580,40 @@ function renderPendingRequests() {
 
   container.innerHTML = pendingList.map(r => {
     const urgency = getUrgencyLevel(r.startDate);
-              <input type="text" id="adminNotes_${r.id}" class="form-control" placeholder="רשום הערה שתופיע במייל של הרכז/ת...">
-            </div>
+    const borderClass = urgency === 'HIGH' ? 'border-danger' : urgency === 'MEDIUM' ? 'border-warning' : 'border-success';
 
-            <div class="action-buttons mt-3">
-              <button class="btn btn-success" onclick="approveRequest('${r.id}')">
-                <i class="fa-solid fa-check-circle"></i> אישור מותאם אישית + שליחת מייל לרכז/ת
+    return `
+      <div class="pending-card card mb-3 ${borderClass}">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <h4 class="mb-1 text-primary">#${r.id} — ${r.applicantName} (${r.group})</h4>
+            <span class="req-date"><i class="fa-solid fa-clock"></i> תאריך אירוע: <strong>${r.startDate}</strong></span>
+          </div>
+          <p class="text-muted mb-2"><strong>ארוחות שבוטלו:</strong> ${r.requestedMeals ? r.requestedMeals.join(', ') : ''} | <strong>סיבה:</strong> ${r.reason}</p>
+          <div class="approval-controls-box p-3 mt-2 bg-light border-radius">
+            <div class="row align-items-center">
+              <div class="col-md-4">
+                <label class="small font-weight-bold">קבע סכום החזר ב-₪ לחובת זיכוי הרכז/ת:</label>
+                <input type="number" id="approvedRefund_${r.id}" class="form-control form-control-sm" placeholder="סכום ב-₪ (ברירת מחדל 0₪)" min="0">
+              </div>
+              <div class="col-md-4">
+                <label class="small font-weight-bold">ארוחות שאושרו לביטול (אופציונלי):</label>
+                <input type="text" id="approvedMeals_${r.id}" class="form-control form-control-sm" value="${r.requestedMeals ? r.requestedMeals.join(', ') : ''}">
+              </div>
+              <div class="col-md-4">
+                <label class="small font-weight-bold">הערת גזברות (תופיע במייל):</label>
+                <input type="text" id="adminNotes_${r.id}" class="form-control form-control-sm" placeholder="למשל: מאושר מותאם אישית">
+              </div>
+            </div>
+            <div class="mt-3 text-left">
+              <button class="btn btn-success btn-sm font-weight-bold ml-2" onclick="approveRequest('${r.id}')">
+                <i class="fa-solid fa-check"></i> אישור מותאם אישית + שליחת מייל
               </button>
-              <button class="btn btn-danger" onclick="rejectRequest('${r.id}')">
-                <i class="fa-solid fa-circle-xmark"></i> דחיית הבקשה
+              <button class="btn btn-danger btn-sm ml-2" onclick="rejectRequest('${r.id}')">
+                <i class="fa-solid fa-xmark"></i> דחיית הבקשה
+              </button>
+              <button class="btn btn-outline-danger btn-sm" onclick="deleteSingleRequest('${r.id}')">
+                <i class="fa-solid fa-trash"></i> מחק
               </button>
             </div>
           </div>
