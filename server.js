@@ -35,7 +35,7 @@ app.post('/api/auth/login', (req, res) => {
   // 1. Check if user is an Admin
   const admin = db.getAllAdmins().find(a => a.id === cleanId || a.id === String(id).trim());
   if (admin) {
-    if (pass && admin.pass !== pass) {
+    if (pass && admin.pass && admin.pass !== pass) {
       return res.status(401).json({ success: false, message: 'סיסמת אדמין שגויה' });
     }
     return res.json({
