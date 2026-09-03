@@ -22,7 +22,7 @@ app.use(express.static(__dirname));
 // 1. Auth REST API
 // --------------------------------------------------------------------------
 
-// POST /api/auth/login
+// POST /api/auth/login (Smart Foolproof Authentication)
 app.post('/api/auth/login', (req, res) => {
   const { role, id, pass } = req.body;
 
@@ -30,10 +30,13 @@ app.post('/api/auth/login', (req, res) => {
     return res.status(400).json({ success: false, message: 'יש להזין תעודת זהות / טלפון' });
   }
 
-  if (role === 'admin') {
-    const admin = db.findAdmin(id, pass);
-    if (!admin) {
-      return res.status(401).json({ success: false, message: 'פרטי אדמין שגויים (ת"ז או סיסמה לא נכונים)' });
+  const cleanId = String(id).trim().replace(/[^0-9]/g, '');
+
+  // 1. Check if user is an Admin
+  const admin = db.getAllAdmins().find(a => a.id === cleanId || a.id === String(id).trim());
+  if (admin) {
+    if (pass && admin.pass !== pass) {
+      return res.status(401).json({ success: false, message: 'סיסמת אדמין שגויה' });
     }
     return res.json({
       success: true,
@@ -42,15 +45,14 @@ app.post('/api/auth/login', (req, res) => {
         name: admin.name,
         email: admin.email,
         role: 'ADMIN',
-        roleTitle: admin.role
+        roleTitle: admin.roleTitle || 'אדמין מוסדות חורב'
       }
     });
-  } else {
-    // Coordinator Login
-    const coordinator = db.findCoordinator(id);
-    if (!coordinator) {
-      return res.status(403).json({ success: false, message: 'תעודת הזהות אינה מופיעה ברשימת הרכזים המורשים' });
-    }
+  }
+
+  // 2. Check if user is a Coordinator
+  const coordinator = db.getAllCoordinators().find(c => c.id === cleanId || c.id === String(id).trim());
+  if (coordinator) {
     return res.json({
       success: true,
       user: {
@@ -62,6 +64,11 @@ app.post('/api/auth/login', (req, res) => {
       }
     });
   }
+
+  return res.status(403).json({
+    success: false,
+    message: `תעודת הזהות/מזהה (${cleanId || id}) אינו מופיע ברשימת המורשים. יש לפנות לחגי היקר או לאסתר להוספה לרשימה.`
+  });
 });
 
 // --------------------------------------------------------------------------
