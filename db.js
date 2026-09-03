@@ -252,6 +252,14 @@ class DatabaseManager {
     return newReq;
   }
 
+  updateRequest(id, updatedFields) {
+    const req = this.getRequestById(id);
+    if (!req) return null;
+    Object.assign(req, updatedFields);
+    this.save();
+    return req;
+  }
+
   approveRequest(id, refundAmount, adminNotes, handledByName) {
     const req = this.getRequestById(id);
     if (!req) return null;
