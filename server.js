@@ -148,90 +148,109 @@ app.post('/api/requests', async (req, res) => {
 
 // POST /api/requests/:id/approve (Custom Approval & Manual Refund in ₪)
 app.post('/api/requests/:id/approve', async (req, res) => {
-  const { id } = req.params;
-  const { approvedRefund, approvedMeals, adminNotes, adminName } = req.body;
+  try {
+    const { id } = req.params;
+    const { approvedRefund, approvedMeals, adminNotes, adminName } = req.body;
 
-  const request = db.getAllRequests().find(r => r.id === id);
-  if (!request) {
-    return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
-  }
-
-  const refundAmount = parseFloat(approvedRefund) || 0;
-  const nowStr = db.formatDate(new Date());
-
-  const updatedTimeline = [
-    ...request.timeline,
-    {
-      time: nowStr,
-      title: `אושר ע"י ${adminName || 'חגי היקר'}`,
-      desc: `אושר מותאם אישית. ארוחות מאושרות: ${approvedMeals || request.requestedMeals.join(', ')} | סכום החזר: ₪${refundAmount.toLocaleString()}`,
-      type: "success"
-    },
-    {
-      time: nowStr,
-      title: "שליחת אימייל עדכון לרכז/ת",
-      desc: `נשלח אימייל עדכון ל-` + request.applicantEmail + ` עם סכום ההחזר ו-2 הנחיות החובה`,
-      type: "info"
+    const request = db.getAllRequests().find(r => r.id === id);
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
     }
-  ];
 
-  const updatedReq = db.updateRequest(id, {
-    status: "APPROVED",
-    approvedRefund: refundAmount,
-    approvedDetails: approvedMeals || request.requestedMeals.join(', '),
-    adminNotes: adminNotes || "",
-    handledBy: adminName || "חגי היקר (גזבר)",
-    handledAt: nowStr,
-    timeline: updatedTimeline
-  });
+    const refundAmount = parseFloat(approvedRefund) || 0;
+    const nowStr = db.formatDate(new Date());
+    const mealsStr = Array.isArray(request.requestedMeals) ? request.requestedMeals.join(', ') : (request.requestedMeals || '');
 
-  // Send Automatic Update Email to Coordinator
-  await mailer.sendDecisionToCoordinator(updatedReq);
+    const updatedTimeline = [
+      ...(request.timeline || []),
+      {
+        time: nowStr,
+        title: `אושר ע"י ${adminName || 'חגי היקר'}`,
+        desc: `אושר מותאם אישית. ארוחות מאושרות: ${approvedMeals || mealsStr} | סכום החזר: ₪${refundAmount.toLocaleString()}`,
+        type: "success"
+      },
+      {
+        time: nowStr,
+        title: "שליחת אימייל עדכון לרכז/ת",
+        desc: `נשלח אימייל עדכון ל-` + request.applicantEmail + ` עם סכום ההחזר ו-2 הנחיות החובה`,
+        type: "info"
+      }
+    ];
 
-  res.json({ success: true, request: updatedReq, message: `הבקשה אושרה בהצלחה! נשלח מייל עדכון לרכז/ת (${request.applicantEmail}) עם סכום החזר ₪${refundAmount}.` });
+    const updatedReq = db.updateRequest(id, {
+      status: "APPROVED",
+      approvedRefund: refundAmount,
+      approvedDetails: approvedMeals || mealsStr,
+      adminNotes: adminNotes || "",
+      handledBy: adminName || "חגי היקר (גזבר)",
+      handledAt: nowStr,
+      timeline: updatedTimeline
+    });
+
+    // Send Automatic Update Email to Coordinator
+    try {
+      await mailer.sendDecisionToCoordinator(updatedReq);
+    } catch (mailErr) {
+      console.error("Mailer send error:", mailErr.message);
+    }
+
+    res.json({ success: true, request: updatedReq, message: `הבקשה אושרה בהצלחה! נשלח מייל עדכון לרכז/ת (${request.applicantEmail}) עם סכום החזר ₪${refundAmount}.` });
+  } catch (err) {
+    console.error("Approve route error:", err);
+    res.status(500).json({ success: false, message: "שגיאה באישור הבקשה: " + err.message });
+  }
 });
 
 // POST /api/requests/:id/reject (Rejection with Email to Coordinator)
 app.post('/api/requests/:id/reject', async (req, res) => {
-  const { id } = req.params;
-  const { adminNotes, adminName } = req.body;
+  try {
+    const { id } = req.params;
+    const { adminNotes, adminName } = req.body;
 
-  const request = db.getAllRequests().find(r => r.id === id);
-  if (!request) {
-    return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
-  }
-
-  const nowStr = db.formatDate(new Date());
-
-  const updatedTimeline = [
-    ...request.timeline,
-    {
-      time: nowStr,
-      title: `נדחה ע"י ${adminName || 'חגי היקר'}`,
-      desc: `סיבת דחייה: ${adminNotes || 'לא צוינה סיבה'}`,
-      type: "danger"
-    },
-    {
-      time: nowStr,
-      title: "שליחת אימייל עדכון לרכז/ת",
-      desc: `נשלח אימייל עדכון ל-` + request.applicantEmail,
-      type: "info"
+    const request = db.getAllRequests().find(r => r.id === id);
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
     }
-  ];
 
-  const updatedReq = db.updateRequest(id, {
-    status: "REJECTED",
-    approvedRefund: 0,
-    adminNotes: adminNotes || "",
-    handledBy: adminName || "חגי היקר (גזבר)",
-    handledAt: nowStr,
-    timeline: updatedTimeline
-  });
+    const nowStr = db.formatDate(new Date());
 
-  // Send Automatic Update Email to Coordinator
-  await mailer.sendDecisionToCoordinator(updatedReq);
+    const updatedTimeline = [
+      ...(request.timeline || []),
+      {
+        time: nowStr,
+        title: `נדחה ע"י ${adminName || 'חגי היקר'}`,
+        desc: `סיבת דחייה: ${adminNotes || 'לא צוינה סיבה'}`,
+        type: "danger"
+      },
+      {
+        time: nowStr,
+        title: "שליחת אימייל עדכון לרכז/ת",
+        desc: `נשלח אימייל עדכון ל-` + request.applicantEmail,
+        type: "info"
+      }
+    ];
 
-  res.json({ success: true, request: updatedReq, message: 'הבקשה נדחתה. נשלח מייל עדכון לרכז/ת.' });
+    const updatedReq = db.updateRequest(id, {
+      status: "REJECTED",
+      approvedRefund: 0,
+      adminNotes: adminNotes || "",
+      handledBy: adminName || "חגי היקר (גזבר)",
+      handledAt: nowStr,
+      timeline: updatedTimeline
+    });
+
+    // Send Automatic Update Email to Coordinator
+    try {
+      await mailer.sendDecisionToCoordinator(updatedReq);
+    } catch (mailErr) {
+      console.error("Mailer send error:", mailErr.message);
+    }
+
+    res.json({ success: true, request: updatedReq, message: 'הבקשה נדחתה. נשלח מייל עדכון לרכז/ת.' });
+  } catch (err) {
+    console.error("Reject route error:", err);
+    res.status(500).json({ success: false, message: "שגיאה בדחיית הבקשה: " + err.message });
+  }
 });
 
 // --------------------------------------------------------------------------
