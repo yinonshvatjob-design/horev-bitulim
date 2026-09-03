@@ -158,7 +158,7 @@ async function handleTestEmailSubmit(e) {
       statusDiv.style.border = '1px solid #6ee7b7';
       statusDiv.innerHTML = `✅ <strong>הצלחה!</strong> המייל נשלח בהצלחה לכתובת <strong>${recipientEmail}</strong>. בדוק את תיבת הדואר הנכנס / דואר זבל.`;
       showToast('מייל בדיקה נשלח בהצלחה!', 'success');
-      loadEmailLogs(); // Refresh activity log
+      renderEmailLogs(); // Refresh activity log
     } else {
       statusDiv.style.background = '#fef2f2';
       statusDiv.style.color = '#b91c1c';
