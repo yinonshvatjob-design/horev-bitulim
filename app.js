@@ -77,18 +77,21 @@ window.switchRoleTab = function(role) {
   const alertBox = document.getElementById('loginAlertBox');
   if (alertBox) alertBox.style.display = 'none';
 
-  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  const coordTab = document.getElementById('tabRoleCoord');
+  const adminTab = document.getElementById('tabRoleAdmin');
   const coordForm = document.getElementById('coordinatorLoginForm');
   const adminForm = document.getElementById('adminLoginForm');
 
   if (role === 'coordinator') {
-    document.getElementById('tabRoleCoord')?.classList.add('active');
-    if (coordForm) coordForm.style.setProperty('display', 'block', 'important');
-    if (adminForm) adminForm.style.setProperty('display', 'none', 'important');
+    if (coordTab) coordTab.className = 'role-tab active';
+    if (adminTab) adminTab.className = 'role-tab';
+    if (coordForm) coordForm.style.display = 'block';
+    if (adminForm) adminForm.style.display = 'none';
   } else {
-    document.getElementById('tabRoleAdmin')?.classList.add('active');
-    if (coordForm) coordForm.style.setProperty('display', 'none', 'important');
-    if (adminForm) adminForm.style.setProperty('display', 'block', 'important');
+    if (coordTab) coordTab.className = 'role-tab';
+    if (adminTab) adminTab.className = 'role-tab active';
+    if (coordForm) coordForm.style.display = 'none';
+    if (adminForm) adminForm.style.display = 'block';
   }
 };
 
