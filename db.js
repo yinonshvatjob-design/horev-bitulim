@@ -99,8 +99,25 @@ class DatabaseManager {
     return d.toISOString().split('T')[0];
   }
 
-  formatDate(d) {
-    return d.toLocaleDateString('he-IL') + ' ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+  formatDate(d = new Date()) {
+    if (!d) d = new Date();
+    try {
+      const options = {
+        timeZone: 'Asia/Jerusalem',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      };
+      const parts = new Intl.DateTimeFormat('en-CA', options).formatToParts(d);
+      const p = {};
+      parts.forEach(pt => p[pt.type] = pt.value);
+      return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}`;
+    } catch (e) {
+      return d.toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' });
+    }
   }
 
   async initPg() {
