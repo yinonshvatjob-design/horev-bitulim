@@ -66,16 +66,16 @@
 
       <!-- Role Tabs -->
       <div class="role-tabs">
-        <button class="role-tab active" data-role="coordinator">
+        <button class="role-tab active" id="tabRoleCoord" data-role="coordinator" onclick="switchRoleTab('coordinator')">
           <i class="fa-solid fa-user-graduate"></i> כניסת רכז / רכזת
         </button>
-        <button class="role-tab" data-role="admin">
+        <button class="role-tab" id="tabRoleAdmin" data-role="admin" onclick="switchRoleTab('admin')">
           <i class="fa-solid fa-user-shield"></i> כניסת אדמין / גזברות
         </button>
       </div>
 
       <!-- Coordinator Form -->
-      <form id="coordinatorLoginForm" class="auth-form">
+      <form id="coordinatorLoginForm" class="auth-form" onsubmit="submitCoordinatorLogin(event)">
         <div class="form-group">
           <label for="coordIdInput"><i class="fa-solid fa-id-card"></i> מספר תעודת זהות / טלפון מורשה</label>
           <input type="text" id="coordIdInput" placeholder="רכז יקר! אנא הכנס תז" required autocomplete="off">
@@ -87,7 +87,7 @@
       </form>
 
       <!-- Admin Form -->
-      <form id="adminLoginForm" class="auth-form" style="display: none;">
+      <form id="adminLoginForm" class="auth-form" style="display: none;" onsubmit="submitAdminLogin(event)">
         <div class="form-group">
           <label for="adminIdInput"><i class="fa-solid fa-id-card"></i> מספר ת"ז / טלפון אדמין</label>
           <input type="text" id="adminIdInput" placeholder="הכנס ת"ז אדמין" required autocomplete="off">

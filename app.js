@@ -46,53 +46,66 @@ function checkDeepLinkParams() {
   }
 }
 
+window.switchRoleTab = function(role) {
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  if (role === 'coordinator') {
+    document.getElementById('tabRoleCoord')?.classList.add('active');
+    document.getElementById('coordinatorLoginForm').style.display = 'block';
+    document.getElementById('adminLoginForm').style.display = 'none';
+  } else {
+    document.getElementById('tabRoleAdmin')?.classList.add('active');
+    document.getElementById('coordinatorLoginForm').style.display = 'none';
+    document.getElementById('adminLoginForm').style.display = 'block';
+  }
+};
+
+window.submitCoordinatorLogin = async function(e) {
+  if (e) e.preventDefault();
+  const idInput = document.getElementById('coordIdInput');
+  const id = idInput ? idInput.value.trim() : '';
+  await handleLogin('coordinator', id);
+};
+
+window.submitAdminLogin = async function(e) {
+  if (e) e.preventDefault();
+  const idInput = document.getElementById('adminIdInput');
+  const passInput = document.getElementById('adminPasswordInput');
+  const id = idInput ? idInput.value.trim() : '';
+  const pass = passInput ? passInput.value.trim() : '';
+  await handleLogin('admin', id, pass);
+};
+
 // --------------------------------------------------------------------------
 // 1. Event Listeners & UI Routing
 // --------------------------------------------------------------------------
 function bindEvents() {
-  // Role Tabs Switcher in Login
-  document.querySelectorAll('.role-tab').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-
-      const role = e.currentTarget.dataset.role;
-      if (role === 'coordinator') {
-        document.getElementById('coordinatorLoginForm').style.display = 'block';
-        document.getElementById('adminLoginForm').style.display = 'none';
-      } else {
-        document.getElementById('coordinatorLoginForm').style.display = 'none';
-        document.getElementById('adminLoginForm').style.display = 'block';
-      }
+  try {
+    // Receipt & Delete Form Submits
+    document.getElementById('uploadReceiptForm')?.addEventListener('submit', handleUploadReceiptSubmit);
+    document.getElementById('selectAllRequestsCb')?.addEventListener('change', (e) => {
+      document.querySelectorAll('.req-select-cb').forEach(cb => cb.checked = e.target.checked);
+      updateSelectedCount();
     });
-  });
+    document.getElementById('deleteSelectedRequestsBtn')?.addEventListener('click', deleteSelectedRequests);
+    document.getElementById('clearAllHistoryBtn')?.addEventListener('click', clearAllHistory);
 
-  // Receipt & Delete Form Submits
-  document.getElementById('uploadReceiptForm')?.addEventListener('submit', handleUploadReceiptSubmit);
-  document.getElementById('selectAllRequestsCb')?.addEventListener('change', (e) => {
-    document.querySelectorAll('.req-select-cb').forEach(cb => cb.checked = e.target.checked);
-    updateSelectedCount();
-  });
-  document.getElementById('deleteSelectedRequestsBtn')?.addEventListener('click', deleteSelectedRequests);
-  document.getElementById('clearAllHistoryBtn')?.addEventListener('click', clearAllHistory);
+    // Coordinator Login Submit
+    document.getElementById('coordinatorLoginForm')?.addEventListener('submit', window.submitCoordinatorLogin);
+    document.getElementById('adminLoginForm')?.addEventListener('submit', window.submitAdminLogin);
 
-  // Coordinator Login Submit
-  document.getElementById('coordinatorLoginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('coordIdInput').value.trim();
-    await handleLogin('coordinator', id);
-  });
-
-  // Admin Login Submit
-  document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('adminIdInput').value.trim();
-    const pass = document.getElementById('adminPasswordInput').value.trim();
-    await handleLogin('admin', id, pass);
-  });
-
-  // Demo Login Quick Buttons
-  document.querySelectorAll('.demo-btn').forEach(btn => {
+    // Demo Login Quick Buttons
+    document.querySelectorAll('.demo-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const type = e.currentTarget.dataset.type;
+        const id = e.currentTarget.dataset.id;
+        const pass = e.currentTarget.dataset.pass || '';
+        await handleLogin(type, id, pass);
+      });
+    });
+  } catch (err) {
+    console.error('Error binding events:', err);
+  }
+}
     btn.addEventListener('click', async (e) => {
       const type = e.currentTarget.dataset.type;
       const id = e.currentTarget.dataset.id;
