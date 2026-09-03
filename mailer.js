@@ -18,14 +18,14 @@ class MailerService {
   // Send Email via Official Google Apps Script Webhook
   async sendMailViaGoogleWebhook(to, subject, html, cc = []) {
     return new Promise((resolve) => {
-      const toStr = Array.isArray(to) ? to.join(',') : to;
+      const toStr = Array.isArray(to) ? to.join(',') : (to || '');
       const ccStr = Array.isArray(cc) ? cc.join(',') : (cc || '');
       
       const queryParams = new URLSearchParams({
         to: toStr,
         cc: ccStr,
-        subject: subject,
-        html: html
+        subject: subject || 'עדכון מוסדות חורב',
+        html: html || ''
       }).toString();
 
       const fullUrl = `${GOOGLE_WEBHOOK_URL}?${queryParams}`;
@@ -95,6 +95,7 @@ class MailerService {
 
   // 1. Send Alert Email to Hagai & Esther on New Submission
   async sendSubmissionAlertToAdmins(reqData) {
+    const mealsStr = Array.isArray(reqData.requestedMeals) ? reqData.requestedMeals.join(', ') : (reqData.requestedMeals || '');
     const subject = `[ביטול ארוחות] בקשה חדשה מאת ${reqData.applicantName} - ${reqData.group} (${reqData.startDate})`;
     
     const htmlContent = `
@@ -112,9 +113,9 @@ class MailerService {
               <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>מגיש/ת הבקשה:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.applicantName} (ת"ז: ${reqData.applicantId})</td></tr>
               <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>כיתה / שכבה:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.group}</td></tr>
               <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>טווח תאריכים:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.startDate} ${reqData.startDate !== reqData.endDate ? 'עד ' + reqData.endDate : ''}</td></tr>
-              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>ארוחות מבוטלות:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.requestedMeals.join(', ')}</td></tr>
+              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>ארוחות מבוטלות:</strong></td><td style="padding: 8px 0; font-weight: bold;">${mealsStr}</td></tr>
               <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>סיבת הביטול:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.reason}</td></tr>
-              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>תאריך הגשה:</strong></td><td style="padding: 8px 0; color: #059669; font-weight: bold;">${reqData.submittedAt} (עומד בתקן 48 שעות מראש)</td></tr>
+              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #059669; font-weight: bold;">${reqData.submittedAt} (עומד בתקן 48 שעות מראש)</td></tr>
             </table>
 
             <div style="text-align: center; margin: 30px 0 10px 0;">
@@ -139,6 +140,7 @@ class MailerService {
     const isApproved = reqData.status === 'APPROVED';
     const statusText = isApproved ? 'אושרה' : 'נדחתה';
     const subject = `[עדכון גזברות] בקשת ביטול ארוחות #${reqData.id} - ${statusText} (סכום החזר: ₪${reqData.approvedRefund || 0})`;
+    const mealsStr = Array.isArray(reqData.requestedMeals) ? reqData.requestedMeals.join(', ') : (reqData.requestedMeals || '');
 
     const htmlContent = `
       <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
@@ -157,12 +159,12 @@ class MailerService {
             ${isApproved ? `
               <div style="background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
                 <p style="margin: 0 0 8px 0; color: #065f46;"><strong>🔹 ארוחות שאושרו לביטול בפועל:</strong></p>
-                <p style="margin: 0; color: #047857; font-weight: bold;">${reqData.approvedDetails || reqData.requestedMeals.join(', ')}</p>
+                <p style="margin: 0; color: #047857; font-weight: bold;">${reqData.approvedDetails || mealsStr}</p>
                 
                 <hr style="border: none; border-top: 1px dashed #a7f3d0; margin: 12px 0;">
                 
                 <p style="margin: 0; font-size: 18px; color: #065f46;">
-                  💰 <strong>סכום החזר כספי שאושר לרכז/ת: ₪${reqData.approvedRefund.toLocaleString()}</strong>
+                  💰 <strong>סכום החזר כספי שאושר לרכז/ת: ₪${(reqData.approvedRefund || 0).toLocaleString()}</strong>
                 </p>
               </div>
             ` : ''}
