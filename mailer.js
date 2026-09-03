@@ -135,8 +135,16 @@ class MailerService {
     return this.sendMail(this.treasurerEmail, subject, htmlContent, [this.secretaryEmail]);
   }
 
-  // 2. Send Decision Email to Coordinator on Approval/Rejection
+  // 2. Send Decision Email to Coordinator on Approval/Rejection (with CC to Admins for confirmation)
   async sendDecisionToCoordinator(reqData) {
+    const coordinator = db.findCoordinator(reqData.applicantId);
+    const targetEmail = (coordinator && coordinator.email) ? coordinator.email : reqData.applicantEmail;
+
+    if (!targetEmail) {
+      console.error(`[MAILER WARNING] No target email found for applicantId ${reqData.applicantId}`);
+      return { success: false, error: new Error('No target email address found') };
+    }
+
     const isApproved = reqData.status === 'APPROVED';
     const statusText = isApproved ? 'אושרה' : 'נדחתה';
     const subject = `[עדכון גזברות] בקשת ביטול ארוחות #${reqData.id} - ${statusText} (סכום החזר: ₪${reqData.approvedRefund || 0})`;
@@ -199,7 +207,8 @@ class MailerService {
       </div>
     `;
 
-    return this.sendMail(reqData.applicantEmail, subject, htmlContent);
+    // Send to Coordinator with CC to Treasurer & Secretary for confirmation
+    return this.sendMail(targetEmail, subject, htmlContent, [this.treasurerEmail, this.secretaryEmail]);
   }
 
   // 3. Send Live Test Email to Custom Recipient

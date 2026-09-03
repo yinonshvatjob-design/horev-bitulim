@@ -342,10 +342,13 @@ async function handleFormSubmit(e) {
     return;
   }
 
+  const foundCoord = (AppStore.coordinators || []).find(c => c.id === AppStore.currentUser.id);
+  const applicantEmail = (foundCoord && foundCoord.email) ? foundCoord.email : (AppStore.currentUser.email || '');
+
   const payload = {
     applicantId: AppStore.currentUser.id,
     applicantName: AppStore.currentUser.name,
-    applicantEmail: AppStore.currentUser.email || 'ohadhadas@horev.org.il',
+    applicantEmail: applicantEmail,
     group,
     startDate,
     endDate,
