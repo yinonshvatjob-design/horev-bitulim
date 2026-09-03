@@ -213,8 +213,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 5000;
   padding: 1.5rem;
+}
+
+.login-overlay[style*="display: none"] {
+  display: none !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  visibility: hidden !important;
 }
 
 .login-card {
@@ -882,11 +889,18 @@ body.dark-mode .mandatory-guidelines-box {
   inset: 0;
   background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(6px);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 4000;
   padding: 1.5rem;
+}
+
+.modal-overlay[style*="display: none"] {
+  display: none !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  visibility: hidden !important;
 }
 
 .modal-card {
