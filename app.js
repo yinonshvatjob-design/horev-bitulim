@@ -525,14 +525,14 @@ function renderPendingRequests() {
 async function approveRequest(id) {
   if (AppStore.currentUser.role !== 'ADMIN') return;
 
-  const approvedRefund = document.getElementById(`approvedRefund_${id}`).value;
-  const approvedMeals = document.getElementById(`approvedMeals_${id}`).value;
-  const adminNotes = document.getElementById(`adminNotes_${id}`).value;
+  const refundInput = document.getElementById(`approvedRefund_${id}`);
+  const mealsInput = document.getElementById(`approvedMeals_${id}`);
+  const notesInput = document.getElementById(`adminNotes_${id}`);
 
-  if (!approvedRefund || parseFloat(approvedRefund) < 0) {
-    showToast('יש להזין סכום החזר ב-₪ לחובת זיכוי הרכז/ת', 'warning');
-    return;
-  }
+  const rawRefund = refundInput ? refundInput.value.trim() : '0';
+  const approvedRefund = parseFloat(rawRefund) || 0;
+  const approvedMeals = mealsInput ? mealsInput.value.trim() : '';
+  const adminNotes = notesInput ? notesInput.value.trim() : '';
 
   try {
     const res = await fetch(`${API_BASE_URL}/requests/${id}/approve`, {
