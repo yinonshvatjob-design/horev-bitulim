@@ -745,26 +745,57 @@ function renderReports() {
     filtered = filtered.filter(r => r.status === statusVal);
   }
 
-  tbody.innerHTML = filtered.map(r => `
-    <tr>
-      <td><strong>${r.id}</strong></td>
-      <td>${r.applicantName}</td>
-      <td>${r.group}</td>
-      <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
-      <td>${r.approvedDetails || r.requestedMeals.join(', ')}</td>
-      <td class="text-success font-weight-bold">₪${(r.approvedRefund || 0).toLocaleString()}</td>
-      <td><span class="badge ${getStatusBadgeClass(r.status)}">${getStatusHebrew(r.status)}</span></td>
-      <td>${r.handledAt || '-'}</td>
-      <td><button class="btn btn-sm btn-outline-primary" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i> ציר זמן</button></td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = filtered.map(r => {
+    let receiptCell = '<span class="text-muted small">אין</span>';
+    if (r.receipt) {
+      receiptCell = `<button class="btn btn-sm btn-outline-success py-0" onclick="openViewReceiptModal('${r.id}')"><i class="fa-solid fa-receipt"></i> קבלה (₪${r.receipt.amount})</button>`;
+    }
+
+    return `
+      <tr>
+        <td style="text-align: center;">
+          <input type="checkbox" class="req-select-cb" value="${r.id}" onchange="updateSelectedCount()">
+        </td>
+        <td><strong>#${r.id}</strong></td>
+        <td>${r.applicantName}</td>
+        <td>${r.group}</td>
+        <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
+        <td>${r.approvedDetails || (r.requestedMeals ? r.requestedMeals.join(', ') : '')}</td>
+        <td class="text-success font-weight-bold">₪${(r.approvedRefund || 0).toLocaleString()}</td>
+        <td><span class="badge ${getStatusBadgeClass(r.status)}">${getStatusHebrew(r.status)}</span></td>
+        <td>${receiptCell}</td>
+        <td><button class="btn btn-sm btn-outline-primary" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i> ציר זמן</button></td>
+        <td>
+          <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteSingleRequest('${r.id}')" title="מחק בקשה זו">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  window.updateSelectedCount();
 
   // Update KPIs
   const totalApproved = filtered.filter(r => r.status === 'APPROVED').reduce((sum, r) => sum + (r.approvedRefund || 0), 0);
-  document.getElementById('kpiTotalApprovedRefund').textContent = `₪${totalApproved.toLocaleString()}`;
-  document.getElementById('kpiApprovedCount').textContent = filtered.filter(r => r.status === 'APPROVED').length;
-  document.getElementById('kpiPendingCount').textContent = filtered.filter(r => r.status === 'PENDING').length;
+  const totalRefundEl = document.getElementById('kpiTotalApprovedRefund');
+  const approvedCountEl = document.getElementById('kpiApprovedCount');
+  const pendingCountEl = document.getElementById('kpiPendingCount');
+
+  if (totalRefundEl) totalRefundEl.textContent = `₪${totalApproved.toLocaleString()}`;
+  if (approvedCountEl) approvedCountEl.textContent = filtered.filter(r => r.status === 'APPROVED').length;
+  if (pendingCountEl) pendingCountEl.textContent = filtered.filter(r => r.status === 'PENDING').length;
 }
+
+window.updateSelectedCount = function() {
+  const selectedCbs = document.querySelectorAll('.req-select-cb:checked');
+  const count = selectedCbs.length;
+  const badge = document.getElementById('selectedCountBadge');
+  const btn = document.getElementById('deleteSelectedRequestsBtn');
+
+  if (badge) badge.textContent = count;
+  if (btn) btn.style.display = count > 0 ? 'inline-block' : 'none';
+};
 
 function resetFilters() {
   document.getElementById('filterStatus').value = 'ALL';
@@ -1013,6 +1044,186 @@ async function renderEmailLogs() {
     </div>
   `).join('');
 }
+
+// --------------------------------------------------------------------------
+// 9. Receipt Upload & Deletion Global Handlers
+// --------------------------------------------------------------------------
+window.openUploadReceiptModal = function(reqId) {
+  const req = AppStore.requests.find(r => r.id === reqId);
+  if (!req) {
+    showToast('בקשה לא נמצאה', 'danger');
+    return;
+  }
+
+  const reqIdEl = document.getElementById('uploadReceiptReqId');
+  const amountEl = document.getElementById('receiptAmountInput');
+  const storeEl = document.getElementById('receiptStoreInput');
+  const notesEl = document.getElementById('receiptNotesInput');
+  const fileEl = document.getElementById('receiptFileInput');
+  const modalEl = document.getElementById('uploadReceiptModal');
+
+  if (reqIdEl) reqIdEl.value = req.id;
+  if (amountEl) amountEl.value = req.approvedRefund || '';
+  if (storeEl) storeEl.value = '';
+  if (notesEl) notesEl.value = '';
+  if (fileEl) fileEl.value = '';
+  if (modalEl) modalEl.style.display = 'flex';
+};
+
+window.handleUploadReceiptSubmit = async function(e) {
+  if (e) e.preventDefault();
+
+  const reqId = document.getElementById('uploadReceiptReqId')?.value;
+  const amount = document.getElementById('receiptAmountInput')?.value.trim();
+  const store = document.getElementById('receiptStoreInput')?.value.trim();
+  const notes = document.getElementById('receiptNotesInput')?.value.trim();
+  const fileInput = document.getElementById('receiptFileInput');
+
+  if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+    showToast('יש לבחור קובץ קבלה/חשבונית למשלוח', 'warning');
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+
+  reader.onload = async function(evt) {
+    const fileData = evt.target.result;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/requests/${reqId}/receipt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: parseFloat(amount) || 0,
+          store,
+          notes,
+          fileName: file.name,
+          fileData
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        showToast('הקבלה הועלתה בהצלחה ונשלחה לאסתר במזכירות (עותק לחגי)!', 'success');
+        document.getElementById('uploadReceiptModal').style.display = 'none';
+        await fetchRequestsData();
+      } else {
+        showToast(data.message || 'שגיאה בהעלאת הקבלה', 'danger');
+      }
+    } catch (err) {
+      showToast('שגיאה בתקשורת עם השרת', 'danger');
+    }
+  };
+
+  reader.readAsDataURL(file);
+};
+
+window.openViewReceiptModal = function(reqId) {
+  const req = AppStore.requests.find(r => r.id === reqId);
+  if (!req || !req.receipt) {
+    showToast('עדיין לא הועלתה קבלה לבקשה זו', 'warning');
+    return;
+  }
+
+  const r = req.receipt;
+  const isImage = r.fileData && r.fileData.startsWith('data:image');
+
+  const contentHtml = `
+    <div class="p-3">
+      <h4 class="text-primary mb-2">בקשה #${req.id} — ${req.applicantName} (${req.group})</h4>
+      <div class="bg-light p-3 border-radius mb-3 text-right">
+        <p class="mb-1"><strong>ספק / חנות:</strong> ${r.store}</p>
+        <p class="mb-1 text-success font-weight-bold" style="font-size: 18px;"><strong>סכום בקבלה:</strong> ₪${(r.amount || 0).toLocaleString()}</p>
+        <p class="mb-1"><strong>זמן העלאה:</strong> ${r.uploadedAt || ''}</p>
+        ${r.notes ? `<p class="mb-0 text-muted"><strong>הערות לאסתר:</strong> "${r.notes}"</p>` : ''}
+      </div>
+
+      ${isImage ? `
+        <div class="text-center my-3" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 5px;">
+          <img src="${r.fileData}" alt="תמונת קבלה" style="max-width: 100%; height: auto; border-radius: 6px;">
+        </div>
+      ` : r.fileData ? `
+        <div class="my-3">
+          <a href="${r.fileData}" download="${r.fileName || 'receipt.pdf'}" class="btn btn-primary btn-block">
+            <i class="fa-solid fa-download"></i> הורד קובץ קבלה (${r.fileName || 'PDF'})
+          </a>
+        </div>
+      ` : '<p class="text-muted">אין קובץ מצורף</p>'}
+    </div>
+  `;
+
+  document.getElementById('viewReceiptContent').innerHTML = contentHtml;
+  document.getElementById('viewReceiptModal').style.display = 'flex';
+};
+
+window.deleteSingleRequest = async function(id) {
+  if (AppStore.currentUser.role !== 'ADMIN') return;
+  if (!confirm(`האם אתה בטוח שברצונך למחוק את בקשה #${id} מהמערכת?`)) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/requests/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      await fetchRequestsData();
+    } else {
+      showToast(data.message, 'danger');
+    }
+  } catch (err) {
+    showToast('שגיאה במחיקת הבקשה', 'danger');
+  }
+};
+
+window.deleteSelectedRequests = async function() {
+  if (AppStore.currentUser.role !== 'ADMIN') return;
+
+  const selectedCbs = document.querySelectorAll('.req-select-cb:checked');
+  const ids = Array.from(selectedCbs).map(cb => cb.value);
+
+  if (!ids.length) {
+    showToast('יש לבחור לפחות בקשה אחת למחיקה', 'warning');
+    return;
+  }
+
+  if (!confirm(`האם אתה בטוח שברצונך למחוק ${ids.length} בקשות שנבחרו?`)) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/requests/delete-batch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      await fetchRequestsData();
+    } else {
+      showToast(data.message, 'danger');
+    }
+  } catch (err) {
+    showToast('שגיאה במחיקת הבקשות שנבחרו', 'danger');
+  }
+};
+
+window.clearAllHistory = async function() {
+  if (AppStore.currentUser.role !== 'ADMIN') return;
+
+  if (!confirm('⚠️ אזהרה חמורה: פעולה זו תמחק את כל היסטוריית הבקשות מהמערכת 100%.\nהאם אתה בטוח לחלוטין ברצונך לאפס ולמחוק את כל היסטוריית ההזמנות?')) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/requests`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      await fetchRequestsData();
+    } else {
+      showToast(data.message, 'danger');
+    }
+  } catch (err) {
+    showToast('שגיאה באיפוס היסטוריית הבקשות', 'danger');
+  }
+};
 
 // Helpers
 function getUrgencyLevel(dateStr) {
