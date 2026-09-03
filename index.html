@@ -535,6 +535,36 @@
     </div>
   </div>
 
+  <!-- MODAL: Edit Coordinator -->
+  <div id="editUserModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-pen"></i> עריכת פרטי רכז/ת מורש/ת</h3>
+        <button class="close-modal-btn" data-close="editUserModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editUserForm">
+          <input type="hidden" id="editOriginalUserId">
+          <div class="form-group">
+            <label for="editUserId">מספר תעודת זהות / טלפון (מזהה להתחברות) *</label>
+            <input type="text" id="editUserId" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="editUserName">שם מלא של הרכז/ת *</label>
+            <input type="text" id="editUserName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="editUserEmail">כתובת אימייל *</label>
+            <input type="email" id="editUserEmail" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block mt-3">
+            <i class="fa-solid fa-floppy-disk"></i> שמור שינויים
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container"></div>
 

@@ -114,6 +114,7 @@ function bindEvents() {
 
   // Manage Users - Submit Form
   document.getElementById('addNewUserForm')?.addEventListener('submit', handleAddUserSubmit);
+  document.getElementById('editUserForm')?.addEventListener('submit', handleEditUserSubmit);
 
   // Filters Events in Reports
   document.getElementById('filterCoordinator')?.addEventListener('change', renderReports);
@@ -683,12 +684,55 @@ async function renderUsersTable() {
       <td>${c.email}</td>
       <td><span class="badge badge-success">מורשה להגשה</span></td>
       <td>
+        <button class="btn btn-sm btn-outline-primary" style="margin-left: 6px;" onclick="openEditUserModal('${c.id}')">
+          <i class="fa-solid fa-user-pen"></i> ערוך פרטים
+        </button>
         <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${c.id}')">
           <i class="fa-solid fa-trash"></i> הסר
         </button>
       </td>
     </tr>
   `).join('');
+}
+
+window.openEditUserModal = function(id) {
+  const coordinator = AppStore.coordinators.find(c => c.id === id);
+  if (!coordinator) return;
+
+  document.getElementById('editOriginalUserId').value = coordinator.id;
+  document.getElementById('editUserId').value = coordinator.id;
+  document.getElementById('editUserName').value = coordinator.name;
+  document.getElementById('editUserEmail').value = coordinator.email;
+  document.getElementById('editUserModal').style.display = 'flex';
+};
+
+async function handleEditUserSubmit(e) {
+  e.preventDefault();
+  if (AppStore.currentUser.role !== 'ADMIN') return;
+
+  const originalId = document.getElementById('editOriginalUserId').value;
+  const newId = document.getElementById('editUserId').value.trim();
+  const name = document.getElementById('editUserName').value.trim();
+  const email = document.getElementById('editUserEmail').value.trim();
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/users/${originalId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: newId, name, email })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('פרטי הרכז/ת עודכנו בהצלחה!', 'success');
+      document.getElementById('editUserModal').style.display = 'none';
+      await fetchUsersData();
+      renderUsersTable();
+    } else {
+      showToast(data.message || 'שגיאה בעדכון הפרטים', 'danger');
+    }
+  } catch (err) {
+    showToast('שגיאה בתקשורת עם השרת', 'danger');
+  }
 }
 
 async function handleAddUserSubmit(e) {
