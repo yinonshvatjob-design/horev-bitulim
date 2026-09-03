@@ -6,7 +6,7 @@
 const https = require('https');
 const db = require('./db');
 
-const GOOGLE_WEBHOOK_URL = process.env.GOOGLE_MAILER_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbzUMmjY9jbnAU0lnhelviUInt48Zjpn5tD75BQoaxYT97u7W0fwSwRmxehhyCv707TN/exec';
+const GOOGLE_WEBHOOK_URL = process.env.GOOGLE_MAILER_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbygzoipBy6omG2rtrJPnSJJIFK-IJF6P6szb0y-YVzzxro45Ht9rlb5l9-_Zdd-Fx6h/exec';
 
 class MailerService {
   constructor() {
@@ -15,15 +15,20 @@ class MailerService {
     this.secretaryEmail = process.env.SECRETARY_EMAIL || 'esters@horev.org.il';
   }
 
-  // Send Email via Official Google Apps Script Webhook (Port 443 HTTPS)
+  // Send Email via Official Google Apps Script Webhook
   async sendMailViaGoogleWebhook(to, subject, html, cc = []) {
     return new Promise((resolve) => {
-      const payload = JSON.stringify({
-        to: Array.isArray(to) ? to.join(',') : to,
-        cc: Array.isArray(cc) ? cc.join(',') : (cc || ''),
+      const toStr = Array.isArray(to) ? to.join(',') : to;
+      const ccStr = Array.isArray(cc) ? cc.join(',') : (cc || '');
+      
+      const queryParams = new URLSearchParams({
+        to: toStr,
+        cc: ccStr,
         subject: subject,
         html: html
-      });
+      }).toString();
+
+      const fullUrl = `${GOOGLE_WEBHOOK_URL}?${queryParams}`;
 
       const sendRequest = (urlStr, redirectCount = 0) => {
         if (redirectCount > 5) {
@@ -35,20 +40,15 @@ class MailerService {
         const options = {
           hostname: url.hostname,
           path: url.pathname + url.search,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(payload)
-          },
+          method: 'GET',
           timeout: 15000
         };
 
         const req = https.request(options, (res) => {
-          // Handle Google Apps Script 302/301 Redirect (Preserving POST method)
+          // Handle Google Apps Script 302 Redirect
           if (res.statusCode === 302 || res.statusCode === 301 || res.statusCode === 307) {
             const redirectUrl = res.headers.location;
             if (redirectUrl) {
-              // Note: Google Apps Script redirects to script.googleusercontent.com which accepts GET or POST
               sendRequest(redirectUrl, redirectCount + 1);
               return;
             }
@@ -57,12 +57,21 @@ class MailerService {
           let body = '';
           res.on('data', chunk => body += chunk);
           res.on('end', () => {
-            if (res.statusCode >= 200 && res.statusCode < 400) {
-              console.log(`[GOOGLE GMAIL SENT SUCCESSFULLY] to ${to}`);
-              resolve({ success: true, body });
-            } else {
-              console.error(`[GOOGLE GMAIL ERROR] Status ${res.statusCode}: ${body}`);
-              resolve({ success: false, error: new Error(`HTTP ${res.statusCode}: ${body}`) });
+            try {
+              const data = JSON.parse(body);
+              if (data.result === 'success') {
+                console.log(`[GOOGLE GMAIL SENT SUCCESSFULLY] to ${toStr}`);
+                resolve({ success: true, body: data });
+              } else {
+                console.error(`[GOOGLE GMAIL ERROR]`, data);
+                resolve({ success: false, error: new Error(data.message || 'Error sending email') });
+              }
+            } catch (err) {
+              if (res.statusCode >= 200 && res.statusCode < 400) {
+                resolve({ success: true, body });
+              } else {
+                resolve({ success: false, error: new Error(`HTTP ${res.statusCode}: ${body}`) });
+              }
             }
           });
         });
@@ -77,11 +86,10 @@ class MailerService {
           resolve({ success: false, error: new Error('Google Mailer Timeout') });
         });
 
-        req.write(payload);
         req.end();
       };
 
-      sendRequest(GOOGLE_WEBHOOK_URL);
+      sendRequest(fullUrl);
     });
   }
 
