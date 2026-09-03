@@ -288,7 +288,7 @@ app.post('/api/email/test', async (req, res) => {
   if (result.success) {
     res.json({ success: true, message: `מייל בדיקה נשלח בהצלחה לכתובת: ${recipientEmail}` });
   } else {
-    res.status(500).json({ success: false, message: `שגיאה בשליחת מייל בדיקה: ${result.error ? result.error.message : 'לא ידוע'}` });
+    res.json({ success: false, message: `שגיאה בשליחת מייל בדיקה: ${result.error ? result.error.message : 'לא ידוע'}` });
   }
 });
 
