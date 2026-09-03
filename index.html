@@ -468,29 +468,21 @@
           <form id="emailConfigForm" class="col-md-8">
             <div class="form-group">
               <label for="gmailAddressInput"><i class="fa-solid fa-at"></i> כתובת אימייל שולח (Gmail מוסדות חורב)</label>
-              <input type="email" id="gmailAddressInput" class="form-control" value="bitulim@horev.org.il" required>
+              <input type="email" id="gmailAddressInput" class="form-control" value="bitulim@horev.org.il" readonly disabled style="background-color: #f1f5f9; font-weight: bold; color: #1e293b;">
+              <small class="text-muted">כל ההודעות והתראות המערכת יוצאות ישירות מחשבון גוגל הרשמי של מוסדות חורב.</small>
             </div>
             
-            <div class="form-group">
-              <label for="treasurerEmailInput"><i class="fa-solid fa-user-tie"></i> אימייל חגי היקר (גזבר לקבלת התראות)</label>
-              <input type="email" id="treasurerEmailInput" class="form-control" value="chagi@horev.org.il" required>
+            <div class="alert alert-info p-3 my-3" style="background: #eef2ff; border-right: 4px solid #4f46e5; color: #312e81; border-radius: 8px;">
+              <i class="fa-solid fa-circle-info"></i> <strong>המקור היחיד והמכריע לעדכון אימיילים וסיסמאות:</strong><br>
+              כתובות האימייל והסיסמאות של הגזבר (חגי), המזכירות (אסתר) ומנהלי התוכנה מנוהלות כעת <strong>במקום אחד בלבד</strong> בטבלת האדמינים במסך <strong>"ניהול רכזים ואדמינים"</strong>.
             </div>
 
             <div class="form-group">
-              <label for="secretaryEmailInput"><i class="fa-solid fa-user-pen"></i> אימייל אסתר (מזכירות לקבלת עותק)</label>
-              <input type="email" id="secretaryEmailInput" class="form-control" value="esters@horev.org.il" required>
-            </div>
-
-            <div class="form-group">
-              <label for="emailModeSelect"><i class="fa-solid fa-sliders"></i> מצב שליחת מיילים</label>
+              <label for="emailModeSelect"><i class="fa-solid fa-sliders"></i> מנוע שליחת מיילים פעיל</label>
               <select id="emailModeSelect" class="form-control">
-                <option value="GMAIL_SMTP" selected>חיבור Google Gmail API / SMTP מורשה (שליחה אמיתית לתיבות דואר)</option>
+                <option value="GMAIL_SMTP" selected>חיבור Google Gmail API / Apps Script Engine (100% הגעה לתיבות דואר)</option>
               </select>
             </div>
-
-            <button type="submit" class="btn btn-primary">
-              <i class="fa-solid fa-floppy-disk"></i> שמור הגדרות שרת מיילים
-            </button>
           </form>
 
           <!-- Live Email Verification Test Component -->

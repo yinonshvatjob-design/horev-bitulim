@@ -11,8 +11,18 @@ const GOOGLE_WEBHOOK_URL = process.env.GOOGLE_MAILER_WEBHOOK_URL || 'https://scr
 class MailerService {
   constructor() {
     this.user = process.env.GMAIL_USER || 'bitulim@horev.org.il';
-    this.treasurerEmail = process.env.TREASURER_EMAIL || 'chagi@horev.org.il';
-    this.secretaryEmail = process.env.SECRETARY_EMAIL || 'esters@horev.org.il';
+  }
+
+  get treasurerEmail() {
+    const admins = db.getAllAdmins();
+    const hagai = admins.find(a => a.id === '0584220463' || (a.name && a.name.includes('חגי')) || (a.roleTitle && a.roleTitle.includes('גזבר')));
+    return (hagai && hagai.email) ? hagai.email : 'chagi@horev.org.il';
+  }
+
+  get secretaryEmail() {
+    const admins = db.getAllAdmins();
+    const esther = admins.find(a => a.id.startsWith('0545540828') || (a.name && a.name.includes('אסתר')) || (a.roleTitle && a.roleTitle.includes('מזכיר')));
+    return (esther && esther.email) ? esther.email : 'esters@horev.org.il';
   }
 
   // Send Email via Official Google Apps Script Webhook (POST + GET Redirect)
