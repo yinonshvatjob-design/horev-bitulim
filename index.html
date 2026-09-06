@@ -24,7 +24,7 @@
   <meta http-equiv="Expires" content="0">
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=19.0">
+  <link rel="stylesheet" href="style.css?v=20.0">
 </head>
 <body class="light-mode">
 
@@ -85,9 +85,9 @@
       <!-- Coordinator Form -->
       <form id="coordinatorLoginForm" class="auth-form" onsubmit="submitCoordinatorLogin(event)">
         <div class="form-group">
-          <label for="coordIdInput"><i class="fa-solid fa-id-card"></i> מספר תעודת זהות / טלפון מורשה</label>
-          <input type="text" id="coordIdInput" placeholder="רכז יקר! אנא הכנס תז" required autocomplete="off">
-          <small class="form-text">הכנס את תעודת הזהות הרשומה במערכת חורב</small>
+          <label for="coordIdInput"><i class="fa-solid fa-phone"></i> מספר טלפון מורשה</label>
+          <input type="text" id="coordIdInput" placeholder="הכנס טלפון" required autocomplete="off">
+          <small class="form-text">הכנס את מספר הטלפון הרשום במערכת חורב</small>
         </div>
         <button type="submit" id="coordLoginBtn" class="btn btn-primary btn-block">
           <i class="fa-solid fa-right-to-bracket"></i> הכנס למערכת
@@ -97,8 +97,8 @@
       <!-- Admin Form -->
       <form id="adminLoginForm" class="auth-form" style="display: none;" onsubmit="submitAdminLogin(event)">
         <div class="form-group">
-          <label for="adminIdInput"><i class="fa-solid fa-id-card"></i> מספר ת"ז / טלפון אדמין</label>
-          <input type="text" id="adminIdInput" placeholder="הכנס ת"ז אדמין" required autocomplete="off">
+          <label for="adminIdInput"><i class="fa-solid fa-phone"></i> מספר טלפון אדמין</label>
+          <input type="text" id="adminIdInput" placeholder="הכנס טלפון" required autocomplete="off">
         </div>
         <div class="form-group">
           <label for="adminPasswordInput"><i class="fa-solid fa-lock"></i> סיסמת אדמינסטרציה</label>
@@ -843,6 +843,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=21.0"></script>
+  <script src="app.js?v=22.0"></script>
 </body>
 </html>
