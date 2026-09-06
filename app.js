@@ -310,6 +310,14 @@ window.handleLogout = function() {
   showToast('התנתקת בהצלחה מהמערכת', 'info');
 };
 
+window.forceCleanReset = function() {
+  try {
+    localStorage.clear();
+    sessionStorage.clear();
+  } catch (e) {}
+  window.location.reload(true);
+};
+
 function showLoginScreen() {
   const loginScreen = document.getElementById('loginScreen');
   const appMain = document.getElementById('appMain');
