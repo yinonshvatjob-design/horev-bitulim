@@ -661,17 +661,8 @@ function getSelectedGroupFormattedString() {
 }
 
 // --------------------------------------------------------------------------
-// 4. Submit Cancellation Request
+// 4. Submit Cancellation Request & Meal Helpers
 // --------------------------------------------------------------------------
-async function handleFormSubmit(e) {
-  e.preventDefault();
-
-  if (!validateDateCutoff()) {
-    showToast('לא ניתן להגיש בקשה בטווח של פחות מ-48 שעות מראש', 'danger');
-    return;
-  }
-}
-
 window.updateMealCardStates = function() {
   const cbBreakfast = document.getElementById('mealCbBreakfast');
   const cbLunch = document.getElementById('mealCbLunch');
@@ -705,17 +696,24 @@ window.toggleSelectBothMeals = function() {
   const bothSelected = cbBreakfast && cbLunch && cbBreakfast.checked && cbLunch.checked;
 
   if (bothSelected) {
-    // Uncheck both (or keep default breakfast)
     if (cbBreakfast) cbBreakfast.checked = true;
     if (cbLunch) cbLunch.checked = false;
   } else {
-    // Check BOTH!
     if (cbBreakfast) cbBreakfast.checked = true;
     if (cbLunch) cbLunch.checked = true;
   }
 
   updateMealCardStates();
 };
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+
+  if (!validateDateCutoff()) {
+    showToast('לא ניתן להגיש בקשה בטווח של פחות מ-48 שעות מראש', 'danger');
+    return;
+  }
+
   const group = getSelectedGroupFormattedString();
   if (!group) {
     showToast('יש לבחור לפחות כיתה אחת או שכבה מהרשימה (סימון מרובה)', 'warning');
