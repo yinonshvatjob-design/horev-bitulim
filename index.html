@@ -24,7 +24,7 @@
   <meta http-equiv="Expires" content="0">
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=22.0">
+  <link rel="stylesheet" href="style.css?v=23.0">
 </head>
 <body class="light-mode">
 
@@ -809,7 +809,7 @@
             <label for="receiptNotesInput"><i class="fa-solid fa-comment"></i> הערות לאסתר במזכירות (אופציונלי)</label>
             <textarea id="receiptNotesInput" class="form-control" rows="2" placeholder="לדוגמה: קניות לטובת אירוע שכבה ט'"></textarea>
           </div>
-          <button type="submit" id="submitReceiptBtn" class="btn btn-success btn-block mt-3">
+          <button type="button" id="submitReceiptBtn" onclick="handleUploadReceiptSubmit(event)" class="btn btn-success btn-block mt-3">
             <i class="fa-solid fa-paper-plane"></i> שלח קבלה במיידי לאסתר במזכירות
           </button>
         </form>
@@ -836,6 +836,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=24.0"></script>
+  <script src="app.js?v=25.0"></script>
 </body>
 </html>

@@ -18,7 +18,7 @@ class MailerService {
     return admins.find(a => a.id === '0584220463' || (a.name && a.name.includes('חגי')) || (a.roleTitle && a.roleTitle.includes('גזבר'))) || {
       name: 'חגי היקר',
       roleTitle: 'גזבר המוסד (Admin)',
-      email: 'yinonshvat@gmail.com'
+      email: 'chagi@horev.org.il'
     };
   }
 
@@ -27,7 +27,7 @@ class MailerService {
     return admins.find(a => a.id === '0545540828' || (a.name && a.name.includes('אסתר')) || (a.roleTitle && a.roleTitle.includes('מזכיר'))) || {
       name: 'אסתר',
       roleTitle: 'מזכירת המוסד (Admin)',
-      email: 'yinonshvat@gmail.com'
+      email: 'esters@horev.org.il'
     };
   }
 
@@ -41,11 +41,11 @@ class MailerService {
   }
 
   get treasurerEmail() {
-    return (this.treasurerAdmin && this.treasurerAdmin.email) ? this.treasurerAdmin.email : 'yinonshvat@gmail.com';
+    return (this.treasurerAdmin && this.treasurerAdmin.email) ? this.treasurerAdmin.email : 'chagi@horev.org.il';
   }
 
   get secretaryEmail() {
-    return (this.secretaryAdmin && this.secretaryAdmin.email) ? this.secretaryAdmin.email : 'yinonshvat@gmail.com';
+    return (this.secretaryAdmin && this.secretaryAdmin.email) ? this.secretaryAdmin.email : 'esters@horev.org.il';
   }
 
   // Send Email via Official Google Apps Script Webhook (POST + GET Redirect)
@@ -184,7 +184,7 @@ class MailerService {
     const treasurer = this.treasurerAdmin;
     const secretary = this.secretaryAdmin;
     const coordinator = db.findCoordinator(reqData.applicantId);
-    const targetEmail = (coordinator && coordinator.email) ? coordinator.email : reqData.applicantEmail;
+    const targetEmail = reqData.applicantEmail || (coordinator && coordinator.email) || '';
 
     if (!targetEmail) {
       console.error(`[MAILER WARNING] No target email found for applicantId ${reqData.applicantId}`);

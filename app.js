@@ -1366,7 +1366,17 @@ window.handleUploadReceiptSubmit = async function(e) {
   const fileInput = document.getElementById('receiptFileInput');
 
   if (!fileInput || !fileInput.files || !fileInput.files[0]) {
-    showToast('יש לבחור קובץ קבלה/חשבונית למשלוח', 'warning');
+    showToast('יש לבחור קובץ קבלה/חשבונית (תמונה או PDF) למשלוח', 'warning');
+    return;
+  }
+
+  if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+    showToast('יש להזין סכום קבלה בפועל (ב-₪)', 'warning');
+    return;
+  }
+
+  if (!store) {
+    showToast('יש להזין את שם החנות או הספק', 'warning');
     return;
   }
 

@@ -9,8 +9,8 @@ const { Pool } = require('pg');
 // Initial Admins (Yinon, Hagai, Esther)
 const SEED_ADMINS = [
   { id: "0542065606", name: "ינון", role: "מנהל תוכנה (Admin)", email: "yinonshvat@horev.org.il", pass: "yinon2026" },
-  { id: "0584220463", name: "חגי היקר", role: "גזבר המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "hagai2026" },
-  { id: "0545540828", name: "אסתר", role: "מזכירת המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "esther2026" }
+  { id: "0584220463", name: "חגי היקר", role: "גזבר המוסד (Admin)", email: "chagi@horev.org.il", pass: "hagai2026" },
+  { id: "0545540828", name: "אסתר", role: "מזכירת המוסד (Admin)", email: "esters@horev.org.il", pass: "esther2026" }
 ];
 
 // Initial 26 Authorized Coordinators from Horev list
