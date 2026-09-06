@@ -179,22 +179,47 @@ function bindEvents() {
   }
 }
 
-async function handleTestEmailSubmit(e) {
-  e.preventDefault();
+window.setTestEmailRecipient = function(roleKey) {
+  const input = document.getElementById('testEmailRecipientInput');
+  if (!input) return;
+
+  if (roleKey === 'treasurer') {
+    const admin = (AppStore.admins || []).find(a => a.id === '0584220463' || (a.name && a.name.includes('חגי')));
+    input.value = admin ? admin.email : 'yinonshvat@gmail.com';
+  } else if (roleKey === 'secretary') {
+    const admin = (AppStore.admins || []).find(a => a.id === '0545540828' || (a.name && a.name.includes('אסתר')));
+    input.value = admin ? admin.email : 'yinonshvat@gmail.com';
+  } else if (roleKey === 'software') {
+    const admin = (AppStore.admins || []).find(a => a.id === '0542065606' || (a.name && a.name.includes('ינון')));
+    input.value = admin ? admin.email : 'yinonshvat@horev.org.il';
+  }
+};
+
+window.handleTestEmailSubmit = async function(e) {
+  if (e) e.preventDefault();
   const recipientInput = document.getElementById('testEmailRecipientInput');
-  const recipientEmail = recipientInput.value.trim();
+  const recipientEmail = recipientInput ? recipientInput.value.trim() : '';
   const statusDiv = document.getElementById('testEmailStatus');
   const btn = document.getElementById('sendTestEmailBtn');
 
-  if (!recipientEmail) return;
+  if (!recipientEmail) {
+    showToast('יש להזין כתובת אימייל לבדיקה', 'warning');
+    return;
+  }
 
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> שולח מייל בדיקה בלייב...';
-  statusDiv.style.display = 'block';
-  statusDiv.style.background = 'rgba(59, 130, 246, 0.1)';
-  statusDiv.style.color = '#2563eb';
-  statusDiv.style.border = '1px solid #93c5fd';
-  statusDiv.innerHTML = `⏳ שולח מייל בדיקה לכתובת <strong>${recipientEmail}</strong> מ-bitulim@horev.org.il...`;
+  const origBtnText = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> שולח מייל בדיקה בלייב...';
+  }
+
+  if (statusDiv) {
+    statusDiv.style.display = 'block';
+    statusDiv.style.background = '#eff6ff';
+    statusDiv.style.color = '#1d4ed8';
+    statusDiv.style.border = '2px solid #93c5fd';
+    statusDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> שולח מייל בדיקה מעוצב לכתובת <strong>${recipientEmail}</strong> מ-bitulim@horev.org.il...`;
+  }
 
   try {
     const res = await fetch(`${API_BASE_URL}/email/test`, {
@@ -205,30 +230,39 @@ async function handleTestEmailSubmit(e) {
     const data = await res.json();
 
     if (data.success) {
-      statusDiv.style.background = '#ecfdf5';
-      statusDiv.style.color = '#047857';
-      statusDiv.style.border = '1px solid #6ee7b7';
-      statusDiv.innerHTML = `✅ <strong>הצלחה!</strong> המייל נשלח בהצלחה לכתובת <strong>${recipientEmail}</strong>. בדוק את תיבת הדואר הנכנס / דואר זבל.`;
-      showToast('מייל בדיקה נשלח בהצלחה!', 'success');
-      renderEmailLogs(); // Refresh activity log
+      if (statusDiv) {
+        statusDiv.style.background = '#ecfdf5';
+        statusDiv.style.color = '#047857';
+        statusDiv.style.border = '2px solid #6ee7b7';
+        statusDiv.innerHTML = `✅ <strong>הצלחה! המייל נשלח בהצלחה!</strong><br>הודעת בדיקה נשלחה לכתובת <strong>${recipientEmail}</strong>.<br><small style="color: #065f46;">אנא בדוק את תיבת הדואר הנכנס / דואר זבל (Spam) של כתובת זו כדי לוודא הגעה.</small>`;
+      }
+      showToast(`מייל בדיקה נשלח בהצלחה ל-${recipientEmail}!`, 'success');
+      await renderEmailLogs();
     } else {
-      statusDiv.style.background = '#fef2f2';
-      statusDiv.style.color = '#b91c1c';
-      statusDiv.style.border = '1px solid #fca5a5';
-      statusDiv.innerHTML = `❌ <strong>שגיאה בשליחה:</strong> ${data.message}`;
-      showToast('שגיאה בשליחת מייל הבדיקה', 'danger');
+      if (statusDiv) {
+        statusDiv.style.background = '#fef2f2';
+        statusDiv.style.color = '#b91c1c';
+        statusDiv.style.border = '2px solid #fca5a5';
+        statusDiv.innerHTML = `❌ <strong>שגיאה בשליחה:</strong> ${data.message || 'לא ניתן היה לשלוח את המייל'}`;
+      }
+      showToast(data.message || 'שגיאה בשליחת מייל הבדיקה', 'danger');
     }
   } catch (err) {
-    statusDiv.style.background = '#fef2f2';
-    statusDiv.style.color = '#b91c1c';
-    statusDiv.style.border = '1px solid #fca5a5';
-    statusDiv.innerHTML = `❌ <strong>שגיאת תקשורת:</strong> ${err.message}`;
+    console.error('Test email send error:', err);
+    if (statusDiv) {
+      statusDiv.style.background = '#fef2f2';
+      statusDiv.style.color = '#b91c1c';
+      statusDiv.style.border = '2px solid #fca5a5';
+      statusDiv.innerHTML = `❌ <strong>שגיאת תקשורת:</strong> לא ניתן להתחבר לשרת הדיוור.`;
+    }
     showToast('שגיאה בתקשורת עם השרת', 'danger');
   } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> שלח מייל בדיקה בלייב';
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origBtnText;
+    }
   }
-}
+};
 
 // --------------------------------------------------------------------------
 // 2. Authentication Logic & Strict Role Guards

@@ -643,16 +643,31 @@
           </form>
 
           <!-- Live Email Verification Test Component -->
-          <div class="card mt-4 p-3" style="background: rgba(43, 108, 176, 0.04); border: 2px dashed var(--primary); border-radius: 12px;">
-            <h4 style="color: var(--primary); margin-bottom: 0.5rem;"><i class="fa-solid fa-vial-circle-check"></i> בדיקת תקינות שליחת מייל בלייב (Live Email Test)</h4>
-            <p class="text-muted small mb-3">הזן כתובת אימייל כלשהי (למשל האימייל האישי שלך) ולחץ על "שלח מייל בדיקה". המערכת תשלח הודעת ניסיון ישירות מ-bitulim@horev.org.il ותציג את התוצאה.</p>
-            <form id="testEmailForm" class="d-flex gap-2 align-items-center flex-wrap">
-              <input type="email" id="testEmailRecipientInput" class="form-control" placeholder="הכנס כתובת אימייל לבדיקה (למשל: your@email.com)" required style="flex: 1; min-width: 260px;">
-              <button type="submit" id="sendTestEmailBtn" class="btn btn-success">
+          <div class="card mt-4 p-3" style="background: #f0f9ff; border: 2px dashed #0284c7; border-radius: 12px;">
+            <h4 style="color: #0369a1; margin-bottom: 0.5rem;"><i class="fa-solid fa-vial-circle-check"></i> בדיקת תקינות שליחת מייל בלייב לכתובת ספציפית (Live Email Test)</h4>
+            <p class="text-muted small mb-3">הזן כתובת אימייל כלשהי ולחץ על "שלח מייל בדיקה". המערכת תשלח הודעת ניסיון מעוצבת בלייב ישירות מ-bitulim@horev.org.il ותאשר שהמייל התקבל בתיבה!</p>
+            
+            <form id="testEmailForm" onsubmit="handleTestEmailSubmit(event)" class="d-flex gap-2 align-items-center flex-wrap mb-3">
+              <input type="email" id="testEmailRecipientInput" class="form-control" placeholder="הכנס כתובת אימייל לבדיקה (למשל: yinonshvat@gmail.com)" required style="flex: 1; min-width: 260px;">
+              <button type="button" id="sendTestEmailBtn" onclick="handleTestEmailSubmit(event)" class="btn btn-success">
                 <i class="fa-solid fa-paper-plane"></i> שלח מייל בדיקה בלייב
               </button>
             </form>
-            <div id="testEmailStatus" class="mt-3 p-2 border-radius-sm" style="display: none; border-radius: 6px; font-weight: 500;"></div>
+
+            <div class="d-flex gap-2 flex-wrap mb-2">
+              <span class="text-muted small align-self-center"><strong>לחצני קיצור לבדיקה מהירה לפי ההגדרות:</strong></span>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="setTestEmailRecipient('treasurer')">
+                📩 שלח לבדיקה לאימייל של חגי (גזבר)
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-info" onclick="setTestEmailRecipient('secretary')">
+                📩 שלח לבדיקה לאימייל של אסתר (מזכירות)
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setTestEmailRecipient('software')">
+                📩 שלח לבדיקה לאימייל של ינון (תוכנה)
+              </button>
+            </div>
+
+            <div id="testEmailStatus" class="mt-3 p-3" style="display: none; border-radius: 8px; font-weight: 500;"></div>
           </div>
 
           <!-- Email Activity Log -->
@@ -856,6 +871,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=27.0"></script>
+  <script src="app.js?v=28.0"></script>
 </body>
 </html>
