@@ -228,12 +228,12 @@ class MailerService {
           <div style="padding: 25px;">
             <!-- Role Header Banner -->
             <div style="background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
-              <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">נמען המייל:</h4>
+              <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">אישור עדכון בקשה - עותק לגזברות ולמזכירות:</h4>
               <p style="margin: 0 0 6px 0; color: #065f46; font-size: 14px;">
-                <strong>${reqData.applicantName}</strong> - <span style="background: #059669; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">רכז/ת מורש/ת (${reqData.group})</span> (נמען ראשי: <code>${targetEmail}</code>)
+                <strong>נמען ראשי (הרכז/ת):</strong> ${reqData.applicantName} (${reqData.group} - <code>${targetEmail}</code>)
               </p>
               <div style="font-size: 12px; color: #047857; border-top: 1px dashed #a7f3d0; padding-top: 6px;">
-                עותקים לידיעה בשרשרת האישור: <strong>${treasurer.name}</strong> (${treasurer.roleTitle}) | <strong>${secretary.name}</strong> (${secretary.roleTitle})
+                הודעה זו נשלחה כעותק אישור (CC) ל-<strong>${treasurer.name}</strong> (גזבר) ול-<strong>${secretary.name}</strong> (מזכירות) כתיעוד רשמי של ההודעה שנמסרה כעת לרכז/ת.
               </div>
             </div>
 
