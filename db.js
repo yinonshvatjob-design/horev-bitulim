@@ -10,7 +10,6 @@ const { Pool } = require('pg');
 const SEED_ADMINS = [
   { id: "0542065606", name: "ינון", role: "מנהל תוכנה (Admin)", email: "yinonshvat@horev.org.il", pass: "yinon2026" },
   { id: "0584220463", name: "חגי היקר", role: "גזבר המוסד (Admin)", email: "chagi@horev.org.il", pass: "hagai2026" },
-  { id: "05455408280", name: "אסתר", role: "מזכירת המוסד (Admin)", email: "esters@horev.org.il", pass: "esther2026" },
   { id: "0545540828", name: "אסתר", role: "מזכירת המוסד (Admin)", email: "esters@horev.org.il", pass: "esther2026" }
 ];
 
@@ -139,9 +138,21 @@ class DatabaseManager {
         await this.savePg();
         console.log('Initialized initial database store in PostgreSQL Cloud Database!');
       }
+      this.sanitizeData();
     } catch (err) {
       console.error('PostgreSQL Connection Error, falling back to local file:', err.message);
       this.load();
+    }
+  }
+
+  sanitizeData() {
+    if (this.data && Array.isArray(this.data.admins)) {
+      const initialCount = this.data.admins.length;
+      this.data.admins = this.data.admins.filter(a => a.id !== '05455408280');
+      if (this.data.admins.length < initialCount) {
+        console.log('Sanitized duplicate admin Esther (05455408280)');
+        this.save();
+      }
     }
   }
 
@@ -167,6 +178,7 @@ class DatabaseManager {
       } else {
         this.save();
       }
+      this.sanitizeData();
     } catch (err) {
       console.error('Error loading database.json:', err.message);
     }

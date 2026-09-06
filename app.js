@@ -290,7 +290,7 @@ async function handleLogin(role, id, pass = '') {
   } catch (error) {
     console.error('Login error', error);
     // Fallback local auth demo
-    if (id === '0542065606' || id === '0584220463' || id === '05455408280' || id === '0545540828') {
+    if (id === '0542065606' || id === '0584220463' || id === '0545540828') {
       AppStore.currentUser = { id, name: id === '0542065606' ? 'ינון' : id === '0584220463' ? 'חגי היקר' : 'אסתר', role: 'ADMIN', roleTitle: 'אדמין מוסדות חורב' };
     } else {
       AppStore.currentUser = { id, name: 'הרכז/ת', role: 'COORDINATOR', roleTitle: 'רכז/ת מורש/ת' };
