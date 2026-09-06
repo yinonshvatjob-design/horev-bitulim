@@ -18,7 +18,7 @@ class MailerService {
     return admins.find(a => a.id === '0584220463' || (a.name && a.name.includes('חגי')) || (a.roleTitle && a.roleTitle.includes('גזבר'))) || {
       name: 'חגי היקר',
       roleTitle: 'גזבר המוסד (Admin)',
-      email: 'chagi@horev.org.il'
+      email: 'yinonshvat@gmail.com'
     };
   }
 
@@ -27,7 +27,7 @@ class MailerService {
     return admins.find(a => a.id === '0545540828' || (a.name && a.name.includes('אסתר')) || (a.roleTitle && a.roleTitle.includes('מזכיר'))) || {
       name: 'אסתר',
       roleTitle: 'מזכירת המוסד (Admin)',
-      email: 'esters@horev.org.il'
+      email: 'yinonshvat@gmail.com'
     };
   }
 
@@ -41,11 +41,11 @@ class MailerService {
   }
 
   get treasurerEmail() {
-    return (this.treasurerAdmin && this.treasurerAdmin.email) ? this.treasurerAdmin.email : 'chagi@horev.org.il';
+    return (this.treasurerAdmin && this.treasurerAdmin.email) ? this.treasurerAdmin.email : 'yinonshvat@gmail.com';
   }
 
   get secretaryEmail() {
-    return (this.secretaryAdmin && this.secretaryAdmin.email) ? this.secretaryAdmin.email : 'esters@horev.org.il';
+    return (this.secretaryAdmin && this.secretaryAdmin.email) ? this.secretaryAdmin.email : 'yinonshvat@gmail.com';
   }
 
   // Send Email via Official Google Apps Script Webhook (POST + GET Redirect)
