@@ -475,7 +475,23 @@ window.selectAllClasses = function() {
 window.clearAllClasses = function() {
   document.querySelectorAll('input[name="targetClasses"]').forEach(cb => cb.checked = false);
   document.querySelectorAll('.grade-all-cb').forEach(cb => cb.checked = false);
+  const otherWrapper = document.getElementById('otherCustomGroupWrapper');
+  const otherInput = document.getElementById('otherCustomGroupInput');
+  if (otherWrapper) otherWrapper.style.display = 'none';
+  if (otherInput) otherInput.value = '';
   updateSelectedClassPills();
+};
+
+window.toggleOtherCustomInput = function(isChecked) {
+  const wrapper = document.getElementById('otherCustomGroupWrapper');
+  const input = document.getElementById('otherCustomGroupInput');
+  if (wrapper) wrapper.style.display = isChecked ? 'block' : 'none';
+  if (isChecked && input) {
+    input.focus();
+  } else if (!isChecked && input) {
+    input.value = '';
+  }
+  onClassCheckboxChange('special');
 };
 
 window.filterClassesInDropdown = function(query) {
@@ -537,7 +553,14 @@ function updateSelectedClassPills() {
     });
 
     const specialChecked = Array.from(document.querySelectorAll('.grade-group-box[data-grade="special"] input[name="targetClasses"]:checked'));
-    specialChecked.forEach(cb => displayTokens.push(cb.value));
+    specialChecked.forEach(cb => {
+      if (cb.value === 'OTHER_CUSTOM') {
+        const customVal = (document.getElementById('otherCustomGroupInput')?.value || '').trim();
+        displayTokens.push(customVal ? `אחר (${customVal})` : 'אחר');
+      } else {
+        displayTokens.push(cb.value);
+      }
+    });
   }
 
   wrapper.innerHTML = displayTokens.map(token => `
@@ -551,6 +574,13 @@ function updateSelectedClassPills() {
 window.removeSpecificPillToken = function(token) {
   if (token === 'כלל המוסד (כל השכבות)') {
     clearAllClasses();
+    return;
+  }
+
+  if (token.startsWith('אחר')) {
+    const cb = document.getElementById('otherCustomCb');
+    if (cb) cb.checked = false;
+    toggleOtherCustomInput(false);
     return;
   }
 
@@ -615,7 +645,14 @@ function getSelectedGroupFormattedString() {
   });
 
   const specialChecked = Array.from(document.querySelectorAll('.grade-group-box[data-grade="special"] input[name="targetClasses"]:checked'));
-  specialChecked.forEach(cb => formattedTokens.push(cb.value));
+  specialChecked.forEach(cb => {
+    if (cb.value === 'OTHER_CUSTOM') {
+      const customVal = (document.getElementById('otherCustomGroupInput')?.value || '').trim();
+      formattedTokens.push(customVal ? `אחר (${customVal})` : 'אחר');
+    } else {
+      formattedTokens.push(cb.value);
+    }
+  });
 
   return formattedTokens.join(', ');
 }

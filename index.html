@@ -24,7 +24,7 @@
   <meta http-equiv="Expires" content="0">
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=9.0">
+  <link rel="stylesheet" href="style.css?v=10.0">
 </head>
 <body class="light-mode">
 
@@ -303,7 +303,12 @@
                         <div class="classes-grid">
                           <label class="class-item"><input type="checkbox" name="targetClasses" value="קבוצת פנימייה" onchange="onClassCheckboxChange('special')"> פנימייה</label>
                           <label class="class-item"><input type="checkbox" name="targetClasses" value="נבחרת ספורט" onchange="onClassCheckboxChange('special')"> ספורט</label>
-                          <label class="class-item"><input type="checkbox" name="targetClasses" value="מגמה לימודית" onchange="onClassCheckboxChange('special')"> מגמה</label>
+                          <label class="class-item" id="otherClassItem">
+                            <input type="checkbox" name="targetClasses" value="OTHER_CUSTOM" id="otherCustomCb" onchange="toggleOtherCustomInput(this.checked)"> אחר
+                          </label>
+                        </div>
+                        <div id="otherCustomGroupWrapper" style="display: none; margin-top: 0.5rem;">
+                          <input type="text" id="otherCustomGroupInput" class="form-control form-control-sm" placeholder="פרט קבוצה / כיתה אחרת (לדוגמה: מגמת פיזיקה / מקהלה)..." oninput="onClassCheckboxChange('special')">
                         </div>
                       </div>
                     </div>
@@ -824,6 +829,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=12.0"></script>
+  <script src="app.js?v=13.0"></script>
 </body>
 </html>
