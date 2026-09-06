@@ -478,12 +478,42 @@ class DatabaseManager {
   }
 
   sanitizeData() {
-    if (this.data && Array.isArray(this.data.admins)) {
+    if (!this.data) return;
+
+    if (Array.isArray(this.data.admins)) {
       const initialCount = this.data.admins.length;
       this.data.admins = this.data.admins.filter(a => a.id !== '05455408280');
       if (this.data.admins.length < initialCount) {
         console.log('Sanitized duplicate admin Esther (05455408280)');
+      }
+    }
+
+    // Merge SEED_COORDINATORS into this.data.coordinators so cloud PostgreSQL store is always up-to-date!
+    if (Array.isArray(SEED_COORDINATORS)) {
+      if (!Array.isArray(this.data.coordinators)) {
+        this.data.coordinators = [];
+      }
+
+      let updatedCount = 0;
+      SEED_COORDINATORS.forEach(seedCoord => {
+        const index = this.data.coordinators.findIndex(c => c.id === seedCoord.id || c.name === seedCoord.name);
+        if (index === -1) {
+          this.data.coordinators.push(seedCoord);
+          updatedCount++;
+        } else {
+          if (this.data.coordinators[index].email !== seedCoord.email || this.data.coordinators[index].name !== seedCoord.name || this.data.coordinators[index].id !== seedCoord.id) {
+            this.data.coordinators[index].id = seedCoord.id;
+            this.data.coordinators[index].name = seedCoord.name;
+            this.data.coordinators[index].email = seedCoord.email;
+            updatedCount++;
+          }
+        }
+      });
+
+      if (updatedCount > 0) {
+        console.log(`[DatabaseManager] Synced ${updatedCount} coordinators from SEED_COORDINATORS into live database store.`);
         this.save();
+        if (this.pool) this.savePg();
       }
     }
   }
