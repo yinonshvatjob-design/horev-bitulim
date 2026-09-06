@@ -1148,10 +1148,54 @@ async function fetchUsersData() {
     if (dataAdmins.success) {
       AppStore.admins = dataAdmins.admins;
     }
+
+    await fetchWebhookUrl();
   } catch (error) {
     console.error('Error fetching users/admins data', error);
   }
 }
+
+async function fetchWebhookUrl() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/settings/webhook`);
+    const data = await res.json();
+    if (data.success && data.webhookUrl) {
+      const input = document.getElementById('webhookUrlInput');
+      if (input) input.value = data.webhookUrl;
+    }
+  } catch (err) {
+    console.error('Error fetching webhook URL:', err);
+  }
+}
+
+window.handleSaveWebhookUrl = async function(e) {
+  if (e) e.preventDefault();
+  if (!AppStore.currentUser || AppStore.currentUser.role !== 'ADMIN') return;
+
+  const webhookUrlInput = document.getElementById('webhookUrlInput');
+  const webhookUrl = webhookUrlInput ? webhookUrlInput.value.trim() : '';
+
+  if (!webhookUrl || !webhookUrl.startsWith('http')) {
+    showToast('יש להזין כתובת Google Webhook URL תקינה', 'warning');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/settings/webhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ webhookUrl })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('כתובת ה-Webhook של גוגל עודכנה ונשמרה בהצלחה!', 'success');
+    } else {
+      showToast(data.message || 'שגיאה בעדכון ה-Webhook', 'danger');
+    }
+  } catch (err) {
+    showToast('שגיאה בתקשורת עם השרת', 'danger');
+  }
+};
 
 async function renderUsersTable() {
   if (AppStore.currentUser.role !== 'ADMIN') return;

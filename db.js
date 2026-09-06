@@ -48,6 +48,9 @@ const DB_FILE = path.join(__dirname, 'database.json');
 class DatabaseManager {
   constructor() {
     this.data = {
+      settings: {
+        googleWebhookUrl: process.env.GOOGLE_MAILER_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbygzoipBy6omG2rtrJPnSJJIFK-IJF6P6szb0y-YVzzxro45Ht9rlb5l9-_Zdd-Fx6h/exec'
+      },
       admins: SEED_ADMINS,
       coordinators: SEED_COORDINATORS,
       requests: [
@@ -193,6 +196,23 @@ class DatabaseManager {
     } catch (err) {
       console.error('Error saving database.json:', err.message);
     }
+  }
+
+  // --- Webhook Settings ---
+  getGoogleWebhookUrl() {
+    if (this.data && this.data.settings && this.data.settings.googleWebhookUrl) {
+      return this.data.settings.googleWebhookUrl;
+    }
+    return process.env.GOOGLE_MAILER_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbygzoipBy6omG2rtrJPnSJJIFK-IJF6P6szb0y-YVzzxro45Ht9rlb5l9-_Zdd-Fx6h/exec';
+  }
+
+  updateGoogleWebhookUrl(url) {
+    if (!this.data.settings) {
+      this.data.settings = {};
+    }
+    this.data.settings.googleWebhookUrl = url;
+    this.save();
+    return url;
   }
 
   // --- Admins & Coordinators ---

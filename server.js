@@ -423,6 +423,21 @@ app.delete('/api/users/:id', (req, res) => {
   res.json({ success: true, message: 'הרכז/ת הוסר/ה מורשי המערכת' });
 });
 
+// GET /api/settings/webhook (Get Google Webhook URL)
+app.get('/api/settings/webhook', (req, res) => {
+  res.json({ success: true, webhookUrl: db.getGoogleWebhookUrl() });
+});
+
+// POST /api/settings/webhook (Update Google Webhook URL)
+app.post('/api/settings/webhook', (req, res) => {
+  const { webhookUrl } = req.body;
+  if (!webhookUrl || !webhookUrl.startsWith('http')) {
+    return res.status(400).json({ success: false, message: 'יש להזין כתובת Google Webhook URL תקינה (מתחילה ב-https)' });
+  }
+  const updatedUrl = db.updateGoogleWebhookUrl(webhookUrl.trim());
+  res.json({ success: true, webhookUrl: updatedUrl, message: 'כתובת ה-Webhook של גוגל עודכנה בהצלחה!' });
+});
+
 // GET /api/email-logs
 app.get('/api/email-logs', (req, res) => {
   res.json({ success: true, logs: db.data.emailLogs });

@@ -121,7 +121,7 @@ class MailerService {
         req.end();
       };
 
-      sendRequest(GOOGLE_WEBHOOK_URL, false, 0);
+      sendRequest(db.getGoogleWebhookUrl(), false, 0);
     });
   }
 
