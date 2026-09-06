@@ -50,13 +50,22 @@ class MailerService {
 
   // Send Email via Official Google Apps Script Webhook (POST + GET Redirect)
   async sendMailViaGoogleWebhook(to, subject, html, cc = []) {
+    // Generate clean plain text fallback to satisfy anti-spam MIME standards
+    const plainText = html ? html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+                                 .replace(/<[^>]+>/g, ' ')
+                                 .replace(/\s+/g, ' ')
+                                 .trim() : '';
+
     return new Promise((resolve) => {
       const payload = JSON.stringify({
         to: Array.isArray(to) ? to.join(',') : (to || ''),
         cc: Array.isArray(cc) ? cc.join(',') : (cc || ''),
         subject: subject || 'עדכון מוסדות חורב',
-        html: html || ''
+        html: html || '',
+        text: plainText
       });
+
+      const payloadBuffer = Buffer.from(payload, 'utf8');
 
       const sendRequest = (urlStr, isRedirect = false, redirectCount = 0) => {
         if (redirectCount > 5) {
@@ -71,8 +80,8 @@ class MailerService {
           method: isRedirect ? 'GET' : 'POST',
           rejectUnauthorized: false,
           headers: isRedirect ? {} : {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(payload)
+            'Content-Type': 'application/json; charset=utf-8',
+            'Content-Length': payloadBuffer.length
           },
           timeout: 15000
         };
@@ -116,7 +125,7 @@ class MailerService {
         });
 
         if (!isRedirect) {
-          req.write(payload);
+          req.write(payloadBuffer);
         }
         req.end();
       };
@@ -131,14 +140,14 @@ class MailerService {
     const secretary = this.secretaryAdmin;
 
     const mealsStr = Array.isArray(reqData.requestedMeals) ? reqData.requestedMeals.join(', ') : (reqData.requestedMeals || '');
-    const subject = `[ביטול ארוחות] בקשה חדשה מאת ${reqData.applicantName} - ${reqData.group} (${reqData.startDate})`;
+    const subject = `בקשת ביטול ארוחות חדשה מאת ${reqData.applicantName} - ${reqData.group} (${reqData.startDate})`;
     
     const htmlContent = `
       <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           
           <div style="background: #1b779e; color: #ffffff; padding: 20px; text-align: center;">
-            <h2 style="margin: 0; font-size: 22px;">מוסדות חורב ירושלים — פלטפורמת ביטול ארוחות</h2>
+            <h2 style="margin: 0; font-size: 22px;">מוסדות חורב ירושלים - פלטפורמת ביטול ארוחות</h2>
             <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">התקבלה בקשת ביטול ארוחות חדשה לאישור הגזברות</p>
           </div>
 
@@ -170,7 +179,7 @@ class MailerService {
           </div>
 
           <div style="background: #f1f5f9; padding: 15px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
-            מוסדות חורב ירושלים — תורה עם דרך ארץ
+            מוסדות חורב ירושלים - תורה עם דרך ארץ
           </div>
         </div>
       </div>
@@ -193,7 +202,7 @@ class MailerService {
 
     const isApproved = reqData.status === 'APPROVED';
     const statusText = isApproved ? 'אושרה' : 'נדחתה';
-    const subject = `[עדכון גזברות] בקשת ביטול ארוחות #${reqData.id} - ${statusText} (סכום החזר: ₪${reqData.approvedRefund || 0})`;
+    const subject = `עדכון גזברות: בקשת ביטול ארוחות #${reqData.id} ${statusText} (סכום החזר: ₪${reqData.approvedRefund || 0})`;
     const mealsStr = Array.isArray(reqData.requestedMeals) ? reqData.requestedMeals.join(', ') : (reqData.requestedMeals || '');
 
     const htmlContent = `
@@ -201,7 +210,7 @@ class MailerService {
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           
           <div style="background: ${isApproved ? '#059669' : '#dc2626'}; color: #ffffff; padding: 20px; text-align: center;">
-            <h2 style="margin: 0; font-size: 22px;">מוסדות חורב ירושלים — עדכון בקשת ביטול ארוחות</h2>
+            <h2 style="margin: 0; font-size: 22px;">מוסדות חורב ירושלים - עדכון בקשת ביטול ארוחות</h2>
             <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">בקשתך #${reqData.id} נבחנה ועודכנה ע"י חגי היקר והגזברות</p>
           </div>
 
@@ -218,7 +227,7 @@ class MailerService {
             </div>
 
             <h3 style="color: ${isApproved ? '#059669' : '#dc2626'}; margin-top: 0;">
-              📋 סטטוס הבקשה: ${isApproved ? 'אושר מותאם אישית (Custom Approved)' : 'נדחה ע"י הגזברות'}
+              📋 סטטוס הבקשה: ${isApproved ? 'אושר מותאם אישית' : 'נדחה ע"י הגזברות'}
             </h3>
 
             ${isApproved ? `
@@ -269,7 +278,7 @@ class MailerService {
           </div>
 
           <div style="background: #f1f5f9; padding: 15px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
-            מוסדות חורב ירושלים — תורה עם דרך ארץ
+            מוסדות חורב ירושלים - תורה עם דרך ארץ
           </div>
         </div>
       </div>
@@ -284,15 +293,15 @@ class MailerService {
     const treasurer = this.treasurerAdmin;
     const secretary = this.secretaryAdmin;
 
-    const subject = `[קבלה חדשה] התקבלה קבלה לבקשה #${reqData.id} מאת ${reqData.applicantName} (₪${(receiptObj.amount || 0).toLocaleString()})`;
+    const subject = `קבלה חדשה לבקשה #${reqData.id} מאת ${reqData.applicantName} (₪${(receiptObj.amount || 0).toLocaleString()})`;
 
     const htmlContent = `
       <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           
           <div style="background: #4f46e5; color: #ffffff; padding: 20px; text-align: center;">
-            <h2 style="margin: 0; font-size: 22px;">🧾 התקבלה קבלה/חשבונית חדשה במזכירות!</h2>
-            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">מוסדות חורב ירושלים — פיילוט קבלות דיגיטלי</p>
+            <h2 style="margin: 0; font-size: 22px;">🧾 התקבלה קבלה/חשבונית חדשה במזכירות</h2>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">מוסדות חורב ירושלים - פיילוט קבלות דיגיטלי</p>
           </div>
 
           <div style="padding: 25px;">
@@ -332,7 +341,7 @@ class MailerService {
           </div>
 
           <div style="background: #f1f5f9; padding: 15px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
-            מוסדות חורב ירושלים — תורה עם דרך ארץ
+            מוסדות חורב ירושלים - תורה עם דרך ארץ
           </div>
         </div>
       </div>
@@ -347,13 +356,13 @@ class MailerService {
     const secretary = this.secretaryAdmin;
     const softwareMgr = this.softwareManagerAdmin;
 
-    const subject = `[בדיקת מערכת] מייל בדיקה תקין ממוסדות חורב ירושלים — ביטול ארוחות`;
+    const subject = `מייל בדיקה מוסדות חורב ירושלים - ביטול ארוחות`;
     const htmlContent = `
       <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           <div style="background: #059669; color: #ffffff; padding: 20px; text-align: center;">
-            <h2 style="margin: 0; font-size: 22px;">✓ מייל בדיקה בלייב נשלח בהצלחה!</h2>
-            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">מוסדות חורב ירושלים — פלטפורמת ביטול ארוחות</p>
+            <h2 style="margin: 0; font-size: 22px;">מייל בדיקה בלייב נשלח בהצלחה</h2>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">מוסדות חורב ירושלים - פלטפורמת ביטול ארוחות</p>
           </div>
           <div style="padding: 25px;">
             <!-- Role Header Banner -->
@@ -376,7 +385,7 @@ class MailerService {
             <p style="font-size: 15px; line-height: 1.6;">
               שלום רב,<br><br>
               מייל זה נשלח כחלק מבדיקת תקינות של מערכת הדיוור המוסדית (Google Gmail Engine).<br>
-              אם קיבלת הודעה זו — פירושו ששרת הדואר, ה-Webhook והאישורים מוגדרים בצורה תקינה 100%!
+              אם קיבלת הודעה זו - פירושו ששרת הדואר, ה-Webhook והאישורים מוגדרים בצורה תקינה 100%!
             </p>
             <div style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 12px 15px; margin: 20px 0; border-radius: 6px; font-size: 13px;">
               <strong>📧 שולח המייל:</strong> bitulim@horev.org.il<br>
@@ -385,7 +394,7 @@ class MailerService {
             </div>
           </div>
           <div style="background: #f1f5f9; padding: 15px; text-align: center; font-size: 12px; color: #64748b;">
-            מוסדות חורב ירושלים — תורה עם דרך ארץ
+            מוסדות חורב ירושלים - תורה עם דרך ארץ
           </div>
         </div>
       </div>
