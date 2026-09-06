@@ -24,7 +24,7 @@
   <meta http-equiv="Expires" content="0">
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=8.0">
+  <link rel="stylesheet" href="style.css?v=9.0">
 </head>
 <body class="light-mode">
 
@@ -159,36 +159,162 @@
         <div class="card-body">
           <form id="cancellationForm">
             <div class="form-row">
-              <!-- Class / Grade -->
+              <!-- Class / Grade Multi-Select -->
               <div class="form-group col-md-6">
-                <label for="targetGroupSelect"><i class="fa-solid fa-users-rectangle"></i> כיתה / שכבה / קבוצה *</label>
-                <select id="targetGroupSelect" class="form-control" required>
-                  <option value="" disabled selected>בחר כיתה או שכבה...</option>
-                  <optgroup label="שכבות מוסדיות">
-                    <option value="שכבה ז'">שכבה ז'</option>
-                    <option value="שכבה ח'">שכבה ח'</option>
-                    <option value="שכבה ט'">שכבה ט'</option>
-                    <option value="שכבה י'">שכבה י'</option>
-                    <option value="שכבה י''א">שכבה י''א</option>
-                    <option value="שכבה י''ב">שכבה י''ב</option>
-                    <option value="כלל המוסד">כלל המוסד (כל השכבות)</option>
-                  </optgroup>
-                  <optgroup label="כיתות ספציפיות">
-                    <option value="כיתה ז'1">כיתה ז'1</option>
-                    <option value="כיתה ז'2">כיתה ז'2</option>
-                    <option value="כיתה ח'1">כיתה ח'1</option>
-                    <option value="כיתה ח'2">כיתה ח'2</option>
-                    <option value="כיתה ט'1">כיתה ט'1</option>
-                    <option value="כיתה ט'2">כיתה ט'2</option>
-                    <option value="כיתה י'1">כיתה י'1</option>
-                    <option value="כיתה י'2">כיתה י'2</option>
-                  </optgroup>
-                  <optgroup label="קבוצות ייעודיות">
-                    <option value="קבוצת פנימייה">קבוצת פנימייה</option>
-                    <option value="נבחרת ספורט">נבחרת ספורט</option>
-                    <option value="מגמה לימודית">מגמה לימודית</option>
-                  </optgroup>
-                </select>
+                <label><i class="fa-solid fa-users-rectangle"></i> בחירת כיתות / שכבות (סימון מרובה) *</label>
+                <div class="multi-select-container" id="classMultiSelectContainer">
+                  <div class="multi-select-trigger" id="classMultiSelectTrigger" onclick="toggleClassDropdown()" tabindex="0">
+                    <div class="selected-pills-wrapper" id="selectedPillsWrapper">
+                      <span class="placeholder-text">לחץ לבחירת כיתות (ז' עד י''ב - 6 כיתות לשכבה)...</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down trigger-arrow"></i>
+                  </div>
+
+                  <div class="multi-select-dropdown" id="classMultiSelectDropdown">
+                    <div class="dropdown-toolbar">
+                      <button type="button" class="btn-tool" onclick="selectAllClasses()"><i class="fa-solid fa-check-double"></i> בחר הכל (כלל המוסד)</button>
+                      <button type="button" class="btn-tool" onclick="clearAllClasses()"><i class="fa-solid fa-xmark"></i> נקה הכל</button>
+                    </div>
+
+                    <div class="dropdown-search">
+                      <input type="text" id="classSearchInput" placeholder="חפש כיתה (לדוגמה: ז'3, י'1...)" oninput="filterClassesInDropdown(this.value)">
+                    </div>
+
+                    <div class="grades-accordion" id="gradesAccordion">
+                      <!-- Grade ז' -->
+                      <div class="grade-group-box" data-grade="ז">
+                        <div class="grade-header">
+                          <label class="grade-checkbox-label">
+                            <input type="checkbox" class="grade-all-cb" data-grade="ז" onchange="toggleGradeAll('ז', this.checked)">
+                            <strong>שכבה ז' (כל 6 הכיתות)</strong>
+                          </label>
+                          <span class="badge badge-light">6 כיתות</span>
+                        </div>
+                        <div class="classes-grid">
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ז'1" onchange="onClassCheckboxChange('ז')"> ז'1</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ז'2" onchange="onClassCheckboxChange('ז')"> ז'2</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ז'3" onchange="onClassCheckboxChange('ז')"> ז'3</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ז'4" onchange="onClassCheckboxChange('ז')"> ז'4</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ז'5" onchange="onClassCheckboxChange('ז')"> ז'5</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ז'6" onchange="onClassCheckboxChange('ז')"> ז'6</label>
+                        </div>
+                      </div>
+
+                      <!-- Grade ח' -->
+                      <div class="grade-group-box" data-grade="ח">
+                        <div class="grade-header">
+                          <label class="grade-checkbox-label">
+                            <input type="checkbox" class="grade-all-cb" data-grade="ח" onchange="toggleGradeAll('ח', this.checked)">
+                            <strong>שכבה ח' (כל 6 הכיתות)</strong>
+                          </label>
+                          <span class="badge badge-light">6 כיתות</span>
+                        </div>
+                        <div class="classes-grid">
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ח'1" onchange="onClassCheckboxChange('ח')"> ח'1</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ח'2" onchange="onClassCheckboxChange('ח')"> ח'2</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ח'3" onchange="onClassCheckboxChange('ח')"> ח'3</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ח'4" onchange="onClassCheckboxChange('ח')"> ח'4</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ח'5" onchange="onClassCheckboxChange('ח')"> ח'5</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ח'6" onchange="onClassCheckboxChange('ח')"> ח'6</label>
+                        </div>
+                      </div>
+
+                      <!-- Grade ט' -->
+                      <div class="grade-group-box" data-grade="ט">
+                        <div class="grade-header">
+                          <label class="grade-checkbox-label">
+                            <input type="checkbox" class="grade-all-cb" data-grade="ט" onchange="toggleGradeAll('ט', this.checked)">
+                            <strong>שכבה ט' (כל 6 הכיתות)</strong>
+                          </label>
+                          <span class="badge badge-light">6 כיתות</span>
+                        </div>
+                        <div class="classes-grid">
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ט'1" onchange="onClassCheckboxChange('ט')"> ט'1</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ט'2" onchange="onClassCheckboxChange('ט')"> ט'2</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ט'3" onchange="onClassCheckboxChange('ט')"> ט'3</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ט'4" onchange="onClassCheckboxChange('ט')"> ט'4</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ט'5" onchange="onClassCheckboxChange('ט')"> ט'5</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה ט'6" onchange="onClassCheckboxChange('ט')"> ט'6</label>
+                        </div>
+                      </div>
+
+                      <!-- Grade י' -->
+                      <div class="grade-group-box" data-grade="י">
+                        <div class="grade-header">
+                          <label class="grade-checkbox-label">
+                            <input type="checkbox" class="grade-all-cb" data-grade="י" onchange="toggleGradeAll('י', this.checked)">
+                            <strong>שכבה י' (כל 6 הכיתות)</strong>
+                          </label>
+                          <span class="badge badge-light">6 כיתות</span>
+                        </div>
+                        <div class="classes-grid">
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י'1" onchange="onClassCheckboxChange('י')"> י'1</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י'2" onchange="onClassCheckboxChange('י')"> י'2</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י'3" onchange="onClassCheckboxChange('י')"> י'3</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י'4" onchange="onClassCheckboxChange('י')"> י'4</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י'5" onchange="onClassCheckboxChange('י')"> י'5</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י'6" onchange="onClassCheckboxChange('י')"> י'6</label>
+                        </div>
+                      </div>
+
+                      <!-- Grade י"א -->
+                      <div class="grade-group-box" data-grade="יא">
+                        <div class="grade-header">
+                          <label class="grade-checkbox-label">
+                            <input type="checkbox" class="grade-all-cb" data-grade="יא" onchange="toggleGradeAll('יא', this.checked)">
+                            <strong>שכבה י''א (כל 6 הכיתות)</strong>
+                          </label>
+                          <span class="badge badge-light">6 כיתות</span>
+                        </div>
+                        <div class="classes-grid">
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''א 1" onchange="onClassCheckboxChange('יא')"> י''א 1</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''א 2" onchange="onClassCheckboxChange('יא')"> י''א 2</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''א 3" onchange="onClassCheckboxChange('יא')"> י''א 3</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''א 4" onchange="onClassCheckboxChange('יא')"> י''א 4</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''א 5" onchange="onClassCheckboxChange('יא')"> י''א 5</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''א 6" onchange="onClassCheckboxChange('יא')"> י''א 6</label>
+                        </div>
+                      </div>
+
+                      <!-- Grade י"ב -->
+                      <div class="grade-group-box" data-grade="יב">
+                        <div class="grade-header">
+                          <label class="grade-checkbox-label">
+                            <input type="checkbox" class="grade-all-cb" data-grade="יב" onchange="toggleGradeAll('יב', this.checked)">
+                            <strong>שכבה י''ב (כל 6 הכיתות)</strong>
+                          </label>
+                          <span class="badge badge-light">6 כיתות</span>
+                        </div>
+                        <div class="classes-grid">
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''ב 1" onchange="onClassCheckboxChange('יב')"> י''ב 1</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''ב 2" onchange="onClassCheckboxChange('יב')"> י''ב 2</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''ב 3" onchange="onClassCheckboxChange('יב')"> י''ב 3</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''ב 4" onchange="onClassCheckboxChange('יב')"> י''ב 4</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''ב 5" onchange="onClassCheckboxChange('יב')"> י''ב 5</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="כיתה י''ב 6" onchange="onClassCheckboxChange('יב')"> י''ב 6</label>
+                        </div>
+                      </div>
+
+                      <!-- Special Groups -->
+                      <div class="grade-group-box" data-grade="special">
+                        <div class="grade-header">
+                          <strong>קבוצות ייעודיות</strong>
+                        </div>
+                        <div class="classes-grid">
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="קבוצת פנימייה" onchange="onClassCheckboxChange('special')"> פנימייה</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="נבחרת ספורט" onchange="onClassCheckboxChange('special')"> ספורט</label>
+                          <label class="class-item"><input type="checkbox" name="targetClasses" value="מגמה לימודית" onchange="onClassCheckboxChange('special')"> מגמה</label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="dropdown-footer">
+                      <button type="button" class="btn btn-primary btn-sm btn-block" onclick="closeClassDropdown()">
+                        <i class="fa-solid fa-check"></i> אישור בחירה (<span id="classesCountBadge">0 נבחרו</span>)
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <!-- Date Range -->
@@ -698,6 +824,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=11.0"></script>
+  <script src="app.js?v=12.0"></script>
 </body>
 </html>

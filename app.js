@@ -425,6 +425,202 @@ function validateDateCutoff() {
 }
 
 // --------------------------------------------------------------------------
+// Multi-Select Classes & Grades UI Logic
+// --------------------------------------------------------------------------
+window.toggleClassDropdown = function() {
+  const container = document.getElementById('classMultiSelectContainer');
+  if (container) container.classList.toggle('open');
+};
+
+window.closeClassDropdown = function() {
+  const container = document.getElementById('classMultiSelectContainer');
+  if (container) container.classList.remove('open');
+};
+
+document.addEventListener('click', (e) => {
+  const container = document.getElementById('classMultiSelectContainer');
+  if (container && !container.contains(e.target)) {
+    container.classList.remove('open');
+  }
+});
+
+window.toggleGradeAll = function(gradeCode, isChecked) {
+  const box = document.querySelector(`.grade-group-box[data-grade="${gradeCode}"]`);
+  if (!box) return;
+  box.querySelectorAll('input[name="targetClasses"]').forEach(cb => {
+    cb.checked = isChecked;
+  });
+  updateSelectedClassPills();
+};
+
+window.onClassCheckboxChange = function(gradeCode) {
+  if (gradeCode && gradeCode !== 'special') {
+    const box = document.querySelector(`.grade-group-box[data-grade="${gradeCode}"]`);
+    if (box) {
+      const classCbs = Array.from(box.querySelectorAll('input[name="targetClasses"]'));
+      const allChecked = classCbs.every(cb => cb.checked);
+      const gradeHeaderCb = box.querySelector('.grade-all-cb');
+      if (gradeHeaderCb) gradeHeaderCb.checked = allChecked;
+    }
+  }
+  updateSelectedClassPills();
+};
+
+window.selectAllClasses = function() {
+  document.querySelectorAll('input[name="targetClasses"]').forEach(cb => cb.checked = true);
+  document.querySelectorAll('.grade-all-cb').forEach(cb => cb.checked = true);
+  updateSelectedClassPills();
+};
+
+window.clearAllClasses = function() {
+  document.querySelectorAll('input[name="targetClasses"]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.grade-all-cb').forEach(cb => cb.checked = false);
+  updateSelectedClassPills();
+};
+
+window.filterClassesInDropdown = function(query) {
+  const q = String(query).trim().toLowerCase();
+  document.querySelectorAll('.grade-group-box').forEach(box => {
+    const text = box.innerText.toLowerCase();
+    box.style.display = text.includes(q) ? 'block' : 'none';
+  });
+};
+
+function updateSelectedClassPills() {
+  const wrapper = document.getElementById('selectedPillsWrapper');
+  const countBadge = document.getElementById('classesCountBadge');
+  if (!wrapper) return;
+
+  const selectedCbs = Array.from(document.querySelectorAll('input[name="targetClasses"]:checked'));
+
+  if (countBadge) countBadge.textContent = `${selectedCbs.length} נבחרו`;
+
+  if (selectedCbs.length === 0) {
+    wrapper.innerHTML = `<span class="placeholder-text">לחץ לבחירת כיתות (ז' עד י''ב - 6 כיתות לשכבה)...</span>`;
+    return;
+  }
+
+  const gradeMap = {
+    'ז': { name: "שכבה ז'", cbs: [] },
+    'ח': { name: "שכבה ח'", cbs: [] },
+    'ט': { name: "שכבה ט'", cbs: [] },
+    'י': { name: "שכבה י'", cbs: [] },
+    'יא': { name: "שכבה י''א", cbs: [] },
+    'יב': { name: "שכבה י''ב", cbs: [] }
+  };
+
+  document.querySelectorAll('.grade-group-box[data-grade]').forEach(box => {
+    const g = box.dataset.grade;
+    if (gradeMap[g]) {
+      gradeMap[g].cbs = Array.from(box.querySelectorAll('input[name="targetClasses"]'));
+    }
+  });
+
+  const displayTokens = [];
+  const allSchoolChecked = Object.values(gradeMap).every(g => g.cbs.length > 0 && g.cbs.every(cb => cb.checked));
+
+  if (allSchoolChecked) {
+    displayTokens.push('כלל המוסד (כל השכבות)');
+  } else {
+    Object.keys(gradeMap).forEach(gKey => {
+      const g = gradeMap[gKey];
+      if (g.cbs.length > 0) {
+        const checkedInGrade = g.cbs.filter(cb => cb.checked);
+        if (checkedInGrade.length === g.cbs.length) {
+          displayTokens.push(`${g.name} (כל 6 הכיתות)`);
+        } else if (checkedInGrade.length > 0) {
+          checkedInGrade.forEach(cb => {
+            displayTokens.push(cb.value.replace('כיתה ', ''));
+          });
+        }
+      }
+    });
+
+    const specialChecked = Array.from(document.querySelectorAll('.grade-group-box[data-grade="special"] input[name="targetClasses"]:checked'));
+    specialChecked.forEach(cb => displayTokens.push(cb.value));
+  }
+
+  wrapper.innerHTML = displayTokens.map(token => `
+    <span class="class-pill">
+      ${token}
+      <i class="fa-solid fa-xmark remove-pill" onclick="event.stopPropagation(); removeSpecificPillToken('${token}')"></i>
+    </span>
+  `).join('');
+}
+
+window.removeSpecificPillToken = function(token) {
+  if (token === 'כלל המוסד (כל השכבות)') {
+    clearAllClasses();
+    return;
+  }
+
+  const gradeMatch = token.match(/שכבה (ז'|ח'|ט'|י'|י''א|י''ב)/);
+  if (gradeMatch) {
+    const rawGrade = gradeMatch[1];
+    const codeMap = { "ז'": 'ז', "ח'": 'ח', "ט'": 'ט', "י'": 'י', "י''א": 'יא', "י''ב": 'יב' };
+    const code = codeMap[rawGrade];
+    if (code) toggleGradeAll(code, false);
+    return;
+  }
+
+  document.querySelectorAll('input[name="targetClasses"]').forEach(cb => {
+    if (cb.value === token || cb.value === `כיתה ${token}`) {
+      cb.checked = false;
+      const box = cb.closest('.grade-group-box');
+      if (box) {
+        const gradeHeaderCb = box.querySelector('.grade-all-cb');
+        if (gradeHeaderCb) gradeHeaderCb.checked = false;
+      }
+    }
+  });
+
+  updateSelectedClassPills();
+};
+
+function getSelectedGroupFormattedString() {
+  const selectedCbs = Array.from(document.querySelectorAll('input[name="targetClasses"]:checked'));
+  if (!selectedCbs.length) return '';
+
+  const gradeMap = {
+    'ז': { name: "שכבה ז'", cbs: [] },
+    'ח': { name: "שכבה ח'", cbs: [] },
+    'ט': { name: "שכבה ט'", cbs: [] },
+    'י': { name: "שכבה י'", cbs: [] },
+    'יא': { name: "שכבה י''א", cbs: [] },
+    'יב': { name: "שכבה י''ב", cbs: [] }
+  };
+
+  document.querySelectorAll('.grade-group-box[data-grade]').forEach(box => {
+    const g = box.dataset.grade;
+    if (gradeMap[g]) {
+      gradeMap[g].cbs = Array.from(box.querySelectorAll('input[name="targetClasses"]'));
+    }
+  });
+
+  const allSchoolChecked = Object.values(gradeMap).every(g => g.cbs.length > 0 && g.cbs.every(cb => cb.checked));
+  if (allSchoolChecked) return 'כלל המוסד (כל השכבות)';
+
+  const formattedTokens = [];
+
+  Object.keys(gradeMap).forEach(gKey => {
+    const g = gradeMap[gKey];
+    if (g.cbs.length > 0) {
+      const checkedInGrade = g.cbs.filter(cb => cb.checked);
+      if (checkedInGrade.length === g.cbs.length) {
+        formattedTokens.push(`${g.name} (כל 6 הכיתות)`);
+      } else if (checkedInGrade.length > 0) {
+        checkedInGrade.forEach(cb => formattedTokens.push(cb.value));
+      }
+    }
+  });
+
+  const specialChecked = Array.from(document.querySelectorAll('.grade-group-box[data-grade="special"] input[name="targetClasses"]:checked'));
+  specialChecked.forEach(cb => formattedTokens.push(cb.value));
+
+  return formattedTokens.join(', ');
+}
+
+// --------------------------------------------------------------------------
 // 4. Submit Cancellation Request
 // --------------------------------------------------------------------------
 async function handleFormSubmit(e) {
@@ -435,7 +631,12 @@ async function handleFormSubmit(e) {
     return;
   }
 
-  const group = document.getElementById('targetGroupSelect').value;
+  const group = getSelectedGroupFormattedString();
+  if (!group) {
+    showToast('יש לבחור לפחות כיתה אחת או שכבה מהרשימה (סימון מרובה)', 'warning');
+    return;
+  }
+
   const startDate = document.getElementById('startDateInput').value;
   const endDate = document.getElementById('endDateInput').value;
   const reason = document.getElementById('reasonInput').value;
@@ -483,10 +684,12 @@ async function handleFormSubmit(e) {
 
     showToast('הבקשה נרשמה בהצלחה ונשלחה במייל לחגי היקר ואסתר!', 'success');
     document.getElementById('cancellationForm').reset();
+    clearAllClasses();
     fetchRequestsData();
   } catch (err) {
     showToast('הבקשה נרשמה מקומית בהצלחה!', 'success');
     document.getElementById('cancellationForm').reset();
+    clearAllClasses();
     fetchRequestsData();
   }
 }
