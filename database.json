@@ -168,6 +168,49 @@
   ],
   "requests": [
     {
+      "id": "REQ-999",
+      "applicantId": "021395694",
+      "applicantName": "אהרנפלד אוהד",
+      "applicantEmail": "ohadhadas@horev.org.il",
+      "group": "שכבה ט'",
+      "startDate": "2026-09-11",
+      "endDate": "2026-09-11",
+      "requestedMeals": [
+        "ארוחת בוקר",
+        "ארוחת צהריים"
+      ],
+      "reason": "טיול שדה מדבר יהודה 3 ימים",
+      "submittedAt": "2026-09-06 11:25",
+      "status": "APPROVED",
+      "approvedRefund": 450,
+      "approvedDetails": "ארוחת צהריים בלבד",
+      "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
+      "handledBy": "חגי היקר",
+      "handledAt": "2026-09-06 11:25",
+      "timeline": [
+        {
+          "time": "2026-09-06 11:25",
+          "title": "הגשת בקשת ביטול",
+          "desc": "הבקשה הוגשה ע\"י אהרנפלד אוהד",
+          "type": "info"
+        },
+        {
+          "time": "2026-09-06 11:25",
+          "title": "📸 הועלתה קבלה / חשבונית ע\"י הרכז/ת",
+          "desc": "הועלתה קבלה ע\"ס ₪450 (ספק/חנות: רמי לוי שיווק השקמה). נשלחה התראה לאסתר במזכירות.",
+          "type": "success"
+        }
+      ],
+      "receipt": {
+        "amount": 450,
+        "store": "רמי לוי שיווק השקמה",
+        "notes": "קבלת קניות עבור טיול י\"א",
+        "fileName": "receipt_test.png",
+        "fileData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        "uploadedAt": "2026-09-06 11:25"
+      }
+    },
+    {
       "id": "REQ-101",
       "applicantId": "021395694",
       "applicantName": "אהרנפלד אוהד",
@@ -216,6 +259,54 @@
     }
   ],
   "emailLogs": [
+    {
+      "time": "2026-09-06 11:25",
+      "to": "bitulim@horev.org.il",
+      "subject": "[ביטול ארוחות] בקשה חדשה מאת אורבך נתן - שכבה י' (2026-09-11)",
+      "status": "נשלח בהצלחה ל-chagi@horev.org.il (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 11:25",
+      "to": "bitulim@horev.org.il",
+      "subject": "[ביטול ארוחות] בקשה חדשה מאת אורבך נתן - שכבה י' (2026-09-11)",
+      "status": "[MOCK QA] Sent to chagi@horev.org.il"
+    },
+    {
+      "time": "2026-09-06 11:25",
+      "to": "bitulim@horev.org.il",
+      "subject": "[קבלה חדשה] התקבלה קבלה לבקשה #REQ-999 מאת אהרנפלד אוהד (₪450)",
+      "status": "נשלח בהצלחה ל-esters@horev.org.il (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 11:25",
+      "to": "bitulim@horev.org.il",
+      "subject": "[קבלה חדשה] התקבלה קבלה לבקשה #REQ-999 מאת אהרנפלד אוהד (₪450)",
+      "status": "[MOCK QA] Sent to esters@horev.org.il"
+    },
+    {
+      "time": "2026-09-06 11:25",
+      "to": "bitulim@horev.org.il",
+      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-999 - אושרה (סכום החזר: ₪450)",
+      "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 11:25",
+      "to": "bitulim@horev.org.il",
+      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-999 - אושרה (סכום החזר: ₪450)",
+      "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
+    },
+    {
+      "time": "2026-09-06 11:25",
+      "to": "bitulim@horev.org.il",
+      "subject": "[ביטול ארוחות] בקשה חדשה מאת אהרנפלד אוהד - שכבה ט' (2026-09-11)",
+      "status": "נשלח בהצלחה ל-chagi@horev.org.il (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 11:25",
+      "to": "bitulim@horev.org.il",
+      "subject": "[ביטול ארוחות] בקשה חדשה מאת אהרנפלד אוהד - שכבה ט' (2026-09-11)",
+      "status": "[MOCK QA] Sent to chagi@horev.org.il"
+    },
     {
       "time": "2.9.2026 13:42",
       "to": "ohadhadas@horev.org.il",

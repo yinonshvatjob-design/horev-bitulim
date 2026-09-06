@@ -265,7 +265,7 @@ class DatabaseManager {
   addRequest(reqData) {
     const nextIdNumber = 100 + this.data.requests.length + 1;
     const newReq = {
-      id: `REQ-${nextIdNumber}`,
+      id: reqData.id || `REQ-${nextIdNumber}`,
       applicantId: reqData.applicantId,
       applicantName: reqData.applicantName,
       applicantEmail: reqData.applicantEmail,
@@ -274,14 +274,14 @@ class DatabaseManager {
       endDate: reqData.endDate,
       requestedMeals: reqData.requestedMeals || [],
       reason: reqData.reason,
-      submittedAt: this.formatDate(new Date()),
-      status: "PENDING",
-      approvedRefund: 0,
-      approvedDetails: null,
-      adminNotes: "",
-      handledBy: null,
-      handledAt: null,
-      timeline: [
+      submittedAt: reqData.submittedAt || this.formatDate(new Date()),
+      status: reqData.status || "PENDING",
+      approvedRefund: reqData.approvedRefund || 0,
+      approvedDetails: reqData.approvedDetails || null,
+      adminNotes: reqData.adminNotes || "",
+      handledBy: reqData.handledBy || null,
+      handledAt: reqData.handledAt || null,
+      timeline: reqData.timeline || [
         {
           time: this.formatDate(new Date()),
           title: "הגשת בקשת ביטול",

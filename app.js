@@ -511,15 +511,7 @@ async function fetchRequestsData() {
   updatePendingCounter();
 }
 
-async function fetchUsersData() {
-  try {
-    const res = await fetch(`${API_BASE_URL}/users`);
-    const data = await res.json();
-    if (data.success) {
-      AppStore.coordinators = data.coordinators;
-    }
-  } catch (e) {}
-}
+
 
 function renderMySubmissions() {
   const tbody = document.getElementById('mySubmissionsTbody');
@@ -587,14 +579,17 @@ function renderPendingRequests() {
 
   container.innerHTML = pendingList.map(r => {
     const urgency = getUrgencyLevel(r.startDate);
-    const borderClass = urgency === 'HIGH' ? 'border-danger' : urgency === 'MEDIUM' ? 'border-warning' : 'border-success';
+    const borderClass = urgency.class === 'urgency-high' ? 'border-danger' : urgency.class === 'urgency-medium' ? 'border-warning' : 'border-success';
 
     return `
       <div class="pending-card card mb-3 ${borderClass}">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
             <h4 class="mb-1 text-primary">#${r.id} — ${r.applicantName} (${r.group})</h4>
-            <span class="req-date"><i class="fa-solid fa-clock"></i> תאריך אירוע: <strong>${r.startDate}</strong></span>
+            <div>
+              <span class="badge ${urgency.badgeClass} p-2 ml-2" style="font-size: 13px;"><i class="fa-solid ${urgency.icon}"></i> ${urgency.label}</span>
+              <span class="req-date"><i class="fa-solid fa-clock"></i> תאריך אירוע: <strong>${r.startDate}</strong></span>
+            </div>
           </div>
           <p class="text-muted mb-2"><strong>ארוחות שבוטלו:</strong> ${r.requestedMeals ? r.requestedMeals.join(', ') : ''} | <strong>סיבה:</strong> ${r.reason}</p>
           <div class="approval-controls-box p-3 mt-2 bg-light border-radius">
