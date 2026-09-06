@@ -16,7 +16,7 @@ class MailerService {
   get treasurerAdmin() {
     const admins = db.getAllAdmins();
     return admins.find(a => a.id === '0584220463' || (a.name && a.name.includes('חגי')) || (a.roleTitle && a.roleTitle.includes('גזבר'))) || {
-      name: 'חגי היקר',
+      name: 'חגי',
       roleTitle: 'גזבר המוסד (Admin)',
       email: 'yinonshvat@gmail.com'
     };
@@ -222,7 +222,7 @@ class MailerService {
           
           <div style="background: ${isApproved ? '#059669' : '#dc2626'}; color: #ffffff; padding: 20px; text-align: center;">
             <h2 style="margin: 0; font-size: 22px;">מוסדות חורב ירושלים - עדכון בקשת ביטול ארוחות</h2>
-            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">בקשתך #${reqData.id} נבחנה ועודכנה ע"י חגי היקר והגזברות</p>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">בקשתך #${reqData.id} נבחנה ועודכנה ע"י חגי והגזברות</p>
           </div>
 
           <div style="padding: 25px;">
@@ -256,7 +256,7 @@ class MailerService {
 
             ${reqData.adminNotes ? `
               <div style="background: #f8fafc; border-right: 4px solid #3b82f6; padding: 12px 15px; margin-bottom: 20px;">
-                <strong>הערת חגי היקר / גזברות:</strong><br>
+                <strong>הערת חגי / גזברות:</strong><br>
                 <span style="color: #334155;">"${reqData.adminNotes}"</span>
               </div>
             ` : ''}

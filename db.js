@@ -9,7 +9,7 @@ const { Pool } = require('pg');
 // Initial Admins (Yinon, Hagai, Esther)
 const SEED_ADMINS = [
   { id: "0542065606", name: "ינון", role: "מנהל תוכנה (Admin)", email: "yinonshvat@horev.org.il", pass: "yinon2026" },
-  { id: "0584220463", name: "חגי היקר", role: "גזבר המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "hagai2026" },
+  { id: "0584220463", name: "חגי", role: "גזבר המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "hagai2026" },
   { id: "0545540828", name: "אסתר", role: "מזכירת המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "esther2026" }
 ];
 
@@ -322,7 +322,7 @@ class DatabaseManager {
           handledAt: null,
           timeline: [
             { time: this.formatDate(new Date(Date.now() - 3600000 * 5)), title: "הגשת בקשה", desc: "הבקשה הוגשה ע\"י הרכז אהרנפלד אוהד עבור שכבה ט'", type: "info" },
-            { time: this.formatDate(new Date(Date.now() - 3600000 * 4.9)), title: "שליחת אימייל התראה לחגי היקר ואסתר", desc: "נשלח אימייל התראה ל-chagi@horev.org.il ול-esters@horev.org.il", type: "info" }
+            { time: this.formatDate(new Date(Date.now() - 3600000 * 4.9)), title: "שליחת אימייל התראה לחגי ואסתר", desc: "נשלח אימייל התראה ל-chagi@horev.org.il ול-esters@horev.org.il", type: "info" }
           ]
         }
       ],

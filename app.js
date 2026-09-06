@@ -316,7 +316,7 @@ async function handleLogin(role, id, pass = '') {
     console.error('Login error', error);
     // Fallback local auth demo
     if (id === '0542065606' || id === '0584220463' || id === '0545540828') {
-      AppStore.currentUser = { id, name: id === '0542065606' ? 'ינון' : id === '0584220463' ? 'חגי היקר' : 'אסתר', role: 'ADMIN', roleTitle: 'אדמין מוסדות חורב' };
+      AppStore.currentUser = { id, name: id === '0542065606' ? 'ינון' : id === '0584220463' ? 'חגי' : 'אסתר', role: 'ADMIN', roleTitle: 'אדמין מוסדות חורב' };
     } else {
       AppStore.currentUser = { id, name: 'הרכז/ת', role: 'COORDINATOR', roleTitle: 'רכז/ת מורש/ת' };
     }
@@ -821,7 +821,7 @@ async function handleFormSubmit(e) {
       return;
     }
 
-    showToast('הבקשה נרשמה בהצלחה ונשלחה במייל לחגי היקר ואסתר!', 'success');
+    showToast('הבקשה נרשמה בהצלחה ונשלחה במייל לחגי ואסתר!', 'success');
     document.getElementById('cancellationForm').reset();
     clearAllClasses();
     updateMealCardStates();

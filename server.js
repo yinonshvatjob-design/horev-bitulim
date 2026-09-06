@@ -108,7 +108,7 @@ app.post('/api/auth/login', (req, res) => {
 
   return res.status(403).json({
     success: false,
-    message: `הפרטים שהוזנו (${rawInput}) אינם מופיעים ברשימת המורשים. ניתן לפנות לחגי היקר או לאסתר להוספה ברגע.`
+    message: `הפרטים שהוזנו (${rawInput}) אינם מופיעים ברשימת המורשים. ניתן לפנות לחגי או לאסתר להוספה ברגע.`
   });
 });
 
@@ -182,7 +182,7 @@ app.post('/api/requests', async (req, res) => {
     handledAt: null,
     timeline: [
       { time: submittedAtStr, title: "הגשת בקשת ביטול", desc: `הבקשה הוגשה בהצלחה ע"י הרכז/ת ${applicantName} עבור ${group}`, type: "info" },
-      { time: submittedAtStr, title: "שליחת התראה לחגי היקר ואסתר", desc: "נשלח אימייל התראה ל-chagi@horev.org.il ול-esters@horev.org.il", type: "info" }
+      { time: submittedAtStr, title: "שליחת התראה לחגי ואסתר", desc: "נשלח אימייל התראה ל-chagi@horev.org.il ול-esters@horev.org.il", type: "info" }
     ]
   };
 
@@ -191,7 +191,7 @@ app.post('/api/requests', async (req, res) => {
   // Send Alert Email to Admins (Hagai & Esther)
   await mailer.sendSubmissionAlertToAdmins(newReq);
 
-  res.json({ success: true, request: newReq, message: 'הבקשה הוגשה בהצלחה ונשלחה לאישור חגי היקר!' });
+  res.json({ success: true, request: newReq, message: 'הבקשה הוגשה בהצלחה ונשלחה לאישור חגי!' });
 });
 
 // POST /api/requests/:id/approve (Custom Approval & Manual Refund in ₪)
@@ -213,7 +213,7 @@ app.post('/api/requests/:id/approve', async (req, res) => {
       ...(request.timeline || []),
       {
         time: nowStr,
-        title: `אושר ע"י ${adminName || 'חגי היקר'}`,
+        title: `אושר ע"י ${adminName || 'חגי'}`,
         desc: `אושר מותאם אישית. ארוחות מאושרות: ${approvedMeals || mealsStr} | סכום החזר: ₪${refundAmount.toLocaleString()}`,
         type: "success"
       },
@@ -230,7 +230,7 @@ app.post('/api/requests/:id/approve', async (req, res) => {
       approvedRefund: refundAmount,
       approvedDetails: approvedMeals || mealsStr,
       adminNotes: adminNotes || "",
-      handledBy: adminName || "חגי היקר (גזבר)",
+      handledBy: adminName || "חגי (גזבר)",
       handledAt: nowStr,
       timeline: updatedTimeline
     });
@@ -266,7 +266,7 @@ app.post('/api/requests/:id/reject', async (req, res) => {
       ...(request.timeline || []),
       {
         time: nowStr,
-        title: `נדחה ע"י ${adminName || 'חגי היקר'}`,
+        title: `נדחה ע"י ${adminName || 'חגי'}`,
         desc: `סיבת דחייה: ${adminNotes || 'לא צוינה סיבה'}`,
         type: "danger"
       },
@@ -282,7 +282,7 @@ app.post('/api/requests/:id/reject', async (req, res) => {
       status: "REJECTED",
       approvedRefund: 0,
       adminNotes: adminNotes || "",
-      handledBy: adminName || "חגי היקר (גזבר)",
+      handledBy: adminName || "חגי (גזבר)",
       handledAt: nowStr,
       timeline: updatedTimeline
     });

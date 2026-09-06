@@ -9,7 +9,7 @@
     },
     {
       "id": "0584220463",
-      "name": "חגי היקר",
+      "name": "חגי",
       "role": "גזבר המוסד (Admin)",
       "email": "yinonshvat@gmail.com",
       "pass": "hagai2026"
@@ -301,6 +301,92 @@
   ],
   "requests": [
     {
+      "id": "REQ-798",
+      "applicantId": "021395694",
+      "applicantName": "אהרנפלד אוהד",
+      "applicantEmail": "ohadhadas@horev.org.il",
+      "group": "שכבה ט'",
+      "startDate": "2026-09-11",
+      "endDate": "2026-09-11",
+      "requestedMeals": [
+        "ארוחת בוקר",
+        "ארוחת צהריים"
+      ],
+      "reason": "טיול שדה מדבר יהודה 3 ימים",
+      "submittedAt": "2026-09-06 14:03",
+      "status": "APPROVED",
+      "approvedRefund": 450,
+      "approvedDetails": "ארוחת צהריים בלבד",
+      "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
+      "handledBy": "חגי היקר",
+      "handledAt": "2026-09-06 14:03",
+      "timeline": [
+        {
+          "time": "2026-09-06 14:03",
+          "title": "הגשת בקשת ביטול",
+          "desc": "הבקשה הוגשה ע\"י אהרנפלד אוהד",
+          "type": "info"
+        },
+        {
+          "time": "2026-09-06 14:03",
+          "title": "📸 הועלתה קבלה / חשבונית ע\"י הרכז/ת",
+          "desc": "הועלתה קבלה ע\"ס ₪450 (ספק/חנות: רמי לוי שיווק השקמה). נשלחה התראה לאסתר במזכירות.",
+          "type": "success"
+        }
+      ],
+      "receipt": {
+        "amount": 450,
+        "store": "רמי לוי שיווק השקמה",
+        "notes": "קבלת קניות עבור טיול י\"א",
+        "fileName": "receipt_test.png",
+        "fileData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        "uploadedAt": "2026-09-06 14:03"
+      }
+    },
+    {
+      "id": "REQ-776",
+      "applicantId": "021395694",
+      "applicantName": "אהרנפלד אוהד",
+      "applicantEmail": "ohadhadas@horev.org.il",
+      "group": "שכבה ט'",
+      "startDate": "2026-09-11",
+      "endDate": "2026-09-11",
+      "requestedMeals": [
+        "ארוחת בוקר",
+        "ארוחת צהריים"
+      ],
+      "reason": "טיול שדה מדבר יהודה 3 ימים",
+      "submittedAt": "2026-09-06 14:00",
+      "status": "APPROVED",
+      "approvedRefund": 450,
+      "approvedDetails": "ארוחת צהריים בלבד",
+      "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
+      "handledBy": "חגי",
+      "handledAt": "2026-09-06 14:00",
+      "timeline": [
+        {
+          "time": "2026-09-06 14:00",
+          "title": "הגשת בקשת ביטול",
+          "desc": "הבקשה הוגשה ע\"י אהרנפלד אוהד",
+          "type": "info"
+        },
+        {
+          "time": "2026-09-06 14:00",
+          "title": "📸 הועלתה קבלה / חשבונית ע\"י הרכז/ת",
+          "desc": "הועלתה קבלה ע\"ס ₪450 (ספק/חנות: רמי לוי שיווק השקמה). נשלחה התראה לאסתר במזכירות.",
+          "type": "success"
+        }
+      ],
+      "receipt": {
+        "amount": 450,
+        "store": "רמי לוי שיווק השקמה",
+        "notes": "קבלת קניות עבור טיול י\"א",
+        "fileName": "receipt_test.png",
+        "fileData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        "uploadedAt": "2026-09-06 14:00"
+      }
+    },
+    {
       "id": "REQ-772",
       "applicantId": "021395694",
       "applicantName": "אהרנפלד אוהד",
@@ -318,7 +404,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:58",
       "timeline": [
         {
@@ -361,7 +447,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:56",
       "timeline": [
         {
@@ -404,7 +490,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:44",
       "timeline": [
         {
@@ -447,7 +533,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:42",
       "timeline": [
         {
@@ -490,7 +576,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:39",
       "timeline": [
         {
@@ -533,7 +619,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:33",
       "timeline": [
         {
@@ -576,7 +662,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:28",
       "timeline": [
         {
@@ -619,7 +705,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:25",
       "timeline": [
         {
@@ -662,7 +748,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:22",
       "timeline": [
         {
@@ -705,7 +791,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:16",
       "timeline": [
         {
@@ -748,7 +834,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:15",
       "timeline": [
         {
@@ -791,7 +877,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:12",
       "timeline": [
         {
@@ -834,7 +920,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:11",
       "timeline": [
         {
@@ -877,7 +963,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:05",
       "timeline": [
         {
@@ -920,7 +1006,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 13:02",
       "timeline": [
         {
@@ -963,7 +1049,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:55",
       "timeline": [
         {
@@ -1006,7 +1092,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:51",
       "timeline": [
         {
@@ -1049,7 +1135,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:19",
       "timeline": [
         {
@@ -1092,7 +1178,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:16",
       "timeline": [
         {
@@ -1135,7 +1221,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:13",
       "timeline": [
         {
@@ -1178,7 +1264,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:11",
       "timeline": [
         {
@@ -1221,7 +1307,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:09",
       "timeline": [
         {
@@ -1264,7 +1350,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:07",
       "timeline": [
         {
@@ -1307,7 +1393,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:05",
       "timeline": [
         {
@@ -1350,7 +1436,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:03",
       "timeline": [
         {
@@ -1393,7 +1479,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 12:00",
       "timeline": [
         {
@@ -1436,7 +1522,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 11:55",
       "timeline": [
         {
@@ -1479,7 +1565,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 11:54",
       "timeline": [
         {
@@ -1522,7 +1608,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 11:50",
       "timeline": [
         {
@@ -1565,7 +1651,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 11:41",
       "timeline": [
         {
@@ -1608,7 +1694,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 11:38",
       "timeline": [
         {
@@ -1651,7 +1737,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 11:35",
       "timeline": [
         {
@@ -1694,7 +1780,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 11:33",
       "timeline": [
         {
@@ -1737,7 +1823,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 11:32",
       "timeline": [
         {
@@ -1780,7 +1866,7 @@
       "approvedRefund": 450,
       "approvedDetails": "ארוחת צהריים בלבד",
       "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
-      "handledBy": "חגי היקר",
+      "handledBy": "חגי",
       "handledAt": "2026-09-06 11:25",
       "timeline": [
         {
@@ -1834,7 +1920,7 @@
         },
         {
           "time": "2.9.2026 07:56",
-          "title": "שליחת אימייל התראה לחגי היקר ואסתר",
+          "title": "שליחת אימייל התראה לחגי ואסתר",
           "desc": "נשלח אימייל התראה ל-chagi@horev.org.il ול-esters@horev.org.il",
           "type": "info"
         },
@@ -1854,6 +1940,102 @@
     }
   ],
   "emailLogs": [
+    {
+      "time": "2026-09-06 14:03",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אורבך נתן - שכבה י' (2026-09-11)",
+      "status": "נשלח בהצלחה ל-yinonshvat@gmail.com (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 14:03",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אורבך נתן - שכבה י' (2026-09-11)",
+      "status": "[MOCK QA] Sent to yinonshvat@gmail.com"
+    },
+    {
+      "time": "2026-09-06 14:03",
+      "to": "bitulim@horev.org.il",
+      "subject": "קבלה חדשה לבקשה #REQ-798 מאת אהרנפלד אוהד (₪450)",
+      "status": "נשלח בהצלחה ל-yinonshvat@gmail.com (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 14:03",
+      "to": "bitulim@horev.org.il",
+      "subject": "קבלה חדשה לבקשה #REQ-798 מאת אהרנפלד אוהד (₪450)",
+      "status": "[MOCK QA] Sent to yinonshvat@gmail.com"
+    },
+    {
+      "time": "2026-09-06 14:03",
+      "to": "bitulim@horev.org.il",
+      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-798 אושרה (סכום החזר: ₪450)",
+      "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 14:03",
+      "to": "bitulim@horev.org.il",
+      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-798 אושרה (סכום החזר: ₪450)",
+      "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
+    },
+    {
+      "time": "2026-09-06 14:03",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אהרנפלד אוהד - שכבה ט' (2026-09-11)",
+      "status": "נשלח בהצלחה ל-yinonshvat@gmail.com (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 14:03",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אהרנפלד אוהד - שכבה ט' (2026-09-11)",
+      "status": "[MOCK QA] Sent to yinonshvat@gmail.com"
+    },
+    {
+      "time": "2026-09-06 14:00",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אורבך נתן - שכבה י' (2026-09-11)",
+      "status": "נשלח בהצלחה ל-yinonshvat@gmail.com (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 14:00",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אורבך נתן - שכבה י' (2026-09-11)",
+      "status": "[MOCK QA] Sent to yinonshvat@gmail.com"
+    },
+    {
+      "time": "2026-09-06 14:00",
+      "to": "bitulim@horev.org.il",
+      "subject": "קבלה חדשה לבקשה #REQ-776 מאת אהרנפלד אוהד (₪450)",
+      "status": "נשלח בהצלחה ל-yinonshvat@gmail.com (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 14:00",
+      "to": "bitulim@horev.org.il",
+      "subject": "קבלה חדשה לבקשה #REQ-776 מאת אהרנפלד אוהד (₪450)",
+      "status": "[MOCK QA] Sent to yinonshvat@gmail.com"
+    },
+    {
+      "time": "2026-09-06 14:00",
+      "to": "bitulim@horev.org.il",
+      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-776 אושרה (סכום החזר: ₪450)",
+      "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 14:00",
+      "to": "bitulim@horev.org.il",
+      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-776 אושרה (סכום החזר: ₪450)",
+      "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
+    },
+    {
+      "time": "2026-09-06 14:00",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אהרנפלד אוהד - שכבה ט' (2026-09-11)",
+      "status": "נשלח בהצלחה ל-yinonshvat@gmail.com (Google Gmail)"
+    },
+    {
+      "time": "2026-09-06 14:00",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אהרנפלד אוהד - שכבה ט' (2026-09-11)",
+      "status": "[MOCK QA] Sent to yinonshvat@gmail.com"
+    },
     {
       "time": "2026-09-06 13:58",
       "to": "bitulim@horev.org.il",
