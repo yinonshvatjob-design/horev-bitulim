@@ -670,7 +670,52 @@ async function handleFormSubmit(e) {
     showToast('לא ניתן להגיש בקשה בטווח של פחות מ-48 שעות מראש', 'danger');
     return;
   }
+}
 
+window.updateMealCardStates = function() {
+  const cbBreakfast = document.getElementById('mealCbBreakfast');
+  const cbLunch = document.getElementById('mealCbLunch');
+  const cardBreakfast = document.getElementById('mealCardBreakfast');
+  const cardLunch = document.getElementById('mealCardLunch');
+  const cardBoth = document.getElementById('mealCardBoth');
+
+  if (cardBreakfast && cbBreakfast) {
+    if (cbBreakfast.checked) cardBreakfast.classList.add('active');
+    else cardBreakfast.classList.remove('active');
+  }
+
+  if (cardLunch && cbLunch) {
+    if (cbLunch.checked) cardLunch.classList.add('active');
+    else cardLunch.classList.remove('active');
+  }
+
+  if (cardBoth) {
+    if (cbBreakfast && cbLunch && cbBreakfast.checked && cbLunch.checked) {
+      cardBoth.classList.add('active');
+    } else {
+      cardBoth.classList.remove('active');
+    }
+  }
+};
+
+window.toggleSelectBothMeals = function() {
+  const cbBreakfast = document.getElementById('mealCbBreakfast');
+  const cbLunch = document.getElementById('mealCbLunch');
+
+  const bothSelected = cbBreakfast && cbLunch && cbBreakfast.checked && cbLunch.checked;
+
+  if (bothSelected) {
+    // Uncheck both (or keep default breakfast)
+    if (cbBreakfast) cbBreakfast.checked = true;
+    if (cbLunch) cbLunch.checked = false;
+  } else {
+    // Check BOTH!
+    if (cbBreakfast) cbBreakfast.checked = true;
+    if (cbLunch) cbLunch.checked = true;
+  }
+
+  updateMealCardStates();
+};
   const group = getSelectedGroupFormattedString();
   if (!group) {
     showToast('יש לבחור לפחות כיתה אחת או שכבה מהרשימה (סימון מרובה)', 'warning');
@@ -725,11 +770,13 @@ async function handleFormSubmit(e) {
     showToast('הבקשה נרשמה בהצלחה ונשלחה במייל לחגי היקר ואסתר!', 'success');
     document.getElementById('cancellationForm').reset();
     clearAllClasses();
+    updateMealCardStates();
     fetchRequestsData();
   } catch (err) {
     showToast('הבקשה נרשמה מקומית בהצלחה!', 'success');
     document.getElementById('cancellationForm').reset();
     clearAllClasses();
+    updateMealCardStates();
     fetchRequestsData();
   }
 }

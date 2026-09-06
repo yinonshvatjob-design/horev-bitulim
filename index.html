@@ -24,7 +24,7 @@
   <meta http-equiv="Expires" content="0">
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=13.0">
+  <link rel="stylesheet" href="style.css?v=14.0">
 </head>
 <body class="light-mode">
 
@@ -338,18 +338,25 @@
 
             <!-- Meal Selection -->
             <div class="form-group">
-              <label><i class="fa-solid fa-utensils"></i> ארוחות מבוטלות (ניתן לבחור יותר מאחת) *</label>
+              <label><i class="fa-solid fa-utensils"></i> ארוחות מבוטלות (ניתן לבחור אחת או את שתיהן) *</label>
               <div class="checkbox-group">
-                <label class="custom-checkbox-card">
-                  <input type="checkbox" name="mealType" value="ארוחת בוקר" checked>
+                <label class="custom-checkbox-card active" id="mealCardBreakfast">
+                  <input type="checkbox" name="mealType" value="ארוחת בוקר" id="mealCbBreakfast" checked onchange="updateMealCardStates()">
                   <span class="checkbox-box"><i class="fa-solid fa-sun"></i></span>
                   <span class="checkbox-label">ארוחת בוקר</span>
+                  <i class="fa-solid fa-circle-check meal-check-icon"></i>
                 </label>
-                <label class="custom-checkbox-card">
-                  <input type="checkbox" name="mealType" value="ארוחת צהריים" checked>
+                <label class="custom-checkbox-card active" id="mealCardLunch">
+                  <input type="checkbox" name="mealType" value="ארוחת צהריים" id="mealCbLunch" checked onchange="updateMealCardStates()">
                   <span class="checkbox-box"><i class="fa-solid fa-bowl-food"></i></span>
                   <span class="checkbox-label">ארוחת צהריים</span>
+                  <i class="fa-solid fa-circle-check meal-check-icon"></i>
                 </label>
+                <div class="custom-checkbox-card active" id="mealCardBoth" onclick="toggleSelectBothMeals()" style="cursor: pointer;" title="לחץ לבחירה/ביטול של שתי הארוחות יחד">
+                  <span class="checkbox-box" style="background: var(--primary); color: #fff;"><i class="fa-solid fa-utensils"></i></span>
+                  <span class="checkbox-label">שתיהן (גם בוקר וגם צהריים)</span>
+                  <i class="fa-solid fa-circle-check meal-check-icon"></i>
+                </div>
               </div>
             </div>
 
@@ -827,6 +834,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=15.0"></script>
+  <script src="app.js?v=16.0"></script>
 </body>
 </html>

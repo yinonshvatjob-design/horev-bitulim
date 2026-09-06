@@ -514,10 +514,12 @@ body {
   display: flex;
   gap: 1rem;
   margin-top: 0.4rem;
+  flex-wrap: wrap;
 }
 
 .custom-checkbox-card {
   flex: 1;
+  min-width: 180px;
   display: flex;
   align-items: center;
   gap: 0.8rem;
@@ -526,6 +528,9 @@ body {
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: var(--transition);
+  user-select: none;
+  position: relative;
+  background: var(--bg-surface);
 }
 
 .custom-checkbox-card input[type="checkbox"] {
@@ -543,16 +548,41 @@ body {
   justify-content: center;
   font-size: 1.1rem;
   transition: var(--transition);
+  flex-shrink: 0;
 }
 
+.meal-check-icon {
+  margin-right: auto;
+  font-size: 1.2rem;
+  color: var(--border-color);
+  transition: var(--transition);
+  opacity: 0.3;
+}
+
+.custom-checkbox-card.active,
+.custom-checkbox-card:has(input[type="checkbox"]:checked) {
+  border-color: var(--primary);
+  background: rgba(37, 99, 235, 0.07);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.custom-checkbox-card.active .checkbox-box,
 .custom-checkbox-card input[type="checkbox"]:checked + .checkbox-box {
   background: var(--primary);
   color: #fff;
 }
 
+.custom-checkbox-card.active .checkbox-label,
 .custom-checkbox-card input[type="checkbox"]:checked ~ .checkbox-label {
   font-weight: 700;
   color: var(--primary);
+}
+
+.custom-checkbox-card.active .meal-check-icon,
+.custom-checkbox-card input[type="checkbox"]:checked ~ .meal-check-icon {
+  color: var(--success);
+  opacity: 1;
+  transform: scale(1.15);
 }
 
 .custom-checkbox-card:hover {
