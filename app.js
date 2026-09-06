@@ -1600,31 +1600,171 @@ window.openViewReceiptModal = function(reqId) {
   const isImage = r.fileData && r.fileData.startsWith('data:image');
 
   const contentHtml = `
-    <div class="p-3">
-      <h4 class="text-primary mb-2">בקשה #${req.id} — ${req.applicantName} (${req.group})</h4>
-      <div class="bg-light p-3 border-radius mb-3 text-right">
-        <p class="mb-1"><strong>ספק / חנות:</strong> ${r.store}</p>
+    <div class="p-2 text-right">
+      <h4 class="text-primary mb-2" style="font-size: 18px;">בקשה #${req.id} — ${req.applicantName} (${req.group})</h4>
+      <div class="bg-light p-3 mb-3" style="border-radius: 8px; border: 1px solid #e2e8f0;">
+        <p class="mb-1"><strong>ספק / חנות:</strong> ${r.store || 'לא צוין'}</p>
         <p class="mb-1 text-success font-weight-bold" style="font-size: 18px;"><strong>סכום בקבלה:</strong> ₪${(r.amount || 0).toLocaleString()}</p>
         <p class="mb-1"><strong>זמן העלאה:</strong> ${r.uploadedAt || ''}</p>
         ${r.notes ? `<p class="mb-0 text-muted"><strong>הערות לאסתר:</strong> "${r.notes}"</p>` : ''}
       </div>
 
       ${isImage ? `
-        <div class="text-center my-3" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 5px;">
-          <img src="${r.fileData}" alt="תמונת קבלה" style="max-width: 100%; height: auto; border-radius: 6px;">
+        <div class="text-center my-3" style="max-height: 380px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 10px; padding: 8px; background: #f8fafc;">
+          <img src="${r.fileData}" alt="תמונת קבלה" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.06);">
         </div>
       ` : r.fileData ? `
-        <div class="my-3">
-          <a href="${r.fileData}" download="${r.fileName || 'receipt.pdf'}" class="btn btn-primary btn-block">
+        <div class="my-3 text-center">
+          <a href="${r.fileData}" download="${r.fileName || `receipt_${req.id}.pdf`}" class="btn btn-primary btn-block">
             <i class="fa-solid fa-download"></i> הורד קובץ קבלה (${r.fileName || 'PDF'})
           </a>
         </div>
       ` : '<p class="text-muted">אין קובץ מצורף</p>'}
+
+      <!-- Action Buttons Bar: Download, Print, Copy -->
+      <div class="d-flex flex-wrap justify-content-center mt-3 pt-3" style="gap: 10px; border-top: 1px solid #e2e8f0;">
+        ${isImage ? `
+          <a href="${r.fileData}" download="receipt_${req.id}_${r.store || 'horev'}.png" class="btn btn-success px-3" style="flex: 1; min-width: 140px;">
+            <i class="fa-solid fa-download"></i> שמור / הורד תמונה
+          </a>
+        ` : ''}
+        
+        <button type="button" class="btn btn-primary px-3" onclick="printReceipt('${req.id}')" style="flex: 1; min-width: 130px;">
+          <i class="fa-solid fa-print"></i> הדפס קבלה / PDF
+        </button>
+
+        <button type="button" class="btn btn-outline-dark px-3" onclick="copyReceiptToClipboard('${req.id}')" style="flex: 1; min-width: 130px;">
+          <i class="fa-solid fa-copy"></i> העתק תמונה / פרטים
+        </button>
+      </div>
     </div>
   `;
 
   document.getElementById('viewReceiptContent').innerHTML = contentHtml;
   document.getElementById('viewReceiptModal').style.display = 'flex';
+};
+
+window.printReceipt = function(reqId) {
+  const req = AppStore.requests.find(r => r.id === reqId);
+  if (!req || !req.receipt) return;
+  const r = req.receipt;
+
+  const printWindow = window.open('', '_blank', 'width=850,height=950');
+  if (!printWindow) {
+    showToast('נחסם חלון קופץ בדפדפן. נא לאפשר חלונות קופצים בדפדפן כדי להדפיס.', 'warning');
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html dir="rtl" lang="he">
+    <head>
+      <meta charset="UTF-8">
+      <title>הדפסת קבלה - בקשה #${req.id}</title>
+      <style>
+        body { font-family: 'Rubik', Arial, sans-serif; padding: 30px; color: #1e293b; direction: rtl; text-align: right; background: #fff; }
+        .header { text-align: center; border-bottom: 3px solid #0284c7; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h2 { margin: 0; color: #0369a1; font-size: 24px; }
+        .header p { margin: 6px 0 0 0; color: #64748b; font-size: 14px; }
+        .details-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px 20px; margin-bottom: 25px; }
+        .details-table { width: 100%; border-collapse: collapse; }
+        .details-table td { padding: 8px 5px; border-bottom: 1px dashed #e2e8f0; font-size: 15px; }
+        .amount { color: #059669; font-weight: bold; font-size: 18px; }
+        .receipt-container { text-align: center; margin-top: 20px; }
+        .receipt-img { max-width: 100%; max-height: 750px; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+        @media print {
+          body { padding: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h2>מוסדות חורב ירושלים — פלטפורמת ביטול ארוחות</h2>
+        <p>טופס קבלה / חשבונית דיגיטלית — מזכירות וגזברות</p>
+      </div>
+      <div class="details-box">
+        <table class="details-table">
+          <tr>
+            <td><strong>מספר בקשה:</strong> #${req.id}</td>
+            <td><strong>כיתה / קבוצה:</strong> ${req.group}</td>
+          </tr>
+          <tr>
+            <td><strong>מגיש/ת הבקשה:</strong> ${req.applicantName}</td>
+            <td><strong>ספק / חנות:</strong> ${r.store || 'לא צוין'}</td>
+          </tr>
+          <tr>
+            <td><strong>סכום בקבלה:</strong> <span class="amount">₪${(r.amount || 0).toLocaleString()}</span></td>
+            <td><strong>תאריך העלאה:</strong> ${r.uploadedAt || ''}</td>
+          </tr>
+          ${r.notes ? `<tr><td colspan="2"><strong>הערות לאסתר:</strong> "${r.notes}"</td></tr>` : ''}
+        </table>
+      </div>
+      
+      <div class="receipt-container">
+        ${r.fileData && r.fileData.startsWith('data:image') ? `
+          <img src="${r.fileData}" class="receipt-img" alt="תמונת קבלה">
+        ` : `<p style="font-size: 16px; color: #475569;">קובץ קבלה מצורף במערכת (${r.fileName || 'PDF'})</p>`}
+      </div>
+
+      <div class="footer">
+        הודפס מתוך פלטפורמת ביטול ארוחות מוסדות חורב ירושלים | תורה עם דרך ארץ
+      </div>
+
+      <script>
+        window.onload = function() {
+          setTimeout(function() {
+            window.print();
+          }, 300);
+        };
+      </script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+};
+
+window.copyReceiptToClipboard = async function(reqId) {
+  const req = AppStore.requests.find(r => r.id === reqId);
+  if (!req || !req.receipt) return;
+  const r = req.receipt;
+
+  try {
+    if (r.fileData && r.fileData.startsWith('data:image') && window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      const resp = await fetch(r.fileData);
+      const blob = await resp.blob();
+      
+      let pngBlob = blob;
+      if (blob.type !== 'image/png') {
+        pngBlob = await new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            canvas.toBlob(b => resolve(b), 'image/png');
+          };
+          img.src = r.fileData;
+        });
+      }
+
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': pngBlob })
+      ]);
+      showToast('תמונת הקבלה הועתקה ללוח! ניתן להדביק (Ctrl+V) ב-WhatsApp / Gmail', 'success');
+    } else {
+      const textToCopy = `🧾 קבלה מוסדות חורב\nבקשה #${req.id} (${req.applicantName} - ${req.group})\nספק: ${r.store || 'לא צוין'}\nסכום: ₪${r.amount}\nתאריך: ${r.uploadedAt}`;
+      await navigator.clipboard.writeText(textToCopy);
+      showToast('פרטי הקבלה הועתקו ללוח!', 'success');
+    }
+  } catch (err) {
+    console.error('Clipboard error:', err);
+    const textToCopy = `🧾 קבלה מוסדות חורב\nבקשה #${req.id} (${req.applicantName} - ${req.group})\nספק: ${r.store || 'לא צוין'}\nסכום: ₪${r.amount}\nתאריך: ${r.uploadedAt}`;
+    navigator.clipboard.writeText(textToCopy);
+    showToast('פרטי הקבלה הועתקו ללוח (טקסט)!', 'success');
+  }
 };
 
 window.deleteSingleRequest = async function(id) {
