@@ -1356,6 +1356,8 @@ window.openUploadReceiptModal = function(reqId) {
   const storeEl = document.getElementById('receiptStoreInput');
   const notesEl = document.getElementById('receiptNotesInput');
   const fileEl = document.getElementById('receiptFileInput');
+  const formEl = document.getElementById('uploadReceiptForm');
+  const successEl = document.getElementById('uploadReceiptSuccessState');
   const modalEl = document.getElementById('uploadReceiptModal');
 
   if (reqIdEl) reqIdEl.value = req.id;
@@ -1363,7 +1365,32 @@ window.openUploadReceiptModal = function(reqId) {
   if (storeEl) storeEl.value = '';
   if (notesEl) notesEl.value = '';
   if (fileEl) fileEl.value = '';
+
+  if (formEl) formEl.style.display = 'block';
+  if (successEl) successEl.style.display = 'none';
   if (modalEl) modalEl.style.display = 'flex';
+};
+
+window.resetUploadReceiptForm = function() {
+  const amountEl = document.getElementById('receiptAmountInput');
+  const storeEl = document.getElementById('receiptStoreInput');
+  const notesEl = document.getElementById('receiptNotesInput');
+  const fileEl = document.getElementById('receiptFileInput');
+  const formEl = document.getElementById('uploadReceiptForm');
+  const successEl = document.getElementById('uploadReceiptSuccessState');
+
+  if (amountEl) amountEl.value = '';
+  if (storeEl) storeEl.value = '';
+  if (notesEl) notesEl.value = '';
+  if (fileEl) fileEl.value = '';
+
+  if (formEl) formEl.style.display = 'block';
+  if (successEl) successEl.style.display = 'none';
+};
+
+window.closeUploadReceiptModal = function() {
+  const modalEl = document.getElementById('uploadReceiptModal');
+  if (modalEl) modalEl.style.display = 'none';
 };
 
 window.handleUploadReceiptSubmit = async function(e) {
@@ -1423,7 +1450,10 @@ window.handleUploadReceiptSubmit = async function(e) {
     const data = await res.json();
     if (data.success) {
       showToast('הקבלה הועלתה בהצלחה ונשלחה לאסתר במזכירות (עותק לחגי)!', 'success');
-      document.getElementById('uploadReceiptModal').style.display = 'none';
+      const formEl = document.getElementById('uploadReceiptForm');
+      const successEl = document.getElementById('uploadReceiptSuccessState');
+      if (formEl) formEl.style.display = 'none';
+      if (successEl) successEl.style.display = 'block';
       await fetchRequestsData();
     } else {
       showToast(data.message || 'שגיאה בהעלאת הקבלה', 'danger');

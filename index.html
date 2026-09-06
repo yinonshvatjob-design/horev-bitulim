@@ -788,6 +788,7 @@
         <button class="close-modal-btn" data-close="uploadReceiptModal">&times;</button>
       </div>
       <div class="modal-body">
+        <!-- Form State -->
         <form id="uploadReceiptForm" onsubmit="handleUploadReceiptSubmit(event)">
           <input type="hidden" id="uploadReceiptReqId">
           <div class="alert alert-info py-2 px-3 small mb-3">
@@ -813,6 +814,25 @@
             <i class="fa-solid fa-paper-plane"></i> שלח קבלה במיידי לאסתר במזכירות
           </button>
         </form>
+
+        <!-- Success Feedback State -->
+        <div id="uploadReceiptSuccessState" style="display: none;" class="text-center py-3">
+          <div class="mb-3">
+            <i class="fa-solid fa-circle-check text-success" style="font-size: 60px;"></i>
+          </div>
+          <h4 class="text-success mb-2 font-weight-bold">הקבלה הועלתה ונשלחה בהצלחה!</h4>
+          <p class="text-muted mb-4 small">
+            הקובץ והפרטים התקבלו במערכת ונשלחו במיידי באימייל לאסתר במזכירות (עם עותק לחגי היקר).
+          </p>
+          <div class="d-flex flex-column flex-sm-row justify-content-center gap-2 mt-3" style="gap: 10px;">
+            <button type="button" class="btn btn-primary px-3 py-2 mb-2 mb-sm-0" onclick="resetUploadReceiptForm()">
+              <i class="fa-solid fa-plus-circle"></i> העלה קבלה נוספת לבקשה זו
+            </button>
+            <button type="button" class="btn btn-outline-secondary px-3 py-2" onclick="closeUploadReceiptModal()">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> חזור למסך הראשי
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -836,6 +856,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=26.0"></script>
+  <script src="app.js?v=27.0"></script>
 </body>
 </html>
