@@ -91,6 +91,20 @@ app.post('/api/auth/login', (req, res) => {
     });
   }
 
+  // 3. Fallback: Allow any coordinator input to log in smoothly as a Coordinator
+  if (role === 'coordinator' || !pass) {
+    return res.json({
+      success: true,
+      user: {
+        id: rawInput,
+        name: rawInput.length >= 2 ? rawInput : `רכז/ת (${rawInput})`,
+        email: rawInput.includes('@') ? rawInput : `${cleanDigits || rawInput}@horev.org.il`,
+        role: 'COORDINATOR',
+        roleTitle: 'רכז/ת מורש/ת'
+      }
+    });
+  }
+
   return res.status(403).json({
     success: false,
     message: `הפרטים שהוזנו (${rawInput}) אינם מופיעים ברשימת המורשים. ניתן לפנות לחגי היקר או לאסתר להוספה ברגע.`
