@@ -260,12 +260,10 @@ class MailerService {
             </div>
 
             ${isApproved ? `
-              <!-- Direct Receipt Upload Button for Pilot -->
-              <div style="text-align: center; margin: 25px 0; background: #f0fdf4; border: 2px dashed #10b981; padding: 20px; border-radius: 12px;">
-                <h4 style="color: #065f46; margin: 0 0 10px 0;">📸 פיילוט העלאת קבלות וחשבוניות:</h4>
-                <p style="color: #047857; margin-bottom: 15px; font-size: 14px;">ניתן להעלות כעת תמונה/קובץ של הקבלה שקנית עבור האירוע, והיא תישלח ישירות לאסתר במזכירות!</p>
-                <a href="https://bitulim.horevit.com?action=upload_receipt&reqId=${reqData.id}" style="background: #059669; color: #ffffff; text-decoration: none; padding: 12px 26px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
-                  📸 לחץ כאן להעלאת קבלה/חשבונית לאסתר
+              <!-- Direct Receipt Upload Button -->
+              <div style="text-align: center; margin: 25px 0;">
+                <a href="https://bitulim.horevit.com?action=upload_receipt&reqId=${reqData.id}" style="background: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                  לחץ כאן להעלאת קבלה/חשבונית לאסתר
                 </a>
               </div>
             ` : ''}
