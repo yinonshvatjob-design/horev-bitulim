@@ -1218,7 +1218,14 @@ async function handleEditAdminSubmit(e) {
     if (data.success) {
       showToast('פרטי האדמין והסיסמה עודכנו בהצלחה!', 'success');
       document.getElementById('editAdminModal').style.display = 'none';
+      if (AppStore.currentUser && AppStore.currentUser.id === originalId) {
+        AppStore.currentUser.id = newId;
+        AppStore.currentUser.name = name;
+        AppStore.currentUser.email = email;
+        localStorage.setItem('horev_current_user', JSON.stringify(AppStore.currentUser));
+      }
       await fetchUsersData();
+      renderAdminsTable();
       renderUsersTable();
     } else {
       showToast(data.message || 'שגיאה בעדכון פרטי האדמין', 'danger');
@@ -1258,6 +1265,12 @@ async function handleEditUserSubmit(e) {
     if (data.success) {
       showToast('פרטי הרכז/ת עודכנו בהצלחה!', 'success');
       document.getElementById('editUserModal').style.display = 'none';
+      if (AppStore.currentUser && AppStore.currentUser.id === originalId) {
+        AppStore.currentUser.id = newId;
+        AppStore.currentUser.name = name;
+        AppStore.currentUser.email = email;
+        localStorage.setItem('horev_current_user', JSON.stringify(AppStore.currentUser));
+      }
       await fetchUsersData();
       renderUsersTable();
     } else {
