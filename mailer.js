@@ -13,16 +13,39 @@ class MailerService {
     this.user = process.env.GMAIL_USER || 'bitulim@horev.org.il';
   }
 
-  get treasurerEmail() {
+  get treasurerAdmin() {
     const admins = db.getAllAdmins();
-    const hagai = admins.find(a => a.id === '0584220463' || (a.name && a.name.includes('חגי')) || (a.roleTitle && a.roleTitle.includes('גזבר')));
-    return (hagai && hagai.email) ? hagai.email : 'chagi@horev.org.il';
+    return admins.find(a => a.id === '0584220463' || (a.name && a.name.includes('חגי')) || (a.roleTitle && a.roleTitle.includes('גזבר'))) || {
+      name: 'חגי היקר',
+      roleTitle: 'גזבר המוסד (Admin)',
+      email: 'chagi@horev.org.il'
+    };
+  }
+
+  get secretaryAdmin() {
+    const admins = db.getAllAdmins();
+    return admins.find(a => a.id === '0545540828' || (a.name && a.name.includes('אסתר')) || (a.roleTitle && a.roleTitle.includes('מזכיר'))) || {
+      name: 'אסתר',
+      roleTitle: 'מזכירת המוסד (Admin)',
+      email: 'esters@horev.org.il'
+    };
+  }
+
+  get softwareManagerAdmin() {
+    const admins = db.getAllAdmins();
+    return admins.find(a => a.id === '0542065606' || (a.name && a.name.includes('ינון')) || (a.roleTitle && a.roleTitle.includes('תוכנה'))) || {
+      name: 'ינון',
+      roleTitle: 'מנהל תוכנה (Admin)',
+      email: 'yinonshvat@horev.org.il'
+    };
+  }
+
+  get treasurerEmail() {
+    return (this.treasurerAdmin && this.treasurerAdmin.email) ? this.treasurerAdmin.email : 'chagi@horev.org.il';
   }
 
   get secretaryEmail() {
-    const admins = db.getAllAdmins();
-    const esther = admins.find(a => a.id.startsWith('0545540828') || (a.name && a.name.includes('אסתר')) || (a.roleTitle && a.roleTitle.includes('מזכיר')));
-    return (esther && esther.email) ? esther.email : 'esters@horev.org.il';
+    return (this.secretaryAdmin && this.secretaryAdmin.email) ? this.secretaryAdmin.email : 'esters@horev.org.il';
   }
 
   // Send Email via Official Google Apps Script Webhook (POST + GET Redirect)
@@ -55,7 +78,6 @@ class MailerService {
         };
 
         const req = https.request(options, (res) => {
-          // Handle Google Apps Script 302 Redirect (Switch to GET for redirect URL)
           if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
             sendRequest(res.headers.location, true, redirectCount + 1);
             return;
@@ -105,6 +127,9 @@ class MailerService {
 
   // 1. Send Alert Email to Hagai & Esther on New Submission
   async sendSubmissionAlertToAdmins(reqData) {
+    const treasurer = this.treasurerAdmin;
+    const secretary = this.secretaryAdmin;
+
     const mealsStr = Array.isArray(reqData.requestedMeals) ? reqData.requestedMeals.join(', ') : (reqData.requestedMeals || '');
     const subject = `[ביטול ארוחות] בקשה חדשה מאת ${reqData.applicantName} - ${reqData.group} (${reqData.startDate})`;
     
@@ -118,10 +143,19 @@ class MailerService {
           </div>
 
           <div style="padding: 25px;">
+            <!-- Role Header Banner -->
+            <div style="background: #e0f2fe; border: 2px solid #0284c7; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+              <h4 style="margin: 0 0 6px 0; color: #0369a1; font-size: 15px;">👤 נמעני התראה זו לפי תפקידם במערכת:</h4>
+              <ul style="margin: 0; padding-right: 18px; color: #0c4a6e; font-size: 14px; line-height: 1.6;">
+                <li><strong>${treasurer.name}</strong> — <span style="background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${treasurer.roleTitle || 'גזבר המוסד (Admin)'}</span> (נמען ראשי: <code>${treasurer.email}</code>)</li>
+                <li><strong>${secretary.name}</strong> — <span style="background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${secretary.roleTitle || 'מזכירת המוסד (Admin)'}</span> (עותק לידיעה: <code>${secretary.email}</code>)</li>
+              </ul>
+            </div>
+
             <h3 style="color: #2563eb; margin-top: 0;">📌 פרטי הבקשה המלאים:</h3>
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>מגיש/ת הבקשה:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.applicantName} (ת"ז: ${reqData.applicantId})</td></tr>
-              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>כיתה / שכבה:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.group}</td></tr>
+              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>מגיש/ת הבקשה (רכז/ת):</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.applicantName} (ת"ז: ${reqData.applicantId})</td></tr>
+              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>כיתה / שכבה / קבוצה:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.group}</td></tr>
               <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>טווח תאריכים:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.startDate} ${reqData.startDate !== reqData.endDate ? 'עד ' + reqData.endDate : ''}</td></tr>
               <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>ארוחות מבוטלות:</strong></td><td style="padding: 8px 0; font-weight: bold;">${mealsStr}</td></tr>
               <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>סיבת הביטול:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.reason}</td></tr>
@@ -147,6 +181,8 @@ class MailerService {
 
   // 2. Send Decision Email to Coordinator on Approval/Rejection (with CC to Admins for confirmation)
   async sendDecisionToCoordinator(reqData) {
+    const treasurer = this.treasurerAdmin;
+    const secretary = this.secretaryAdmin;
     const coordinator = db.findCoordinator(reqData.applicantId);
     const targetEmail = (coordinator && coordinator.email) ? coordinator.email : reqData.applicantEmail;
 
@@ -170,6 +206,17 @@ class MailerService {
           </div>
 
           <div style="padding: 25px;">
+            <!-- Role Header Banner -->
+            <div style="background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+              <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">👤 נמען המייל:</h4>
+              <p style="margin: 0 0 6px 0; color: #065f46; font-size: 14px;">
+                <strong>${reqData.applicantName}</strong> — <span style="background: #059669; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">רכז/ת מורש/ת (${reqData.group})</span> (נמען ראשי: <code>${targetEmail}</code>)
+              </p>
+              <div style="font-size: 12px; color: #047857; border-top: 1px dashed #a7f3d0; padding-top: 6px;">
+                📌 עותקים לידיעה בשרשרת האישור: <strong>${treasurer.name}</strong> (${treasurer.roleTitle}) | <strong>${secretary.name}</strong> (${secretary.roleTitle})
+              </div>
+            </div>
+
             <h3 style="color: ${isApproved ? '#059669' : '#dc2626'}; margin-top: 0;">
               📋 סטטוס הבקשה: ${isApproved ? 'אושר מותאם אישית (Custom Approved)' : 'נדחה ע"י הגזברות'}
             </h3>
@@ -234,6 +281,9 @@ class MailerService {
 
   // 3. Send Receipt Upload Alert to Esther (with CC to Hagai)
   async sendReceiptNotificationToEsther(reqData, receiptObj) {
+    const treasurer = this.treasurerAdmin;
+    const secretary = this.secretaryAdmin;
+
     const subject = `[קבלה חדשה] התקבלה קבלה לבקשה #${reqData.id} מאת ${reqData.applicantName} (₪${(receiptObj.amount || 0).toLocaleString()})`;
 
     const htmlContent = `
@@ -246,6 +296,17 @@ class MailerService {
           </div>
 
           <div style="padding: 25px;">
+            <!-- Role Header Banner -->
+            <div style="background: #eef2ff; border: 2px solid #6366f1; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+              <h4 style="margin: 0 0 6px 0; color: #4338ca; font-size: 15px;">👤 נמענת קבלה זו:</h4>
+              <p style="margin: 0 0 6px 0; color: #3730a3; font-size: 14px;">
+                <strong>${secretary.name}</strong> — <span style="background: #4f46e5; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${secretary.roleTitle || 'מזכירת המוסד (Admin)'}</span> (נמענת ראשית: <code>${secretary.email}</code>)
+              </p>
+              <div style="font-size: 12px; color: #4338ca; border-top: 1px dashed #c7d2fe; padding-top: 6px;">
+                📌 עותק לביקורת גזברות: <strong>${treasurer.name}</strong> (${treasurer.roleTitle} - <code>${treasurer.email}</code>)
+              </div>
+            </div>
+
             <h3 style="color: #4f46e5; margin-top: 0;">📌 פרטי הקבלה שהועלתה:</h3>
             
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
@@ -282,21 +343,42 @@ class MailerService {
 
   // 3. Send Live Test Email to Custom Recipient
   async sendTestEmail(recipientEmail) {
+    const treasurer = this.treasurerAdmin;
+    const secretary = this.secretaryAdmin;
+    const softwareMgr = this.softwareManagerAdmin;
+
     const subject = `[בדיקת מערכת] מייל בדיקה תקין ממוסדות חורב ירושלים — ביטול ארוחות`;
     const htmlContent = `
       <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           <div style="background: #059669; color: #ffffff; padding: 20px; text-align: center;">
-            <h2 style="margin: 0; font-size: 22px;">✓ מייל בדיקה נשלח בהצלחה!</h2>
+            <h2 style="margin: 0; font-size: 22px;">✓ מייל בדיקה בלייב נשלח בהצלחה!</h2>
             <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">מוסדות חורב ירושלים — פלטפורמת ביטול ארוחות</p>
           </div>
           <div style="padding: 25px;">
-            <p style="font-size: 16px; line-height: 1.6;">
+            <!-- Role Header Banner -->
+            <div style="background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+              <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">👤 נמען בדיקה בלייב:</h4>
+              <p style="margin: 0; color: #065f46; font-size: 14px;">
+                <strong>נמען:</strong> <code>${recipientEmail}</code>
+              </p>
+            </div>
+
+            <div style="background: #f8fafc; border-right: 4px solid #3b82f6; padding: 12px 16px; margin-bottom: 20px; border-radius: 4px;">
+              <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 14px;">📋 בעלי התפקידים המוגדרים כעת במערכת (מקור אמת דינמי):</h4>
+              <ul style="margin: 0; padding-right: 18px; color: #334155; font-size: 13px; line-height: 1.6;">
+                <li><strong>${treasurer.name}</strong> — ${treasurer.roleTitle} (<code>${treasurer.email}</code>)</li>
+                <li><strong>${secretary.name}</strong> — ${secretary.roleTitle} (<code>${secretary.email}</code>)</li>
+                <li><strong>${softwareMgr.name}</strong> — ${softwareMgr.roleTitle} (<code>${softwareMgr.email}</code>)</li>
+              </ul>
+            </div>
+
+            <p style="font-size: 15px; line-height: 1.6;">
               שלום רב,<br><br>
               מייל זה נשלח כחלק מבדיקת תקינות של מערכת הדיוור המוסדית (Google Gmail Engine).<br>
               אם קיבלת הודעה זו — פירושו ששרת הדואר, ה-Webhook והאישורים מוגדרים בצורה תקינה 100%!
             </p>
-            <div style="background: #ecfdf5; border-right: 4px solid #10b981; padding: 12px 15px; margin: 20px 0; border-radius: 4px;">
+            <div style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 12px 15px; margin: 20px 0; border-radius: 6px; font-size: 13px;">
               <strong>📧 שולח המייל:</strong> bitulim@horev.org.il<br>
               <strong>נמען הבדיקה:</strong> ${recipientEmail}<br>
               <strong>זמן השליחה:</strong> ${db.formatDate(new Date())}
