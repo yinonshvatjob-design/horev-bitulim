@@ -15,32 +15,281 @@ const SEED_ADMINS = [
 
 // Initial 26 Authorized Coordinators from Horev list
 const SEED_COORDINATORS = [
-  { id: "021395694", name: "אהרנפלד אוהד", email: "ohadhadas@horev.org.il" },
-  { id: "033963430", name: "אורבך נתן", email: "natanaue@horev.org.il" },
-  { id: "308000000", name: "בוהרון מנשה", email: "menasheb@horev.org.il" },
-  { id: "040975641", name: "בולבין צבי", email: "zb0527155@horev.org.il" },
-  { id: "025018417", name: "ברוך אושרי", email: "oshrib547@horev.org.il" },
-  { id: "037670692", name: "גרינברג שמואל", email: "mbibeg@horev.org.il" },
-  { id: "057332009", name: "דור יצחק", email: "dorledor@horev.org.il" },
-  { id: "033212911", name: "דנטלסקי צביקה", email: "tzvika.yesh@horev.org.il" },
-  { id: "036194520", name: "זהבי חן", email: "123chen1@horev.org.il" },
-  { id: "058281403", name: "טויבר עופר", email: "ofertb@horev.org.il" },
-  { id: "060936481", name: "ירדני אלעד", email: "nahumy7@horev.org.il" },
-  { id: "059641555", name: "כהן נחמיה", email: "mnkohen@horev.org.il" },
-  { id: "057654667", name: "ליבוביץ דוד", email: "dudilei@horev.org.il" },
-  { id: "023642846", name: "מורביה חיים", email: "hmor10@horev.org.il" },
-  { id: "312000000", name: "מסילתי עמנואל", email: "amitmesi9@horev.org.il" },
-  { id: "206000000", name: "מסינג נתנאל", email: "netanelme@horev.org.il" },
-  { id: "029517455", name: "נגיד איתי", email: "naitay@horev.org.il" },
-  { id: "204000000", name: "נמיר נריה", email: "nreya56@horev.org.il" },
-  { id: "066171638", name: "פיג'ו קובי", email: "kmpecho@horev.org.il" },
-  { id: "066385527", name: "פיינגולד נריה", email: "neriyafg@horev.org.il" },
-  { id: "303000000", name: "צדק איתמר", email: "itamartzed@horev.org.il" },
-  { id: "025352881", name: "קורש רון", email: "koreshhore@horev.org.il" },
-  { id: "040119331", name: "קליין מיכאל", email: "mklain80@horev.org.il" },
-  { id: "028635092", name: "שוחטמן מוטי", email: "motis@horev.org.il" },
-  { id: "059805002", name: "שטיינר אברהם", email: "maleip@horev.org.il" },
-  { id: "028536654", name: "שלוסברג שמואל", email: "s.shlosberg@horev.org.il" }
+  {
+    "id": "021395694",
+    "name": "הרב אוהד אהרנפלד",
+    "email": "ohadhadasa@gmail.com"
+  },
+  {
+    "id": "033963430",
+    "name": "הרב נתן אורבך",
+    "email": "natanaue@gmail.com"
+  },
+  {
+    "id": "040975641",
+    "name": "הרב צביקה בולבין",
+    "email": "zb0527155206@gmail.com"
+  },
+  {
+    "id": "025018417",
+    "name": "הרב אושרי ברוך",
+    "email": "oshrib547@gmail.com"
+  },
+  {
+    "id": "037670692",
+    "name": "הרב שמואל גרינברג",
+    "email": "mbibeg@gmail.com"
+  },
+  {
+    "id": "057332009",
+    "name": "הרב יצחק דור",
+    "email": "ydor@horev.org.il"
+  },
+  {
+    "id": "033212911",
+    "name": "הרב צביקה דנטלסקי",
+    "email": "zviden0@gmail.com"
+  },
+  {
+    "id": "036194520",
+    "name": "הרב חן זהבי",
+    "email": "123chen1@gmail.com"
+  },
+  {
+    "id": "058281403",
+    "name": "הרב עופר י. טויבר",
+    "email": "ofertb@gmail.com"
+  },
+  {
+    "id": "060936481",
+    "name": "הרב אלעד ירדני",
+    "email": "nahumy7@gmail.com"
+  },
+  {
+    "id": "059641555",
+    "name": "הרב נחמיה י. כהן",
+    "email": "mnkohen@gmail.com"
+  },
+  {
+    "id": "057654667",
+    "name": "הרב דוד ליבוביץ",
+    "email": "dudilei@gmail.com"
+  },
+  {
+    "id": "023642846",
+    "name": "הרב חיים מורביה",
+    "email": "hmor10@walla.co.il"
+  },
+  {
+    "id": "312173628",
+    "name": "הרב עמית מסילתי",
+    "email": "amitmesi9@gmail.com"
+  },
+  {
+    "id": "205785710",
+    "name": "הרב נתנאל מסינג",
+    "email": "netanelmessing@gmail.com"
+  },
+  {
+    "id": "029517455",
+    "name": "הרב איתי נגיד",
+    "email": "naitay@walla.com"
+  },
+  {
+    "id": "204070197",
+    "name": "הרב נריה נמיר",
+    "email": "nreya56@gmail.com"
+  },
+  {
+    "id": "066171638",
+    "name": "הרב קובי פיג'ו",
+    "email": "kmpecho@gmail.com"
+  },
+  {
+    "id": "066385527",
+    "name": "הרב נריה פיינגולד",
+    "email": "neriyafg@gmail.com"
+  },
+  {
+    "id": "303184477",
+    "name": "הרב איתמר צדק",
+    "email": "zedek_i@walla.com"
+  },
+  {
+    "id": "025352881",
+    "name": "הרב רון קורש",
+    "email": "koreshhorev@gmail.com"
+  },
+  {
+    "id": "040119331",
+    "name": "הרב מיכאל קליין",
+    "email": "mklain80@gmail.com"
+  },
+  {
+    "id": "059805002",
+    "name": "הרב אברהם שטיינר",
+    "email": "maleip@gmail.com"
+  },
+  {
+    "id": "028536654",
+    "name": "הרב שלמה שלוסברג",
+    "email": "s.shlosberg@gmail.com"
+  },
+  {
+    "id": "025181975",
+    "name": "אברהם ליפשיץ",
+    "email": "avilif2@gmail.com"
+  },
+  {
+    "id": "316097542",
+    "name": "אורי מאיר קרוק",
+    "email": "ori.kruk.7@gmail.com"
+  },
+  {
+    "id": "058265687",
+    "name": "אורלי דברי",
+    "email": "orlydevary@gmail.com"
+  },
+  {
+    "id": "206147621",
+    "name": "אלחנן חיים יגודה",
+    "email": "8441985@gmail.com"
+  },
+  {
+    "id": "036029577",
+    "name": "אסתר סופר",
+    "email": "jkstso@gmail.com"
+  },
+  {
+    "id": "003749561",
+    "name": "ד\"ר זאב פרידמן",
+    "email": "frzeev@gmail.com"
+  },
+  {
+    "id": "057756868",
+    "name": "ד\"ר צבי אריכא",
+    "email": "zvikaarica@gmail.com"
+  },
+  {
+    "id": "318925278",
+    "name": "דולב סופר",
+    "email": "dolevsss2@gmail.com"
+  },
+  {
+    "id": "206673832",
+    "name": "הילל יהונתן ביבי",
+    "email": "hilelbibi@gmail.com"
+  },
+  {
+    "id": "200545432",
+    "name": "הרב א. קירשנבוים",
+    "email": "assafhorev@gmail.com"
+  },
+  {
+    "id": "055707087",
+    "name": "הרב אבנר ששר",
+    "email": "sasar10@walla.com"
+  },
+  {
+    "id": "033226523",
+    "name": "הרב אהרן כהן",
+    "email": "ravitroni5@gmail.com"
+  },
+  {
+    "id": "038707311",
+    "name": "הרב אליהו י. שינפלד",
+    "email": "elidid@gmail.com"
+  },
+  {
+    "id": "038757514",
+    "name": "הרב אליקים קובץ'",
+    "email": "elikovacs@gmail.com"
+  },
+  {
+    "id": "056771736",
+    "name": "הרב אמציה לוי",
+    "email": "amatzya61@gmail.com"
+  },
+  {
+    "id": "029524535",
+    "name": "הרב גואל אהרוני",
+    "email": "goelbendavid@gmail.com"
+  },
+  {
+    "id": "058031337",
+    "name": "הרב דוד מ. מוריה",
+    "email": "davidmoriah@gmail.com"
+  },
+  {
+    "id": "028074342",
+    "name": "הרב דורון עקיבא",
+    "email": "doro999@gmail.com"
+  },
+  {
+    "id": "024453094",
+    "name": "הרב יאיר שינקולבסקי",
+    "email": "Yairshe11@gmail.com"
+  },
+  {
+    "id": "201430485",
+    "name": "הרב יהודה אוחנה",
+    "email": "yehudam801@gmail.com"
+  },
+  {
+    "id": "055560379",
+    "name": "הרב יוסי אליאב",
+    "email": "eliavfam@walla.com"
+  },
+  {
+    "id": "203084637",
+    "name": "הרב ינון שבט",
+    "email": "yinonshvatjob@gmail.com"
+  },
+  {
+    "id": "025630633",
+    "name": "הרב יעקב הכט",
+    "email": "hectyac@gmail.com"
+  },
+  {
+    "id": "037145182",
+    "name": "הרב יעקב כהן",
+    "email": "yakovchn@gmail.com"
+  },
+  {
+    "id": "054856364",
+    "name": "הרב יצחק שטיינר",
+    "email": "iziksteiner@gmail.com"
+  },
+  {
+    "id": "015389414",
+    "name": "הרב ירוחם שמשוביץ",
+    "email": "yeroham.simsovic@gmail.com"
+  },
+  {
+    "id": "028618627",
+    "name": "הרב מרדכי ד. כהן",
+    "email": "Motkecohen6@gmail.com"
+  },
+  {
+    "id": "012763819",
+    "name": "הרב משה טרשנסקי",
+    "email": "horevmoshe@gmail.com"
+  },
+  {
+    "id": "313368367",
+    "name": "הרב נריה חסיד",
+    "email": "neriyahas@gmail.com"
+  },
+  {
+    "id": "029702511",
+    "name": "הרב ציון אבירם",
+    "email": "zionaviram@gmail.com"
+  },
+  {
+    "id": "200989911",
+    "name": "הרב שלמה שרים",
+    "email": "shlomishrem7@gmail.com"
+  }
 ];
 
 const DB_FILE = path.join(__dirname, 'database.json');
