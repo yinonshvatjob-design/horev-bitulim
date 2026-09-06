@@ -1356,6 +1356,9 @@ window.openUploadReceiptModal = function(reqId) {
 window.handleUploadReceiptSubmit = async function(e) {
   if (e) e.preventDefault();
 
+  const btn = document.getElementById('submitReceiptBtn');
+  if (btn && btn.disabled) return;
+
   const reqId = document.getElementById('uploadReceiptReqId')?.value;
   const amount = document.getElementById('receiptAmountInput')?.value.trim();
   const store = document.getElementById('receiptStoreInput')?.value.trim();
@@ -1367,39 +1370,50 @@ window.handleUploadReceiptSubmit = async function(e) {
     return;
   }
 
-  const file = fileInput.files[0];
-  const reader = new FileReader();
+  const origBtnText = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> מעלה קבלה ומבצע משלוח...';
+  }
 
-  reader.onload = async function(evt) {
-    const fileData = evt.target.result;
+  try {
+    const file = fileInput.files[0];
+    const fileData = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (evt) => resolve(evt.target.result);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
 
-    try {
-      const res = await fetch(`${API_BASE_URL}/requests/${reqId}/receipt`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: parseFloat(amount) || 0,
-          store,
-          notes,
-          fileName: file.name,
-          fileData
-        })
-      });
+    const res = await fetch(`${API_BASE_URL}/requests/${reqId}/receipt`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: parseFloat(amount) || 0,
+        store,
+        notes,
+        fileName: file.name,
+        fileData
+      })
+    });
 
-      const data = await res.json();
-      if (data.success) {
-        showToast('הקבלה הועלתה בהצלחה ונשלחה לאסתר במזכירות (עותק לחגי)!', 'success');
-        document.getElementById('uploadReceiptModal').style.display = 'none';
-        await fetchRequestsData();
-      } else {
-        showToast(data.message || 'שגיאה בהעלאת הקבלה', 'danger');
-      }
-    } catch (err) {
-      showToast('שגיאה בתקשורת עם השרת', 'danger');
+    const data = await res.json();
+    if (data.success) {
+      showToast('הקבלה הועלתה בהצלחה ונשלחה לאסתר במזכירות (עותק לחגי)!', 'success');
+      document.getElementById('uploadReceiptModal').style.display = 'none';
+      await fetchRequestsData();
+    } else {
+      showToast(data.message || 'שגיאה בהעלאת הקבלה', 'danger');
     }
-  };
-
-  reader.readAsDataURL(file);
+  } catch (err) {
+    console.error('Receipt upload error:', err);
+    showToast('שגיאה בתקשורת או בטעינת הקובץ', 'danger');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origBtnText;
+    }
+  }
 };
 
 window.openViewReceiptModal = function(reqId) {

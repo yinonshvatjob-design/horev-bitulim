@@ -24,7 +24,7 @@
   <meta http-equiv="Expires" content="0">
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=21.0">
+  <link rel="stylesheet" href="style.css?v=22.0">
 </head>
 <body class="light-mode">
 
@@ -788,7 +788,7 @@
         <button class="close-modal-btn" data-close="uploadReceiptModal">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="uploadReceiptForm">
+        <form id="uploadReceiptForm" onsubmit="handleUploadReceiptSubmit(event)">
           <input type="hidden" id="uploadReceiptReqId">
           <div class="alert alert-info py-2 px-3 small mb-3">
             <i class="fa-solid fa-circle-info"></i> <strong>הקבלה שמועלית תישלח במיידי ישירות לאסתר במזכירות (עם עותק לחגי).</strong>
@@ -836,6 +836,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=23.0"></script>
+  <script src="app.js?v=24.0"></script>
 </body>
 </html>
