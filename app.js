@@ -379,13 +379,22 @@ function showMainApp() {
 
   // STRICT ROLE GUARD: Hide navigation bar completely for Coordinators
   const adminLinks = document.querySelectorAll('.admin-only');
+  const softwareMgrLinks = document.querySelectorAll('.software-manager-only');
   const appNav = document.querySelector('.app-nav');
+
+  const isSoftwareManager = AppStore.currentUser.role === 'ADMIN' && 
+    (AppStore.currentUser.id === '0542065606' || 
+     (AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
+     (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')));
+
   if (AppStore.currentUser.role === 'ADMIN') {
     adminLinks.forEach(el => el.style.display = 'block');
+    softwareMgrLinks.forEach(el => el.style.display = isSoftwareManager ? 'block' : 'none');
     if (appNav) appNav.style.display = 'block';
   } else {
     // Coordinators ONLY see the request submission tab! Hide nav bar completely
     adminLinks.forEach(el => el.style.display = 'none');
+    softwareMgrLinks.forEach(el => el.style.display = 'none');
     if (appNav) appNav.style.display = 'none';
     switchTab('submitView');
   }
@@ -406,6 +415,19 @@ window.switchTab = function(tabId) {
   if (isAdminTab && AppStore.currentUser.role !== 'ADMIN') {
     showToast('אין לך הרשאת גישה למסכי ניהול. גישה מורשית לאדמינים בלבד!', 'danger');
     tabId = 'submitView';
+  }
+
+  // STRICT ACCESS GUARD: Block non-software-managers from opening emailSettingsView
+  if (tabId === 'emailSettingsView') {
+    const isSoftwareManager = AppStore.currentUser.role === 'ADMIN' && 
+      (AppStore.currentUser.id === '0542065606' || 
+       (AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
+       (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')));
+
+    if (!isSoftwareManager) {
+      showToast('אין לך הרשאה לגשת להגדרות Google/Gmail. מסך זה מורשה למנהל התוכנה בלבד!', 'warning');
+      tabId = 'adminDashboardView';
+    }
   }
 
   AppStore.activeTab = tabId;
