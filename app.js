@@ -125,22 +125,7 @@ function bindEvents() {
     document.getElementById('deleteSelectedRequestsBtn')?.addEventListener('click', deleteSelectedRequests);
     document.getElementById('clearAllHistoryBtn')?.addEventListener('click', clearAllHistory);
 
-    // Coordinator Login Submit
-    document.getElementById('coordinatorLoginForm')?.addEventListener('submit', window.submitCoordinatorLogin);
-    document.getElementById('adminLoginForm')?.addEventListener('submit', window.submitAdminLogin);
-
-    // Demo Login Quick Buttons
-    document.querySelectorAll('.demo-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const type = e.currentTarget.dataset.type;
-        const id = e.currentTarget.dataset.id;
-        const pass = e.currentTarget.dataset.pass || '';
-        await handleLogin(type, id, pass);
-      });
-    });
-    // Logout
-    document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
-
+    // Coordinator Login Submit & Logout are handled via inline attributes in index.html to prevent duplicate execution
     // Theme Switcher Toggle
     document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
@@ -248,7 +233,12 @@ async function handleTestEmailSubmit(e) {
 // --------------------------------------------------------------------------
 // 2. Authentication Logic & Strict Role Guards
 // --------------------------------------------------------------------------
+let isLoggingIn = false;
+
 async function handleLogin(role, id, pass = '') {
+  if (isLoggingIn) return;
+  isLoggingIn = true;
+
   const alertBox = document.getElementById('loginAlertBox');
   const coordBtn = document.getElementById('coordLoginBtn');
   const adminBtn = document.getElementById('adminLoginBtn');
@@ -260,6 +250,7 @@ async function handleLogin(role, id, pass = '') {
       alertBox.textContent = 'יש להזין מספר תעודת זהות או טלפון';
       alertBox.style.display = 'block';
     }
+    isLoggingIn = false;
     return;
   }
 
@@ -298,6 +289,7 @@ async function handleLogin(role, id, pass = '') {
     localStorage.setItem('horev_current_user', JSON.stringify(AppStore.currentUser));
     showMainApp();
   } finally {
+    isLoggingIn = false;
     if (coordBtn) { coordBtn.disabled = false; coordBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> הכנס למערכת'; }
     if (adminBtn) { adminBtn.disabled = false; adminBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> התחבר כמנהל/ת'; }
   }
