@@ -211,10 +211,14 @@ body {
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
+  position: relative;
+  z-index: 5000;
 }
 
 .login-overlay[style*="display: none"] {
   display: none !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
 }
 
 .login-card {
@@ -227,7 +231,7 @@ body {
   border: 1px solid var(--border-color);
   pointer-events: auto !important;
   position: relative;
-  z-index: 10;
+  z-index: 5001;
 }
 
 @keyframes modalSlideUp {
@@ -1038,6 +1042,7 @@ body.dark-mode .mandatory-guidelines-box {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  pointer-events: none !important;
 }
 
 .toast {
@@ -1048,6 +1053,7 @@ body.dark-mode .mandatory-guidelines-box {
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-color);
   display: flex;
+  pointer-events: auto !important;
   align-items: center;
   gap: 0.8rem;
   font-weight: 600;
