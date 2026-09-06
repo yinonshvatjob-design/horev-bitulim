@@ -143,7 +143,12 @@ class MailerService {
     const subject = `בקשת ביטול ארוחות חדשה מאת ${reqData.applicantName} - ${reqData.group} (${reqData.startDate})`;
     
     const htmlContent = `
-      <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
+      <!DOCTYPE html>
+      <html dir="rtl" lang="he">
+      <head>
+        <meta charset="UTF-8">
+      </head>
+      <body style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b; direction: rtl; text-align: right;">
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           
           <div style="background: #1b779e; color: #ffffff; padding: 20px; text-align: center;">
@@ -154,14 +159,14 @@ class MailerService {
           <div style="padding: 25px;">
             <!-- Role Header Banner -->
             <div style="background: #e0f2fe; border: 2px solid #0284c7; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
-              <h4 style="margin: 0 0 6px 0; color: #0369a1; font-size: 15px;">👤 נמעני התראה זו לפי תפקידם במערכת:</h4>
+              <h4 style="margin: 0 0 6px 0; color: #0369a1; font-size: 15px;">נמעני התראה זו לפי תפקידם במערכת:</h4>
               <ul style="margin: 0; padding-right: 18px; color: #0c4a6e; font-size: 14px; line-height: 1.6;">
                 <li><strong>${treasurer.name}</strong> — <span style="background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${treasurer.roleTitle || 'גזבר המוסד (Admin)'}</span> (נמען ראשי: <code>${treasurer.email}</code>)</li>
                 <li><strong>${secretary.name}</strong> — <span style="background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${secretary.roleTitle || 'מזכירת המוסד (Admin)'}</span> (עותק לידיעה: <code>${secretary.email}</code>)</li>
               </ul>
             </div>
 
-            <h3 style="color: #2563eb; margin-top: 0;">📌 פרטי הבקשה המלאים:</h3>
+            <h3 style="color: #2563eb; margin-top: 0;">פרטי הבקשה המלאים:</h3>
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
               <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>מגיש/ת הבקשה (רכז/ת):</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.applicantName} (ת"ז: ${reqData.applicantId})</td></tr>
               <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>כיתה / שכבה / קבוצה:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.group}</td></tr>
@@ -173,7 +178,7 @@ class MailerService {
 
             <div style="text-align: center; margin: 30px 0 10px 0;">
               <a href="https://bitulim.horevit.com" style="background: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 16px;">
-                🔘 מעבר לאישור הבקשה בפלטפורמה
+                מעבר לאישור הבקשה בפלטפורמה
               </a>
             </div>
           </div>
@@ -182,7 +187,8 @@ class MailerService {
             מוסדות חורב ירושלים - תורה עם דרך ארץ
           </div>
         </div>
-      </div>
+      </body>
+      </html>
     `;
 
     return this.sendMail(this.treasurerEmail, subject, htmlContent, [this.secretaryEmail]);
@@ -206,7 +212,12 @@ class MailerService {
     const mealsStr = Array.isArray(reqData.requestedMeals) ? reqData.requestedMeals.join(', ') : (reqData.requestedMeals || '');
 
     const htmlContent = `
-      <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
+      <!DOCTYPE html>
+      <html dir="rtl" lang="he">
+      <head>
+        <meta charset="UTF-8">
+      </head>
+      <body style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b; direction: rtl; text-align: right;">
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           
           <div style="background: ${isApproved ? '#059669' : '#dc2626'}; color: #ffffff; padding: 20px; text-align: center;">
@@ -217,42 +228,42 @@ class MailerService {
           <div style="padding: 25px;">
             <!-- Role Header Banner -->
             <div style="background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
-              <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">👤 נמען המייל:</h4>
+              <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">נמען המייל:</h4>
               <p style="margin: 0 0 6px 0; color: #065f46; font-size: 14px;">
                 <strong>${reqData.applicantName}</strong> — <span style="background: #059669; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">רכז/ת מורש/ת (${reqData.group})</span> (נמען ראשי: <code>${targetEmail}</code>)
               </p>
               <div style="font-size: 12px; color: #047857; border-top: 1px dashed #a7f3d0; padding-top: 6px;">
-                📌 עותקים לידיעה בשרשרת האישור: <strong>${treasurer.name}</strong> (${treasurer.roleTitle}) | <strong>${secretary.name}</strong> (${secretary.roleTitle})
+                עותקים לידיעה בשרשרת האישור: <strong>${treasurer.name}</strong> (${treasurer.roleTitle}) | <strong>${secretary.name}</strong> (${secretary.roleTitle})
               </div>
             </div>
 
             <h3 style="color: ${isApproved ? '#059669' : '#dc2626'}; margin-top: 0;">
-              📋 סטטוס הבקשה: ${isApproved ? 'אושר מותאם אישית' : 'נדחה ע"י הגזברות'}
+              סטטוס הבקשה: ${isApproved ? 'אושר מותאם אישית' : 'נדחה ע"י הגזברות'}
             </h3>
 
             ${isApproved ? `
               <div style="background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                <p style="margin: 0 0 8px 0; color: #065f46;"><strong>🔹 ארוחות שאושרו לביטול בפועל:</strong></p>
+                <p style="margin: 0 0 8px 0; color: #065f46;"><strong>ארוחות שאושרו לביטול בפועל:</strong></p>
                 <p style="margin: 0; color: #047857; font-weight: bold;">${reqData.approvedDetails || mealsStr}</p>
                 
                 <hr style="border: none; border-top: 1px dashed #a7f3d0; margin: 12px 0;">
                 
                 <p style="margin: 0; font-size: 18px; color: #065f46;">
-                  💰 <strong>סכום החזר כספי שאושר לרכז/ת: ₪${(reqData.approvedRefund || 0).toLocaleString()}</strong>
+                  <strong>סכום החזר כספי שאושר לרכז/ת: ₪${(reqData.approvedRefund || 0).toLocaleString()}</strong>
                 </p>
               </div>
             ` : ''}
 
             ${reqData.adminNotes ? `
               <div style="background: #f8fafc; border-right: 4px solid #3b82f6; padding: 12px 15px; margin-bottom: 20px;">
-                <strong>💬 הערת חגי היקר / גזברות:</strong><br>
+                <strong>הערת חגי היקר / גזברות:</strong><br>
                 <span style="color: #334155;">"${reqData.adminNotes}"</span>
               </div>
             ` : ''}
 
             <!-- 2 Mandatory Guidelines -->
             <div style="background: #fff8f6; border: 2px solid #f87171; border-radius: 8px; padding: 15px; margin: 20px 0;">
-              <h4 style="color: #dc2626; margin: 0 0 10px 0;">⚠️ תזכורות חובה מוסדיות לכל רכז/ת:</h4>
+              <h4 style="color: #dc2626; margin: 0 0 10px 0;">תזכורות חובה מוסדיות לכל רכז/ת:</h4>
               <ol style="margin: 0; padding-right: 20px; color: #991b1b; line-height: 1.6;">
                 <li><strong>יש לשמור על כל הקבלות ולהעבירם לאסתר / חגי.</strong></li>
                 <li><strong>האוכל שנקנה לטובת האירוע יאוחסן אך ורק בחדר המוקצה לכך בצוללת.</strong></li>
@@ -270,7 +281,7 @@ class MailerService {
 
             <div style="text-align: center; margin-top: 15px;">
               <a href="https://bitulim.horevit.com" style="background: #1b779e; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 8px; font-weight: bold; display: inline-block;">
-                👉 לצפייה בפרטי הבקשה ובציר הזמן
+                לצפייה בפרטי הבקשה ובציר הזמן
               </a>
             </div>
           </div>
@@ -279,7 +290,8 @@ class MailerService {
             מוסדות חורב ירושלים - תורה עם דרך ארץ
           </div>
         </div>
-      </div>
+      </body>
+      </html>
     `;
 
     // Send to Coordinator with CC to Treasurer & Secretary for confirmation
@@ -294,27 +306,32 @@ class MailerService {
     const subject = `קבלה חדשה לבקשה #${reqData.id} מאת ${reqData.applicantName} (₪${(receiptObj.amount || 0).toLocaleString()})`;
 
     const htmlContent = `
-      <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
+      <!DOCTYPE html>
+      <html dir="rtl" lang="he">
+      <head>
+        <meta charset="UTF-8">
+      </head>
+      <body style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b; direction: rtl; text-align: right;">
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           
           <div style="background: #4f46e5; color: #ffffff; padding: 20px; text-align: center;">
-            <h2 style="margin: 0; font-size: 22px;">🧾 התקבלה קבלה/חשבונית חדשה במזכירות</h2>
-            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">מוסדות חורב ירושלים - פיילוט קבלות דיגיטלי</p>
+            <h2 style="margin: 0; font-size: 22px;">התקבלה קבלה/חשבונית חדשה במזכירות</h2>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">מוסדות חורב ירושלים - מערכת קבלות דיגיטלית</p>
           </div>
 
           <div style="padding: 25px;">
             <!-- Role Header Banner -->
             <div style="background: #eef2ff; border: 2px solid #6366f1; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
-              <h4 style="margin: 0 0 6px 0; color: #4338ca; font-size: 15px;">👤 נמענת קבלה זו:</h4>
+              <h4 style="margin: 0 0 6px 0; color: #4338ca; font-size: 15px;">נמענת קבלה זו:</h4>
               <p style="margin: 0 0 6px 0; color: #3730a3; font-size: 14px;">
                 <strong>${secretary.name}</strong> — <span style="background: #4f46e5; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${secretary.roleTitle || 'מזכירת המוסד (Admin)'}</span> (נמענת ראשית: <code>${secretary.email}</code>)
               </p>
               <div style="font-size: 12px; color: #4338ca; border-top: 1px dashed #c7d2fe; padding-top: 6px;">
-                📌 עותק לביקורת גזברות: <strong>${treasurer.name}</strong> (${treasurer.roleTitle} - <code>${treasurer.email}</code>)
+                עותק לביקורת גזברות: <strong>${treasurer.name}</strong> (${treasurer.roleTitle} - <code>${treasurer.email}</code>)
               </div>
             </div>
 
-            <h3 style="color: #4f46e5; margin-top: 0;">📌 פרטי הקבלה שהועלתה:</h3>
+            <h3 style="color: #4f46e5; margin-top: 0;">פרטי הקבלה שהועלתה:</h3>
             
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
               <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>מספר בקשה:</strong></td><td style="padding: 8px 0; font-weight: bold;">#${reqData.id} (${reqData.group})</td></tr>
@@ -326,14 +343,14 @@ class MailerService {
 
             ${receiptObj.notes ? `
               <div style="background: #f8fafc; border-right: 4px solid #4f46e5; padding: 12px 15px; margin-bottom: 20px;">
-                <strong>💬 הערת הרכז/ת לאסתר:</strong><br>
+                <strong>הערת הרכז/ת לאסתר:</strong><br>
                 <span style="color: #334155;">"${receiptObj.notes}"</span>
               </div>
             ` : ''}
 
             <div style="text-align: center; margin: 30px 0 10px 0;">
               <a href="https://bitulim.horevit.com" style="background: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 16px;">
-                🔎 פתח את המערכת לצפייה בקבלה
+                פתח את המערכת לצפייה בקבלה
               </a>
             </div>
           </div>
@@ -342,7 +359,8 @@ class MailerService {
             מוסדות חורב ירושלים - תורה עם דרך ארץ
           </div>
         </div>
-      </div>
+      </body>
+      </html>
     `;
 
     return this.sendMail(this.secretaryEmail, subject, htmlContent, [this.treasurerEmail]);
@@ -356,7 +374,12 @@ class MailerService {
 
     const subject = `מייל בדיקה מוסדות חורב ירושלים - ביטול ארוחות`;
     const htmlContent = `
-      <div dir="rtl" style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
+      <!DOCTYPE html>
+      <html dir="rtl" lang="he">
+      <head>
+        <meta charset="UTF-8">
+      </head>
+      <body style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b; direction: rtl; text-align: right;">
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           <div style="background: #059669; color: #ffffff; padding: 20px; text-align: center;">
             <h2 style="margin: 0; font-size: 22px;">מייל בדיקה בלייב נשלח בהצלחה</h2>
@@ -365,14 +388,14 @@ class MailerService {
           <div style="padding: 25px;">
             <!-- Role Header Banner -->
             <div style="background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
-              <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">👤 נמען בדיקה בלייב:</h4>
+              <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">נמען בדיקה בלייב:</h4>
               <p style="margin: 0; color: #065f46; font-size: 14px;">
                 <strong>נמען:</strong> <code>${recipientEmail}</code>
               </p>
             </div>
 
             <div style="background: #f8fafc; border-right: 4px solid #3b82f6; padding: 12px 16px; margin-bottom: 20px; border-radius: 4px;">
-              <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 14px;">📋 בעלי התפקידים המוגדרים כעת במערכת (מקור אמת דינמי):</h4>
+              <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 14px;">בעלי התפקידים המוגדרים כעת במערכת (מקור אמת דינמי):</h4>
               <ul style="margin: 0; padding-right: 18px; color: #334155; font-size: 13px; line-height: 1.6;">
                 <li><strong>${treasurer.name}</strong> — ${treasurer.roleTitle} (<code>${treasurer.email}</code>)</li>
                 <li><strong>${secretary.name}</strong> — ${secretary.roleTitle} (<code>${secretary.email}</code>)</li>
@@ -386,7 +409,7 @@ class MailerService {
               אם קיבלת הודעה זו - פירושו ששרת הדואר, ה-Webhook והאישורים מוגדרים בצורה תקינה 100%!
             </p>
             <div style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 12px 15px; margin: 20px 0; border-radius: 6px; font-size: 13px;">
-              <strong>📧 שולח המייל:</strong> bitulim@horev.org.il<br>
+              <strong>שולח המייל:</strong> bitulim@horev.org.il<br>
               <strong>נמען הבדיקה:</strong> ${recipientEmail}<br>
               <strong>זמן השליחה:</strong> ${db.formatDate(new Date())}
             </div>
@@ -395,7 +418,8 @@ class MailerService {
             מוסדות חורב ירושלים - תורה עם דרך ארץ
           </div>
         </div>
-      </div>
+      </body>
+      </html>
     `;
     return this.sendMail(recipientEmail, subject, htmlContent);
   }
