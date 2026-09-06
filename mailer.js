@@ -161,8 +161,8 @@ class MailerService {
             <div style="background: #e0f2fe; border: 2px solid #0284c7; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
               <h4 style="margin: 0 0 6px 0; color: #0369a1; font-size: 15px;">נמעני התראה זו לפי תפקידם במערכת:</h4>
               <ul style="margin: 0; padding-right: 18px; color: #0c4a6e; font-size: 14px; line-height: 1.6;">
-                <li><strong>${treasurer.name}</strong> — <span style="background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${treasurer.roleTitle || 'גזבר המוסד (Admin)'}</span> (נמען ראשי: <code>${treasurer.email}</code>)</li>
-                <li><strong>${secretary.name}</strong> — <span style="background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${secretary.roleTitle || 'מזכירת המוסד (Admin)'}</span> (עותק לידיעה: <code>${secretary.email}</code>)</li>
+                <li><strong>${treasurer.name}</strong> - <span style="background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${treasurer.roleTitle || 'גזבר המוסד (Admin)'}</span> (נמען ראשי: <code>${treasurer.email}</code>)</li>
+                <li><strong>${secretary.name}</strong> - <span style="background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${secretary.roleTitle || 'מזכירת המוסד (Admin)'}</span> (עותק לידיעה: <code>${secretary.email}</code>)</li>
               </ul>
             </div>
 
@@ -230,7 +230,7 @@ class MailerService {
             <div style="background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
               <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">נמען המייל:</h4>
               <p style="margin: 0 0 6px 0; color: #065f46; font-size: 14px;">
-                <strong>${reqData.applicantName}</strong> — <span style="background: #059669; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">רכז/ת מורש/ת (${reqData.group})</span> (נמען ראשי: <code>${targetEmail}</code>)
+                <strong>${reqData.applicantName}</strong> - <span style="background: #059669; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">רכז/ת מורש/ת (${reqData.group})</span> (נמען ראשי: <code>${targetEmail}</code>)
               </p>
               <div style="font-size: 12px; color: #047857; border-top: 1px dashed #a7f3d0; padding-top: 6px;">
                 עותקים לידיעה בשרשרת האישור: <strong>${treasurer.name}</strong> (${treasurer.roleTitle}) | <strong>${secretary.name}</strong> (${secretary.roleTitle})
@@ -324,7 +324,7 @@ class MailerService {
             <div style="background: #eef2ff; border: 2px solid #6366f1; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
               <h4 style="margin: 0 0 6px 0; color: #4338ca; font-size: 15px;">נמענת קבלה זו:</h4>
               <p style="margin: 0 0 6px 0; color: #3730a3; font-size: 14px;">
-                <strong>${secretary.name}</strong> — <span style="background: #4f46e5; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${secretary.roleTitle || 'מזכירת המוסד (Admin)'}</span> (נמענת ראשית: <code>${secretary.email}</code>)
+                <strong>${secretary.name}</strong> - <span style="background: #4f46e5; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${secretary.roleTitle || 'מזכירת המוסד (Admin)'}</span> (נמענת ראשית: <code>${secretary.email}</code>)
               </p>
               <div style="font-size: 12px; color: #4338ca; border-top: 1px dashed #c7d2fe; padding-top: 6px;">
                 עותק לביקורת גזברות: <strong>${treasurer.name}</strong> (${treasurer.roleTitle} - <code>${treasurer.email}</code>)
@@ -397,9 +397,9 @@ class MailerService {
             <div style="background: #f8fafc; border-right: 4px solid #3b82f6; padding: 12px 16px; margin-bottom: 20px; border-radius: 4px;">
               <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 14px;">בעלי התפקידים המוגדרים כעת במערכת (מקור אמת דינמי):</h4>
               <ul style="margin: 0; padding-right: 18px; color: #334155; font-size: 13px; line-height: 1.6;">
-                <li><strong>${treasurer.name}</strong> — ${treasurer.roleTitle} (<code>${treasurer.email}</code>)</li>
-                <li><strong>${secretary.name}</strong> — ${secretary.roleTitle} (<code>${secretary.email}</code>)</li>
-                <li><strong>${softwareMgr.name}</strong> — ${softwareMgr.roleTitle} (<code>${softwareMgr.email}</code>)</li>
+                <li><strong>${treasurer.name}</strong> - ${treasurer.roleTitle} (<code>${treasurer.email}</code>)</li>
+                <li><strong>${secretary.name}</strong> - ${secretary.roleTitle} (<code>${secretary.email}</code>)</li>
+                <li><strong>${softwareMgr.name}</strong> - ${softwareMgr.roleTitle} (<code>${softwareMgr.email}</code>)</li>
               </ul>
             </div>
 
