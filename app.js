@@ -343,13 +343,16 @@ function showMainApp() {
   if (userAvatarEl) userAvatarEl.textContent = AppStore.currentUser.name ? AppStore.currentUser.name.charAt(0) : 'מ';
   if (userRoleBadgeEl) userRoleBadgeEl.textContent = AppStore.currentUser.roleTitle || (AppStore.currentUser.role === 'ADMIN' ? 'אדמין / גזבר' : 'רכז/ת');
 
-  // STRICT ROLE GUARD: Hide ALL admin tabs for Coordinators
+  // STRICT ROLE GUARD: Hide navigation bar completely for Coordinators
   const adminLinks = document.querySelectorAll('.admin-only');
+  const appNav = document.querySelector('.app-nav');
   if (AppStore.currentUser.role === 'ADMIN') {
     adminLinks.forEach(el => el.style.display = 'block');
+    if (appNav) appNav.style.display = 'block';
   } else {
-    // Coordinators ONLY see the request submission tab!
+    // Coordinators ONLY see the request submission tab! Hide nav bar completely
     adminLinks.forEach(el => el.style.display = 'none');
+    if (appNav) appNav.style.display = 'none';
     switchTab('submitView');
   }
 
