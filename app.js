@@ -1427,6 +1427,44 @@ window.closeUploadReceiptModal = function() {
   if (modalEl) modalEl.style.display = 'none';
 };
 
+async function compressImageIfNeeded(file) {
+  if (!file || !file.type || !file.type.startsWith('image/')) return null;
+  if (file.size < 800000) return null; // Skip if under 800KB
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 1600;
+      const MAX_HEIGHT = 1600;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width = Math.round((width * MAX_HEIGHT) / height);
+          height = MAX_HEIGHT;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
 window.handleUploadReceiptSubmit = async function(e) {
   if (e) e.preventDefault();
 
@@ -1462,12 +1500,16 @@ window.handleUploadReceiptSubmit = async function(e) {
 
   try {
     const file = fileInput.files[0];
-    const fileData = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (evt) => resolve(evt.target.result);
-      reader.onerror = (err) => reject(err);
-      reader.readAsDataURL(file);
-    });
+    let fileData = await compressImageIfNeeded(file);
+
+    if (!fileData) {
+      fileData = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (evt) => resolve(evt.target.result);
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+      });
+    }
 
     const res = await fetch(`${API_BASE_URL}/requests/${reqId}/receipt`, {
       method: 'POST',
@@ -1494,7 +1536,7 @@ window.handleUploadReceiptSubmit = async function(e) {
     }
   } catch (err) {
     console.error('Receipt upload error:', err);
-    showToast('שגיאה בתקשורת או בטעינת הקובץ', 'danger');
+    showToast('שגיאה בתקשורת או בטעינת הקובץ: ' + err.message, 'danger');
   } finally {
     if (btn) {
       btn.disabled = false;
