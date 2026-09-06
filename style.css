@@ -1416,9 +1416,23 @@ body.dark-mode .mandatory-guidelines-box {
 
 @media (max-width: 420px) {
   .user-details {
-    display: none;
+    display: flex !important;
   }
   
+  .user-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .user-role-badge {
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+
   .brand-titles .sub-title {
     display: none;
   }
