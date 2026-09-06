@@ -24,7 +24,7 @@
   <meta http-equiv="Expires" content="0">
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=20.0">
+  <link rel="stylesheet" href="style.css?v=21.0">
 </head>
 <body class="light-mode">
 
@@ -85,9 +85,9 @@
       <!-- Coordinator Form -->
       <form id="coordinatorLoginForm" class="auth-form" onsubmit="submitCoordinatorLogin(event)">
         <div class="form-group">
-          <label for="coordIdInput"><i class="fa-solid fa-phone"></i> מספר טלפון מורשה</label>
-          <input type="text" id="coordIdInput" placeholder="הכנס טלפון" required autocomplete="off">
-          <small class="form-text">הכנס את מספר הטלפון הרשום במערכת חורב</small>
+          <label for="coordIdInput"><i class="fa-solid fa-id-card"></i> מספר תעודת זהות</label>
+          <input type="text" id="coordIdInput" placeholder="הכנס ת&quot;ז" required autocomplete="off">
+          <small class="form-text">הכנס את מספר תעודת הזהות הרשום במערכת חורב</small>
         </div>
         <button type="submit" id="coordLoginBtn" class="btn btn-primary btn-block">
           <i class="fa-solid fa-right-to-bracket"></i> הכנס למערכת
@@ -108,13 +108,6 @@
           <i class="fa-solid fa-user-check"></i> התחבר כמנהל/ת
         </button>
       </form>
-
-      <!-- Quick Cache Reset Link for frozen browser sessions -->
-      <div class="text-center mt-3 pt-2" style="border-top: 1px dashed var(--border-color);">
-        <button type="button" class="btn btn-link btn-sm text-muted" onclick="forceCleanReset()" title="רענן מטמון ונתונים למקרה שטעינת הדף נתקעה" style="font-size: 0.78rem; text-decoration: none;">
-          <i class="fa-solid fa-rotate"></i> נתקלת בבעיה? לחץ כאן לרענון מטמון מהיר
-        </button>
-      </div>
     </div>
   </div>
 
@@ -843,6 +836,6 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=22.0"></script>
+  <script src="app.js?v=23.0"></script>
 </body>
 </html>
