@@ -1677,61 +1677,36 @@ window.printReceipt = function(reqId) {
     return;
   }
 
+  const isImage = r.fileData && r.fileData.startsWith('data:image');
+  const isPdf = r.fileData && r.fileData.startsWith('data:application/pdf');
+
   printWindow.document.write(`
     <!DOCTYPE html>
     <html dir="rtl" lang="he">
     <head>
       <meta charset="UTF-8">
-      <title>הדפסת קבלה - בקשה #${req.id}</title>
+      <title>קבלה - בקשה #${req.id}</title>
       <style>
-        body { font-family: 'Rubik', Arial, sans-serif; padding: 30px; color: #1e293b; direction: rtl; text-align: right; background: #fff; }
-        .header { text-align: center; border-bottom: 3px solid #0284c7; padding-bottom: 15px; margin-bottom: 20px; }
-        .header h2 { margin: 0; color: #0369a1; font-size: 24px; }
-        .header p { margin: 6px 0 0 0; color: #64748b; font-size: 14px; }
-        .details-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px 20px; margin-bottom: 25px; }
-        .details-table { width: 100%; border-collapse: collapse; }
-        .details-table td { padding: 8px 5px; border-bottom: 1px dashed #e2e8f0; font-size: 15px; }
-        .amount { color: #059669; font-weight: bold; font-size: 18px; }
-        .receipt-container { text-align: center; margin-top: 20px; }
-        .receipt-img { max-width: 100%; max-height: 750px; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #fff; }
+        body { display: flex; justify-content: center; align-items: center; }
+        img { max-width: 100%; max-height: 100vh; object-fit: contain; display: block; margin: auto; }
+        iframe { width: 100vw; height: 100vh; border: none; }
         @media print {
-          body { padding: 0; }
+          html, body { margin: 0; padding: 0; background: #fff; }
+          img { max-width: 100%; max-height: 100vh; width: auto; height: auto; display: block; margin: auto; page-break-inside: avoid; }
+          iframe { width: 100vw; height: 100vh; border: none; }
         }
       </style>
     </head>
     <body>
-      <div class="header">
-        <h2>מוסדות חורב ירושלים — פלטפורמת ביטול ארוחות</h2>
-        <p>טופס קבלה / חשבונית דיגיטלית — מזכירות ואדמיניסטרציה</p>
-      </div>
-      <div class="details-box">
-        <table class="details-table">
-          <tr>
-            <td><strong>מספר בקשה:</strong> #${req.id}</td>
-            <td><strong>כיתה / קבוצה:</strong> ${req.group}</td>
-          </tr>
-          <tr>
-            <td><strong>מגיש/ת הבקשה:</strong> ${req.applicantName}</td>
-            <td><strong>ספק / חנות:</strong> ${r.store || 'לא צוין'}</td>
-          </tr>
-          <tr>
-            <td><strong>סכום בקבלה:</strong> <span class="amount">₪${(r.amount || 0).toLocaleString()}</span></td>
-            <td><strong>תאריך העלאה:</strong> ${r.uploadedAt || ''}</td>
-          </tr>
-          ${r.notes ? `<tr><td colspan="2"><strong>הערות לאסתר:</strong> "${r.notes}"</td></tr>` : ''}
-        </table>
-      </div>
-      
-      <div class="receipt-container">
-        ${r.fileData && r.fileData.startsWith('data:image') ? `
-          <img src="${r.fileData}" class="receipt-img" alt="תמונת קבלה">
-        ` : `<p style="font-size: 16px; color: #475569;">קובץ קבלה מצורף במערכת (${r.fileName || 'PDF'})</p>`}
-      </div>
-
-      <div class="footer">
-        הודפס מתוך פלטפורמת ביטול ארוחות מוסדות חורב ירושלים | תורה עם דרך ארץ
-      </div>
+      ${isImage ? `
+        <img src="${r.fileData}" alt="תמונת קבלה">
+      ` : isPdf ? `
+        <iframe src="${r.fileData}"></iframe>
+      ` : `
+        <p style="font-family: Arial, sans-serif; font-size: 18px; color: #333;">קובץ קבלה מצורף במערכת (${r.fileName || 'PDF'})</p>
+      `}
 
       <script>
         window.onload = function() {
