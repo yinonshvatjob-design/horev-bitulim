@@ -404,8 +404,22 @@ app.post('/api/requests/delete-batch', (req, res) => {
   res.json({ success: true, count: deletedCount, message: `${deletedCount} בקשות נמחקו בהצלחה מהמערכת.` });
 });
 
-// DELETE /api/requests (Clear all request history)
+// DELETE /api/requests (Clear all request history - Software Manager only)
 app.delete('/api/requests', (req, res) => {
+  const { adminId } = req.body || {};
+  const admins = db.getAllAdmins();
+  const reqAdmin = admins.find(a => a.id === adminId);
+  const isSoftwareManager = reqAdmin && (
+    reqAdmin.id === '0542065606' || 
+    (reqAdmin.name && reqAdmin.name.includes('ינון')) || 
+    (reqAdmin.role && reqAdmin.role.includes('תוכנה')) ||
+    (reqAdmin.roleTitle && reqAdmin.roleTitle.includes('תוכנה'))
+  );
+
+  if (adminId && !isSoftwareManager) {
+    return res.status(403).json({ success: false, message: 'פעולת איפוס ומחיקת כל ההיסטוריה מורשית למנהל תוכנה בלבד' });
+  }
+
   const clearedCount = db.clearAllRequests();
   res.json({ success: true, count: clearedCount, message: `כל היסטוריית הבקשות (${clearedCount} בקשות) אופסה ונמחקה בהצלחה.` });
 });

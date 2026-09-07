@@ -389,7 +389,13 @@ function showMainApp() {
 
   if (AppStore.currentUser.role === 'ADMIN') {
     adminLinks.forEach(el => el.style.display = 'block');
-    softwareMgrLinks.forEach(el => el.style.display = isSoftwareManager ? 'block' : 'none');
+    softwareMgrLinks.forEach(el => {
+      if (el.tagName === 'BUTTON' || el.tagName === 'A' || el.tagName === 'SPAN') {
+        el.style.display = isSoftwareManager ? 'inline-block' : 'none';
+      } else {
+        el.style.display = isSoftwareManager ? 'block' : 'none';
+      }
+    });
     if (appNav) appNav.style.display = 'block';
   } else {
     // Coordinators ONLY see the request submission tab! Hide nav bar completely
@@ -1926,12 +1932,24 @@ window.deleteSelectedRequests = async function() {
 };
 
 window.clearAllHistory = async function() {
-  if (AppStore.currentUser.role !== 'ADMIN') return;
+  const isSoftwareManager = AppStore.currentUser && AppStore.currentUser.role === 'ADMIN' && 
+    (AppStore.currentUser.id === '0542065606' || 
+     (AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
+     (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')));
+
+  if (!isSoftwareManager) {
+    showToast('פעולה זו (איפוס ומחיקת כל ההיסטוריה) מורשית למנהל תוכנה בלבד', 'danger');
+    return;
+  }
 
   if (!confirm('⚠️ אזהרה חמורה: פעולה זו תמחק את כל היסטוריית הבקשות מהמערכת 100%.\nהאם אתה בטוח לחלוטין ברצונך לאפס ולמחוק את כל היסטוריית ההזמנות?')) return;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/requests`, { method: 'DELETE' });
+    const res = await fetch(`${API_BASE_URL}/requests`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminId: AppStore.currentUser.id })
+    });
     const data = await res.json();
     if (data.success) {
       showToast(data.message, 'success');
