@@ -10,7 +10,7 @@
     {
       "id": "0584220463",
       "name": "חגי",
-      "role": "גזבר המוסד (Admin)",
+      "role": "מנהל המוסד (Admin)",
       "email": "yinonshvat@gmail.com",
       "pass": "hagai2026"
     },
@@ -380,6 +380,49 @@
     }
   ],
   "requests": [
+    {
+      "id": "REQ-808",
+      "applicantId": "021395694",
+      "applicantName": "אהרנפלד אוהד",
+      "applicantEmail": "ohadhadas@horev.org.il",
+      "group": "שכבה ט'",
+      "startDate": "2026-09-12",
+      "endDate": "2026-09-12",
+      "requestedMeals": [
+        "ארוחת בוקר",
+        "ארוחת צהריים"
+      ],
+      "reason": "טיול שדה מדבר יהודה 3 ימים",
+      "submittedAt": "2026-09-07 09:19",
+      "status": "APPROVED",
+      "approvedRefund": 450,
+      "approvedDetails": "ארוחת צהריים בלבד",
+      "adminNotes": "מאושר מותאם אישית לאחר בדיקת ספקים",
+      "handledBy": "חגי היקר",
+      "handledAt": "2026-09-07 09:19",
+      "timeline": [
+        {
+          "time": "2026-09-07 09:19",
+          "title": "הגשת בקשת ביטול",
+          "desc": "הבקשה הוגשה ע\"י אהרנפלד אוהד",
+          "type": "info"
+        },
+        {
+          "time": "2026-09-07 09:19",
+          "title": "📸 הועלתה קבלה / חשבונית ע\"י הרכז/ת",
+          "desc": "הועלתה קבלה ע\"ס ₪450 (ספק/חנות: רמי לוי שיווק השקמה). נשלחה התראה לאסתר במזכירות.",
+          "type": "success"
+        }
+      ],
+      "receipt": {
+        "amount": 450,
+        "store": "רמי לוי שיווק השקמה",
+        "notes": "קבלת קניות עבור טיול י\"א",
+        "fileName": "receipt_test.png",
+        "fileData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        "uploadedAt": "2026-09-07 09:19"
+      }
+    },
     {
       "id": "REQ-953",
       "applicantId": "021395694",
@@ -2107,6 +2150,54 @@
   ],
   "emailLogs": [
     {
+      "time": "2026-09-07 09:19",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אורבך נתן - שכבה י' (2026-09-12)",
+      "status": "נשלח בהצלחה ל-yinonshvat@gmail.com (Google Gmail)"
+    },
+    {
+      "time": "2026-09-07 09:19",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אורבך נתן - שכבה י' (2026-09-12)",
+      "status": "[MOCK QA] Sent to yinonshvat@gmail.com"
+    },
+    {
+      "time": "2026-09-07 09:19",
+      "to": "bitulim@horev.org.il",
+      "subject": "קבלה חדשה לבקשה #REQ-808 מאת אהרנפלד אוהד (₪450)",
+      "status": "נשלח בהצלחה ל-yinonshvat@gmail.com (Google Gmail)"
+    },
+    {
+      "time": "2026-09-07 09:19",
+      "to": "bitulim@horev.org.il",
+      "subject": "קבלה חדשה לבקשה #REQ-808 מאת אהרנפלד אוהד (₪450)",
+      "status": "[MOCK QA] Sent to yinonshvat@gmail.com"
+    },
+    {
+      "time": "2026-09-07 09:19",
+      "to": "bitulim@horev.org.il",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-808 אושרה (סכום החזר: ₪450)",
+      "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
+    },
+    {
+      "time": "2026-09-07 09:19",
+      "to": "bitulim@horev.org.il",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-808 אושרה (סכום החזר: ₪450)",
+      "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
+    },
+    {
+      "time": "2026-09-07 09:19",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אהרנפלד אוהד - שכבה ט' (2026-09-12)",
+      "status": "נשלח בהצלחה ל-yinonshvat@gmail.com (Google Gmail)"
+    },
+    {
+      "time": "2026-09-07 09:19",
+      "to": "bitulim@horev.org.il",
+      "subject": "בקשת ביטול ארוחות חדשה מאת אהרנפלד אוהד - שכבה ט' (2026-09-12)",
+      "status": "[MOCK QA] Sent to yinonshvat@gmail.com"
+    },
+    {
       "time": "2026-09-06 14:31",
       "to": "bitulim@horev.org.il",
       "subject": "בקשת ביטול ארוחות חדשה מאת אורבך נתן - שכבה י' (2026-09-11)",
@@ -2133,13 +2224,13 @@
     {
       "time": "2026-09-06 14:31",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-953 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-953 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 14:31",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-953 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-953 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2181,13 +2272,13 @@
     {
       "time": "2026-09-06 14:26",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-892 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-892 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 14:26",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-892 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-892 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2229,13 +2320,13 @@
     {
       "time": "2026-09-06 14:03",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-798 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-798 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 14:03",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-798 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-798 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2277,13 +2368,13 @@
     {
       "time": "2026-09-06 14:00",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-776 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-776 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 14:00",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-776 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-776 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2325,13 +2416,13 @@
     {
       "time": "2026-09-06 13:58",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-772 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-772 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:58",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-772 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-772 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2373,13 +2464,13 @@
     {
       "time": "2026-09-06 13:56",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-940 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-940 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:56",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-940 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-940 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2421,13 +2512,13 @@
     {
       "time": "2026-09-06 13:44",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-294 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-294 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:44",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-294 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-294 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2469,13 +2560,13 @@
     {
       "time": "2026-09-06 13:42",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-547 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-547 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:42",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-547 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-547 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2517,13 +2608,13 @@
     {
       "time": "2026-09-06 13:39",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-249 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-249 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:39",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-249 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-249 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2565,13 +2656,13 @@
     {
       "time": "2026-09-06 13:33",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-171 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-171 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:33",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-171 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-171 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2613,13 +2704,13 @@
     {
       "time": "2026-09-06 13:28",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-307 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-307 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:28",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-307 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-307 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2661,13 +2752,13 @@
     {
       "time": "2026-09-06 13:25",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-796 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-796 אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:25",
       "to": "bitulim@horev.org.il",
-      "subject": "עדכון גזברות: בקשת ביטול ארוחות #REQ-796 אושרה (סכום החזר: ₪450)",
+      "subject": "עדכון אדמיניסטרציה: בקשת ביטול ארוחות #REQ-796 אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2709,13 +2800,13 @@
     {
       "time": "2026-09-06 13:22",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-979 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-979 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:22",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-979 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-979 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2757,13 +2848,13 @@
     {
       "time": "2026-09-06 13:16",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-955 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-955 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:16",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-955 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-955 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2805,13 +2896,13 @@
     {
       "time": "2026-09-06 13:15",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-227 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-227 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:15",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-227 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-227 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2853,13 +2944,13 @@
     {
       "time": "2026-09-06 13:12",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-798 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-798 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:12",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-798 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-798 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2901,13 +2992,13 @@
     {
       "time": "2026-09-06 13:11",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-439 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-439 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:11",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-439 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-439 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -2961,13 +3052,13 @@
     {
       "time": "2026-09-06 13:05",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-673 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-673 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:05",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-673 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-673 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3009,13 +3100,13 @@
     {
       "time": "2026-09-06 13:02",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-963 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-963 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 13:02",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-963 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-963 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3057,13 +3148,13 @@
     {
       "time": "2026-09-06 12:55",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-971 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-971 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:55",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-971 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-971 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3105,13 +3196,13 @@
     {
       "time": "2026-09-06 12:51",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-601 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-601 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:51",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-601 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-601 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3177,13 +3268,13 @@
     {
       "time": "2026-09-06 12:19",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-950 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-950 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:19",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-950 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-950 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3225,13 +3316,13 @@
     {
       "time": "2026-09-06 12:16",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-639 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-639 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:16",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-639 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-639 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3273,13 +3364,13 @@
     {
       "time": "2026-09-06 12:13",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-265 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-265 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:13",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-265 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-265 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3321,13 +3412,13 @@
     {
       "time": "2026-09-06 12:11",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-800 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-800 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:11",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-800 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-800 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3369,13 +3460,13 @@
     {
       "time": "2026-09-06 12:09",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-301 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-301 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:09",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-301 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-301 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3417,13 +3508,13 @@
     {
       "time": "2026-09-06 12:07",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-977 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-977 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:07",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-977 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-977 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3465,13 +3556,13 @@
     {
       "time": "2026-09-06 12:05",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-335 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-335 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:05",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-335 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-335 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3513,13 +3604,13 @@
     {
       "time": "2026-09-06 12:03",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-371 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-371 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:03",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-371 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-371 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3561,13 +3652,13 @@
     {
       "time": "2026-09-06 12:00",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-908 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-908 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 12:00",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-908 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-908 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3609,13 +3700,13 @@
     {
       "time": "2026-09-06 11:55",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-357 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-357 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 11:55",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-357 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-357 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3657,13 +3748,13 @@
     {
       "time": "2026-09-06 11:54",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-392 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-392 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 11:54",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-392 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-392 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3705,13 +3796,13 @@
     {
       "time": "2026-09-06 11:50",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-136 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-136 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 11:50",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-136 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-136 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3753,13 +3844,13 @@
     {
       "time": "2026-09-06 11:41",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-672 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-672 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 11:41",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-672 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-672 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3801,13 +3892,13 @@
     {
       "time": "2026-09-06 11:38",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-595 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-595 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 11:38",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-595 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-595 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3849,13 +3940,13 @@
     {
       "time": "2026-09-06 11:35",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-636 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-636 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 11:35",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-636 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-636 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3897,13 +3988,13 @@
     {
       "time": "2026-09-06 11:33",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-215 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-215 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 11:33",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-215 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-215 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3945,13 +4036,13 @@
     {
       "time": "2026-09-06 11:32",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-601 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-601 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 11:32",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-601 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-601 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -3993,13 +4084,13 @@
     {
       "time": "2026-09-06 11:25",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-999 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-999 - אושרה (סכום החזר: ₪450)",
       "status": "נשלח בהצלחה ל-ohadhadas@horev.org.il (Google Gmail)"
     },
     {
       "time": "2026-09-06 11:25",
       "to": "bitulim@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-999 - אושרה (סכום החזר: ₪450)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-999 - אושרה (סכום החזר: ₪450)",
       "status": "[MOCK QA] Sent to ohadhadas@horev.org.il"
     },
     {
@@ -4017,7 +4108,7 @@
     {
       "time": "2.9.2026 13:42",
       "to": "ohadhadas@horev.org.il",
-      "subject": "[עדכון גזברות] בקשת ביטול ארוחות #REQ-101 - נדחתה (סכום החזר: ₪0)",
+      "subject": "[עדכון אדמיניסטרציה] בקשת ביטול ארוחות #REQ-101 - נדחתה (סכום החזר: ₪0)",
       "status": "שגיאת שליחה: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-48448ed2e9fsm5714329f8f.20 - gsmtp"
     },
     {

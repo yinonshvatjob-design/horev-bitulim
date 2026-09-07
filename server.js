@@ -230,7 +230,7 @@ app.post('/api/requests/:id/approve', async (req, res) => {
       approvedRefund: refundAmount,
       approvedDetails: approvedMeals || mealsStr,
       adminNotes: adminNotes || "",
-      handledBy: adminName || "חגי (גזבר)",
+      handledBy: adminName || "חגי (מנהל)",
       handledAt: nowStr,
       timeline: updatedTimeline
     });
@@ -282,7 +282,7 @@ app.post('/api/requests/:id/reject', async (req, res) => {
       status: "REJECTED",
       approvedRefund: 0,
       adminNotes: adminNotes || "",
-      handledBy: adminName || "חגי (גזבר)",
+      handledBy: adminName || "חגי (מנהל)",
       handledAt: nowStr,
       timeline: updatedTimeline
     });

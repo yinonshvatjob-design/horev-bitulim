@@ -375,7 +375,7 @@ function showMainApp() {
 
   if (userNameEl) userNameEl.textContent = AppStore.currentUser.name;
   if (userAvatarEl) userAvatarEl.textContent = AppStore.currentUser.name ? AppStore.currentUser.name.charAt(0) : 'מ';
-  if (userRoleBadgeEl) userRoleBadgeEl.textContent = AppStore.currentUser.roleTitle || (AppStore.currentUser.role === 'ADMIN' ? 'אדמין / גזבר' : 'רכז/ת');
+  if (userRoleBadgeEl) userRoleBadgeEl.textContent = AppStore.currentUser.roleTitle || (AppStore.currentUser.role === 'ADMIN' ? 'אדמין / מנהל' : 'רכז/ת');
 
   // STRICT ROLE GUARD: Hide navigation bar completely for Coordinators
   const adminLinks = document.querySelectorAll('.admin-only');
@@ -917,7 +917,7 @@ function renderPendingRequests() {
   const pendingList = AppStore.requests.filter(r => r.status === 'PENDING');
 
   if (!pendingList.length) {
-    container.innerHTML = `<div class="alert alert-success text-center py-4"><strong>✓ אין בקשות ביטול ממתינות לאישור כרגע!</strong><br><small class="text-muted">כל הבקשות טופלו ע"י הגזברות.</small></div>`;
+    container.innerHTML = `<div class="alert alert-success text-center py-4"><strong>✓ אין בקשות ביטול ממתינות לאישור כרגע!</strong><br><small class="text-muted">כל הבקשות טופלו ע"י האדמיניסטרציה.</small></div>`;
     return;
   }
 
@@ -947,7 +947,7 @@ function renderPendingRequests() {
                 <input type="text" id="approvedMeals_${r.id}" class="form-control form-control-sm" value="${r.requestedMeals ? r.requestedMeals.join(', ') : ''}">
               </div>
               <div class="col-md-4">
-                <label class="small font-weight-bold">הערת גזברות (תופיע במייל):</label>
+                <label class="small font-weight-bold">הערת אדמיניסטרציה (תופיע במייל):</label>
                 <input type="text" id="adminNotes_${r.id}" class="form-control form-control-sm" placeholder="למשל: מאושר מותאם אישית">
               </div>
             </div>
@@ -1703,7 +1703,7 @@ window.printReceipt = function(reqId) {
     <body>
       <div class="header">
         <h2>מוסדות חורב ירושלים — פלטפורמת ביטול ארוחות</h2>
-        <p>טופס קבלה / חשבונית דיגיטלית — מזכירות וגזברות</p>
+        <p>טופס קבלה / חשבונית דיגיטלית — מזכירות ואדמיניסטרציה</p>
       </div>
       <div class="details-box">
         <table class="details-table">

@@ -75,7 +75,7 @@
           <i class="fa-solid fa-user-graduate" style="pointer-events: none;"></i> כניסת רכז / רכזת
         </button>
         <button type="button" class="role-tab" id="tabRoleAdmin" onclick="switchRoleTab('admin')">
-          <i class="fa-solid fa-user-shield" style="pointer-events: none;"></i> כניסת אדמין / גזברות
+          <i class="fa-solid fa-user-shield" style="pointer-events: none;"></i> כניסת אדמין / אדמיניסטרציה
         </button>
       </div>
 
@@ -358,7 +358,7 @@
                 </div>
               </div>
               <small class="form-text text-muted mt-2" style="display: block; background: var(--bg-hover); padding: 0.5rem 0.8rem; border-radius: var(--radius-sm); border-right: 3px solid var(--primary);">
-                <i class="fa-solid fa-lightbulb text-warning"></i> <strong>טיפ לרכז:</strong> אם תמהיל הארוחות שונה בין ימי הפעילות (למשל: ביום א' בוקר+צהריים וביום ב' צהריים בלבד) — מומלץ להגיש 2 בקשות נפרדות לפי הימים. זה לוקח 10 שניות ומבטיח זיכוי כספי מדויק בגזברות!
+                <i class="fa-solid fa-lightbulb text-warning"></i> <strong>טיפ לרכז:</strong> אם תמהיל הארוחות שונה בין ימי הפעילות (למשל: ביום א' בוקר+צהריים וביום ב' צהריים בלבד) — מומלץ להגיש 2 בקשות נפרדות לפי הימים. זה לוקח 10 שניות ומבטיח זיכוי כספי מדויק באדמיניסטרציה!
               </small>
             </div>
 
@@ -449,7 +449,7 @@
     <section id="reportsView" class="tab-content">
       <div class="card card-info">
         <div class="card-header">
-          <h2><i class="fa-solid fa-file-invoice-dollar"></i> פלט הזמנות ודוחות גזברות מפורטים</h2>
+          <h2><i class="fa-solid fa-file-invoice-dollar"></i> פלט הזמנות ודוחות אדמיניסטרציה מפורטים</h2>
         </div>
         <div class="card-body">
           
@@ -558,7 +558,7 @@
       <!-- Admin Credentials Management Card -->
       <div class="card card-primary mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h2><i class="fa-solid fa-user-shield"></i> ניהול ועריכת אדמינים וסיסמאות (גזברות / מזכירות / מנהל תוכנה)</h2>
+          <h2><i class="fa-solid fa-user-shield"></i> ניהול ועריכת אדמינים וסיסמאות (אדמיניסטרציה / מזכירות / מנהל תוכנה)</h2>
         </div>
         <div class="card-body">
           <p class="text-muted">באפשרותך לערוך ולעדכן את תעודות הזהות (שם המשתמש להתחברות), השמות, האימיילים והסיסמאות של האדמינים.</p>
@@ -642,7 +642,7 @@
             
             <div class="alert alert-info p-3 my-3" style="background: #eef2ff; border-right: 4px solid #4f46e5; color: #312e81; border-radius: 8px;">
               <i class="fa-solid fa-circle-info"></i> <strong>המקור היחיד והמכריע לעדכון אימיילים וסיסמאות:</strong><br>
-              כתובות האימייל והסיסמאות של הגזבר (חגי), המזכירות (אסתר) ומנהלי התוכנה מנוהלות כעת <strong>במקום אחד בלבד</strong> בטבלת האדמינים במסך <strong>"ניהול רכזים ואדמינים"</strong>.
+              כתובות האימייל והסיסמאות של המנהל (חגי), המזכירות (אסתר) ומנהלי התוכנה מנוהלות כעת <strong>במקום אחד בלבד</strong> בטבלת האדמינים במסך <strong>"ניהול רכזים ואדמינים"</strong>.
             </div>
           </form>
 
@@ -661,7 +661,7 @@
             <div class="d-flex gap-2 flex-wrap mb-2">
               <span class="text-muted small align-self-center"><strong>לחצני קיצור לבדיקה מהירה לפי ההגדרות:</strong></span>
               <button type="button" class="btn btn-sm btn-outline-primary" onclick="setTestEmailRecipient('treasurer')">
-                📩 שלח לבדיקה לאימייל של חגי (גזבר)
+                📩 שלח לבדיקה לאימייל של חגי (מנהל)
               </button>
               <button type="button" class="btn btn-sm btn-outline-info" onclick="setTestEmailRecipient('secretary')">
                 📩 שלח לבדיקה לאימייל של אסתר (מזכירות)
@@ -773,7 +773,7 @@
           <input type="hidden" id="editOriginalAdminId">
           <div class="form-group">
             <label for="editAdminRoleTitle">תפקיד במערכת</label>
-            <input type="text" id="editAdminRoleTitle" class="form-control" placeholder="לדוגמה: גזבר המוסד (Admin)">
+            <input type="text" id="editAdminRoleTitle" class="form-control" placeholder="לדוגמה: מנהל המוסד (Admin)">
           </div>
           <div class="form-group">
             <label for="editAdminName">שם המנהל/ת *</label>

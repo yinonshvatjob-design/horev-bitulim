@@ -15,9 +15,9 @@ class MailerService {
 
   get treasurerAdmin() {
     const admins = db.getAllAdmins();
-    return admins.find(a => a.id === '0584220463' || (a.name && a.name.includes('חגי')) || (a.roleTitle && a.roleTitle.includes('גזבר'))) || {
+    return admins.find(a => a.id === '0584220463' || (a.name && a.name.includes('חגי')) || (a.roleTitle && (a.roleTitle.includes('מנהל') || a.roleTitle.includes('גזבר')))) || {
       name: 'חגי',
-      roleTitle: 'גזבר המוסד (Admin)',
+      roleTitle: 'מנהל המוסד (Admin)',
       email: 'yinonshvat@gmail.com'
     };
   }
@@ -153,7 +153,7 @@ class MailerService {
           
           <div style="background: #1b779e; color: #ffffff; padding: 20px; text-align: center;">
             <h2 style="margin: 0; font-size: 22px;">מוסדות חורב ירושלים - פלטפורמת ביטול ארוחות</h2>
-            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">התקבלה בקשת ביטול ארוחות חדשה לאישור הגזברות</p>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">התקבלה בקשת ביטול ארוחות חדשה לאישור האדמיניסטרציה</p>
           </div>
 
           <div style="padding: 25px;">
@@ -208,7 +208,7 @@ class MailerService {
 
     const isApproved = reqData.status === 'APPROVED';
     const statusText = isApproved ? 'אושרה' : 'נדחתה';
-    const subject = `עדכון גזברות: בקשת ביטול ארוחות #${reqData.id} ${statusText} (סכום החזר: ₪${reqData.approvedRefund || 0})`;
+    const subject = `עדכון אדמיניסטרציה: בקשת ביטול ארוחות #${reqData.id} ${statusText} (סכום החזר: ₪${reqData.approvedRefund || 0})`;
     const mealsStr = Array.isArray(reqData.requestedMeals) ? reqData.requestedMeals.join(', ') : (reqData.requestedMeals || '');
 
     const htmlContent = `
@@ -222,23 +222,23 @@ class MailerService {
           
           <div style="background: ${isApproved ? '#059669' : '#dc2626'}; color: #ffffff; padding: 20px; text-align: center;">
             <h2 style="margin: 0; font-size: 22px;">מוסדות חורב ירושלים - עדכון בקשת ביטול ארוחות</h2>
-            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">בקשתך #${reqData.id} נבחנה ועודכנה ע"י חגי והגזברות</p>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">בקשתך #${reqData.id} נבחנה ועודכנה ע"י חגי והאדמיניסטרציה</p>
           </div>
 
           <div style="padding: 25px;">
             <!-- Role Header Banner -->
             <div style="background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
-              <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">אישור עדכון בקשה - עותק לגזברות ולמזכירות:</h4>
+              <h4 style="margin: 0 0 6px 0; color: #047857; font-size: 15px;">אישור עדכון בקשה - עותק לאדמיניסטרציה ולמזכירות:</h4>
               <p style="margin: 0 0 6px 0; color: #065f46; font-size: 14px;">
                 <strong>נמען ראשי (הרכז/ת):</strong> ${reqData.applicantName} (${reqData.group} - <code>${targetEmail}</code>)
               </p>
               <div style="font-size: 12px; color: #047857; border-top: 1px dashed #a7f3d0; padding-top: 6px;">
-                הודעה זו נשלחה כעותק אישור (CC) ל-<strong>${treasurer.name}</strong> (גזבר) ול-<strong>${secretary.name}</strong> (מזכירות) כתיעוד רשמי של ההודעה שנמסרה כעת לרכז/ת.
+                הודעה זו נשלחה כעותק אישור (CC) ל-<strong>${treasurer.name}</strong> (מנהל) ול-<strong>${secretary.name}</strong> (מזכירות) כתיעוד רשמי של ההודעה שנמסרה כעת לרכז/ת.
               </div>
             </div>
 
             <h3 style="color: ${isApproved ? '#059669' : '#dc2626'}; margin-top: 0;">
-              סטטוס הבקשה: ${isApproved ? 'אושר מותאם אישית' : 'נדחה ע"י הגזברות'}
+              סטטוס הבקשה: ${isApproved ? 'אושר מותאם אישית' : 'נדחה ע"י האדמיניסטרציה'}
             </h3>
 
             ${isApproved ? `
@@ -256,7 +256,7 @@ class MailerService {
 
             ${reqData.adminNotes ? `
               <div style="background: #f8fafc; border-right: 4px solid #3b82f6; padding: 12px 15px; margin-bottom: 20px;">
-                <strong>הערת חגי / גזברות:</strong><br>
+                <strong>הערת חגי / אדמיניסטרציה:</strong><br>
                 <span style="color: #334155;">"${reqData.adminNotes}"</span>
               </div>
             ` : ''}
@@ -327,7 +327,7 @@ class MailerService {
                 <strong>${secretary.name}</strong> - <span style="background: #4f46e5; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${secretary.roleTitle || 'מזכירת המוסד (Admin)'}</span> (נמענת ראשית: <code>${secretary.email}</code>)
               </p>
               <div style="font-size: 12px; color: #4338ca; border-top: 1px dashed #c7d2fe; padding-top: 6px;">
-                עותק לביקורת גזברות: <strong>${treasurer.name}</strong> (${treasurer.roleTitle} - <code>${treasurer.email}</code>)
+                עותק לביקורת אדמיניסטרציה: <strong>${treasurer.name}</strong> (${treasurer.roleTitle} - <code>${treasurer.email}</code>)
               </div>
             </div>
 

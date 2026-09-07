@@ -9,7 +9,7 @@ const { Pool } = require('pg');
 // Initial Admins (Yinon, Hagai, Esther)
 const SEED_ADMINS = [
   { id: "0542065606", name: "ינון", role: "מנהל תוכנה (Admin)", email: "yinonshvat@horev.org.il", pass: "yinon2026" },
-  { id: "0584220463", name: "חגי", role: "גזבר המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "hagai2026" },
+  { id: "0584220463", name: "חגי", role: "מנהל המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "hagai2026" },
   { id: "0545540828", name: "אסתר", role: "מזכירת המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "esther2026" }
 ];
 
@@ -486,6 +486,14 @@ class DatabaseManager {
       if (this.data.admins.length < initialCount) {
         console.log('Sanitized duplicate admin Esther (05455408280)');
       }
+      this.data.admins.forEach(a => {
+        if (a.role && (a.role.includes('גזבר') || a.role.includes('גזברות'))) {
+          a.role = a.role.replace(/גזברות/g, 'אדמיניסטרציה').replace(/גזבר/g, 'מנהל');
+        }
+        if (a.roleTitle && (a.roleTitle.includes('גזבר') || a.roleTitle.includes('גזברות'))) {
+          a.roleTitle = a.roleTitle.replace(/גזברות/g, 'אדמיניסטרציה').replace(/גזבר/g, 'מנהל');
+        }
+      });
     }
 
     // Merge SEED_COORDINATORS into this.data.coordinators so cloud PostgreSQL store is always up-to-date!
