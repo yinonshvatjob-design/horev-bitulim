@@ -889,6 +889,58 @@ async function handleFormSubmit(e) {
   }
 }
 
+window.getReceiptBudgetStatus = function(r) {
+  if (r.status !== 'APPROVED') {
+    return {
+      allocatedStr: r.approvedRefund ? `₪${r.approvedRefund.toLocaleString()}` : '-',
+      actualStr: '-',
+      code: 'ממתין',
+      badgeHtml: `<span class="badge badge-secondary py-1 px-2" style="font-size: 11px;"><i class="fa-solid fa-hourglass"></i> ${getStatusHebrew(r.status)}</span>`
+    };
+  }
+
+  const allocated = parseFloat(r.approvedRefund) || 0;
+  const allocatedStr = `₪${allocated.toLocaleString()}`;
+
+  if (!r.receipt) {
+    return {
+      allocatedStr,
+      actualStr: '-',
+      code: 'ממתין לקבלה',
+      badgeHtml: `<span class="badge badge-warning py-1 px-2" style="font-size: 11px;"><i class="fa-solid fa-clock"></i> ממתין לקבלה</span>`
+    };
+  }
+
+  const actual = parseFloat(r.receipt.amount) || 0;
+  const actualStr = `₪${actual.toLocaleString()}`;
+  const diff = allocated - actual;
+  const pct = allocated > 0 ? Math.round((actual / allocated) * 100) : 100;
+
+  if (actual === allocated) {
+    return {
+      allocatedStr,
+      actualStr,
+      code: 'נוצל במלואו',
+      badgeHtml: `<span class="badge badge-success py-1 px-2" style="font-size: 11px;" title="נוצרו ₪${actual} מתוך ₪${allocated}"><i class="fa-solid fa-circle-check"></i> נוצל במלואו (100%)</span>`
+    };
+  } else if (actual < allocated) {
+    return {
+      allocatedStr,
+      actualStr,
+      code: 'ניצול חלקי',
+      badgeHtml: `<span class="badge badge-info py-1 px-2" style="font-size: 11px;" title="נוצלו ₪${actual} מתוך ₪${allocated} מוקצים"><i class="fa-solid fa-piggy-bank"></i> ניצול חלקי (${pct}%) — עודף ₪${diff.toLocaleString()}</span>`
+    };
+  } else {
+    const over = actual - allocated;
+    return {
+      allocatedStr,
+      actualStr,
+      code: 'חריגה',
+      badgeHtml: `<span class="badge badge-danger py-1 px-2" style="font-size: 11px;" title="הוגש ₪${actual} מתוך ₪${allocated} מוקצים"><i class="fa-solid fa-triangle-exclamation"></i> חריגה (${pct}%) — חריגה ₪${over.toLocaleString()}</span>`
+    };
+  }
+};
+
 // --------------------------------------------------------------------------
 // 5. Fetch & Render Data
 // --------------------------------------------------------------------------
@@ -920,17 +972,18 @@ function renderMySubmissions() {
     : AppStore.requests.filter(r => r.applicantId === AppStore.currentUser.id);
 
   if (!myReqs.length) {
-    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted">עדיין לא הוגשו בקשות ביטול.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" class="text-center text-muted">עדיין לא הוגשו בקשות ביטול.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = myReqs.map(r => {
+    const budget = getReceiptBudgetStatus(r);
     let receiptBtn = '-';
     if (r.status === 'APPROVED') {
       if (r.receipt) {
-        receiptBtn = `<button class="btn btn-sm btn-outline-success" onclick="openViewReceiptModal('${r.id}')"><i class="fa-solid fa-receipt"></i> קבלה הועלתה (₪${r.receipt.amount})</button>`;
+        receiptBtn = `<button class="btn btn-sm btn-outline-success py-0" onclick="openViewReceiptModal('${r.id}')"><i class="fa-solid fa-receipt"></i> קבלה (₪${r.receipt.amount})</button>`;
       } else {
-        receiptBtn = `<button class="btn btn-sm btn-success" onclick="openUploadReceiptModal('${r.id}')"><i class="fa-solid fa-upload"></i> 📸 העלה קבלה לאסתר</button>`;
+        receiptBtn = `<button class="btn btn-sm btn-success py-0" onclick="openUploadReceiptModal('${r.id}')"><i class="fa-solid fa-upload"></i> 📸 העלה קבלה לאסתר</button>`;
       }
     }
 
@@ -942,9 +995,11 @@ function renderMySubmissions() {
         <td>${r.approvedDetails || r.requestedMeals.join(', ')}</td>
         <td>${r.submittedAt}</td>
         <td><span class="badge ${getStatusBadgeClass(r.status)}">${getStatusHebrew(r.status)}</span></td>
-        <td class="text-success font-weight-bold">₪${(r.approvedRefund || 0).toLocaleString()}</td>
+        <td class="text-primary font-weight-bold">${budget.allocatedStr}</td>
+        <td class="text-success font-weight-bold">${budget.actualStr}</td>
+        <td>${budget.badgeHtml}</td>
         <td>${receiptBtn}</td>
-        <td><button class="btn btn-sm btn-outline-primary" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i> ציר זמן</button></td>
+        <td><button class="btn btn-sm btn-outline-primary py-0" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i> ציר זמן</button></td>
       </tr>
     `;
   }).join('');
@@ -1007,13 +1062,10 @@ function renderPendingRequests() {
             </div>
             <div class="mt-3 text-left">
               <button class="btn btn-success btn-sm font-weight-bold ml-2" onclick="approveRequest('${r.id}')">
-                <i class="fa-solid fa-check"></i> אישור מותאם אישית + שליחת מייל
+                <i class="fa-solid fa-check"></i> אישור בקשה ועדכון סכום החזר
               </button>
-              <button class="btn btn-danger btn-sm ml-2" onclick="rejectRequest('${r.id}')">
-                <i class="fa-solid fa-xmark"></i> דחיית הבקשה
-              </button>
-              <button class="btn btn-outline-danger btn-sm" onclick="deleteSingleRequest('${r.id}')">
-                <i class="fa-solid fa-trash"></i> מחק
+              <button class="btn btn-outline-danger btn-sm font-weight-bold" onclick="rejectRequest('${r.id}')">
+                <i class="fa-solid fa-xmark"></i> דחיית בקשה
               </button>
             </div>
           </div>
@@ -1026,21 +1078,16 @@ function renderPendingRequests() {
 async function approveRequest(id) {
   if (AppStore.currentUser.role !== 'ADMIN') return;
 
-  const refundInput = document.getElementById(`approvedRefund_${id}`);
-  const mealsInput = document.getElementById(`approvedMeals_${id}`);
-  const notesInput = document.getElementById(`adminNotes_${id}`);
-
-  const rawRefund = refundInput ? refundInput.value.trim() : '0';
-  const approvedRefund = parseFloat(rawRefund) || 0;
-  const approvedMeals = mealsInput ? mealsInput.value.trim() : '';
-  const adminNotes = notesInput ? notesInput.value.trim() : '';
+  const approvedRefund = document.getElementById(`approvedRefund_${id}`).value;
+  const approvedMeals = document.getElementById(`approvedMeals_${id}`).value;
+  const adminNotes = document.getElementById(`adminNotes_${id}`).value;
 
   try {
     const res = await fetch(`${API_BASE_URL}/requests/${id}/approve`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        approvedRefund,
+        approvedRefund: parseFloat(approvedRefund) || 0,
         approvedMeals,
         adminNotes,
         adminName: AppStore.currentUser.name
@@ -1139,6 +1186,7 @@ function renderReports() {
   }
 
   tbody.innerHTML = filtered.map(r => {
+    const budget = getReceiptBudgetStatus(r);
     let receiptCell = '<span class="text-muted small">אין</span>';
     if (r.receipt) {
       receiptCell = `<button class="btn btn-sm btn-outline-success py-0" onclick="openViewReceiptModal('${r.id}')"><i class="fa-solid fa-receipt"></i> קבלה (₪${r.receipt.amount})</button>`;
@@ -1154,10 +1202,12 @@ function renderReports() {
         <td>${r.group}</td>
         <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
         <td>${r.approvedDetails || (r.requestedMeals ? r.requestedMeals.join(', ') : '')}</td>
-        <td class="text-success font-weight-bold">₪${(r.approvedRefund || 0).toLocaleString()}</td>
+        <td class="text-primary font-weight-bold">${budget.allocatedStr}</td>
+        <td class="text-success font-weight-bold">${budget.actualStr}</td>
+        <td>${budget.badgeHtml}</td>
         <td><span class="badge ${getStatusBadgeClass(r.status)}">${getStatusHebrew(r.status)}</span></td>
         <td>${receiptCell}</td>
-        <td><button class="btn btn-sm btn-outline-primary" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i> ציר זמן</button></td>
+        <td><button class="btn btn-sm btn-outline-primary py-0" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i> ציר זמן</button></td>
         <td>
           <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteSingleRequest('${r.id}')" title="מחק בקשה זו">
             <i class="fa-solid fa-trash"></i>
@@ -1169,14 +1219,22 @@ function renderReports() {
 
   window.updateSelectedCount();
 
-  // Update KPIs
-  const totalApproved = filtered.filter(r => r.status === 'APPROVED').reduce((sum, r) => sum + (r.approvedRefund || 0), 0);
+  // Update Financial KPIs
+  const approvedReqs = filtered.filter(r => r.status === 'APPROVED');
+  const totalAllocated = approvedReqs.reduce((sum, r) => sum + (r.approvedRefund || 0), 0);
+  const totalReceipts = approvedReqs.filter(r => r.receipt).reduce((sum, r) => sum + (r.receipt.amount || 0), 0);
+  const totalSurplus = totalAllocated - totalReceipts;
+
   const totalRefundEl = document.getElementById('kpiTotalApprovedRefund');
-  const approvedCountEl = document.getElementById('kpiApprovedCount');
+  const totalReceiptsEl = document.getElementById('kpiTotalReceipts');
+  const totalSurplusEl = document.getElementById('kpiTotalSurplus');
   const pendingCountEl = document.getElementById('kpiPendingCount');
 
-  if (totalRefundEl) totalRefundEl.textContent = `₪${totalApproved.toLocaleString()}`;
-  if (approvedCountEl) approvedCountEl.textContent = filtered.filter(r => r.status === 'APPROVED').length;
+  if (totalRefundEl) totalRefundEl.textContent = `₪${totalAllocated.toLocaleString()}`;
+  if (totalReceiptsEl) totalReceiptsEl.textContent = `₪${totalReceipts.toLocaleString()}`;
+  if (totalSurplusEl) {
+    totalSurplusEl.textContent = `${totalSurplus >= 0 ? '+' : ''}₪${totalSurplus.toLocaleString()}`;
+  }
   if (pendingCountEl) pendingCountEl.textContent = filtered.filter(r => r.status === 'PENDING').length;
 }
 
