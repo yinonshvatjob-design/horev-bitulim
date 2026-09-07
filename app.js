@@ -455,6 +455,61 @@ function setupDateLimits() {
   document.getElementById('endDateInput').min = minDateStr;
 }
 
+// Israeli Holidays list (YYYY-MM-DD) for 2025-2027 (where schools/catering administration do not operate)
+const ISRAEL_HOLIDAYS = new Set([
+  // 2026
+  "2026-03-03", "2026-03-04", // Purim
+  "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07", "2026-04-08", // Pesach
+  "2026-04-22", // Yom Haatzmaut
+  "2026-05-21", "2026-05-22", // Shavuot
+  "2026-09-11", "2026-09-12", "2026-09-13", // Rosh Hashanah
+  "2026-09-20", "2026-09-21", // Yom Kippur
+  "2026-09-25", "2026-09-26", "2026-09-27", "2026-09-28", "2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02", "2026-10-03", // Sukkot
+  // 2027
+  "2027-03-23", "2027-03-24", // Purim
+  "2027-04-21", "2027-04-22", "2027-04-23", "2027-04-24", "2027-04-25", "2027-04-26", "2027-04-27", "2027-04-28", // Pesach
+  "2027-05-12", // Yom Haatzmaut
+  "2027-06-10", "2027-06-11", // Shavuot
+  "2027-10-01", "2027-10-02", "2027-10-03", // Rosh Hashanah
+  "2027-10-10", "2027-10-11", // Yom Kippur
+  "2027-10-15", "2027-10-16", "2027-10-17", "2027-10-18", "2027-10-19", "2027-10-20", "2027-10-21", "2027-10-22", "2027-10-23" // Sukkot
+]);
+
+function isNonBusinessDay(d) {
+  const dayOfWeek = d.getDay(); // 0 = Sunday, 5 = Friday, 6 = Saturday
+  if (dayOfWeek === 5 || dayOfWeek === 6) return true;
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return ISRAEL_HOLIDAYS.has(`${yyyy}-${mm}-${dd}`);
+}
+
+function getBusinessDayCutoffDeadline(startDateVal) {
+  const [year, month, day] = startDateVal.split('-').map(Number);
+  // Target time: 12:00 PM on event date
+  let curr = new Date(year, month - 1, day, 12, 0, 0);
+
+  let businessDaysNeeded = 2;
+  while (businessDaysNeeded > 0) {
+    curr.setDate(curr.getDate() - 1);
+    if (!isNonBusinessDay(curr)) {
+      businessDaysNeeded--;
+    }
+  }
+  return curr;
+}
+
+const HEBREW_DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+
+function formatHebrewDeadline(d) {
+  const dayName = HEBREW_DAYS[d.getDay()];
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `יום ${dayName} (${dd}/${mm}) בשעה ${hh}:${min}`;
+}
+
 function validateDateCutoff() {
   const startDateVal = document.getElementById('startDateInput').value;
   const alertBox = document.getElementById('dateValidationAlert');
@@ -468,14 +523,11 @@ function validateDateCutoff() {
   }
 
   const now = new Date();
-  const [year, month, day] = startDateVal.split('-').map(Number);
-  // Target event time is set to 12:00 PM (noon) on the event day
-  const eventTargetDate = new Date(year, month - 1, day, 12, 0, 0);
-  const diffHours = (eventTargetDate - now) / (1000 * 60 * 60);
+  const deadline = getBusinessDayCutoffDeadline(startDateVal);
 
-  if (diffHours < 48) {
+  if (now > deadline) {
     alertBox.style.display = 'block';
-    alertText.innerHTML = `<strong>חסימת 48 שעות:</strong> תאריך הביטול המבוקש (${startDateVal}) קרוב מדי. ניתן להגיש ביטול עד 48 שעות מראש בלבד (עד השעה 12:00 בצהריים יומיים לפני).`;
+    alertText.innerHTML = `<strong>חסימת ימי עסקים:</strong> מועד ההגשה מוגבל ל-2 ימי עסקים מראש (לא כולל שישי, שבת וחגים). עבור אירוע בתאריך ${startDateVal}, המועד האחרון להגשת ביטול היה <strong>${formatHebrewDeadline(deadline)}</strong>.`;
     submitBtn.disabled = true;
     return false;
   } else {

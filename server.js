@@ -147,16 +147,67 @@ app.post('/api/requests', async (req, res) => {
     return res.status(400).json({ success: false, message: 'חובה לאשר את 2 ההנחיות המוסדיות הרשומות בתחתית הטופס' });
   }
 
-  // 48-Hour Cutoff Validation Rule (relative to 12:00 PM on event date)
-  const now = new Date();
-  const [year, month, day] = startDate.split('-').map(Number);
-  const eventTargetDate = new Date(year, month - 1, day, 12, 0, 0);
-  const diffHours = (eventTargetDate - now) / (1000 * 60 * 60);
+// Israeli Holidays list (YYYY-MM-DD) for 2025-2027
+const ISRAEL_HOLIDAYS = new Set([
+  // 2026
+  "2026-03-03", "2026-03-04",
+  "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07", "2026-04-08",
+  "2026-04-22",
+  "2026-05-21", "2026-05-22",
+  "2026-09-11", "2026-09-12", "2026-09-13",
+  "2026-09-20", "2026-09-21",
+  "2026-09-25", "2026-09-26", "2026-09-27", "2026-09-28", "2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02", "2026-10-03",
+  // 2027
+  "2027-03-23", "2027-03-24",
+  "2027-04-21", "2027-04-22", "2027-04-23", "2027-04-24", "2027-04-25", "2027-04-26", "2027-04-27", "2027-04-28",
+  "2027-05-12",
+  "2027-06-10", "2027-06-11",
+  "2027-10-01", "2027-10-02", "2027-10-03",
+  "2027-10-10", "2027-10-11",
+  "2027-10-15", "2027-10-16", "2027-10-17", "2027-10-18", "2027-10-19", "2027-10-20", "2027-10-21", "2027-10-22", "2027-10-23"
+]);
 
-  if (diffHours < 48) {
+function isNonBusinessDay(d) {
+  const dayOfWeek = d.getDay();
+  if (dayOfWeek === 5 || dayOfWeek === 6) return true;
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return ISRAEL_HOLIDAYS.has(`${yyyy}-${mm}-${dd}`);
+}
+
+function getBusinessDayCutoffDeadline(startDateVal) {
+  const [year, month, day] = startDateVal.split('-').map(Number);
+  let curr = new Date(year, month - 1, day, 12, 0, 0);
+
+  let businessDaysNeeded = 2;
+  while (businessDaysNeeded > 0) {
+    curr.setDate(curr.getDate() - 1);
+    if (!isNonBusinessDay(curr)) {
+      businessDaysNeeded--;
+    }
+  }
+  return curr;
+}
+
+const HEBREW_DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+function formatHebrewDeadline(d) {
+  const dayName = HEBREW_DAYS[d.getDay()];
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `יום ${dayName} (${dd}/${mm}) בשעה ${hh}:${min}`;
+}
+
+  // 2 Business Days Cutoff Validation Rule
+  const now = new Date();
+  const deadline = getBusinessDayCutoffDeadline(startDate);
+
+  if (now > deadline) {
     return res.status(400).json({
       success: false,
-      message: `חסימת 48 שעות: תאריך הביטול המבוקש (${startDate}) קרוב מדי. ניתן להגיש ביטול עד 48 שעות מראש בלבד (עד השעה 12:00 בצהריים יומיים לפני).`
+      message: `חסימת ימי עסקים: מועד ההגשה מוגבל ל-2 ימי עסקים מראש (לא כולל שישי, שבת וחגים). עבור אירוע בתאריך ${startDate}, המועד האחרון להגשת ביטול היה ${formatHebrewDeadline(deadline)}.`
     });
   }
 
