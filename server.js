@@ -147,15 +147,16 @@ app.post('/api/requests', async (req, res) => {
     return res.status(400).json({ success: false, message: 'חובה לאשר את 2 ההנחיות המוסדיות הרשומות בתחתית הטופס' });
   }
 
-  // 48-Hour Cutoff Validation Rule
+  // 48-Hour Cutoff Validation Rule (relative to 12:00 PM on event date)
   const now = new Date();
-  const eventDate = new Date(startDate);
-  const diffHours = (eventDate - now) / (1000 * 60 * 60);
+  const [year, month, day] = startDate.split('-').map(Number);
+  const eventTargetDate = new Date(year, month - 1, day, 12, 0, 0);
+  const diffHours = (eventTargetDate - now) / (1000 * 60 * 60);
 
   if (diffHours < 48) {
     return res.status(400).json({
       success: false,
-      message: `חסימת 48 שעות: תאריך הביטול ${startDate} קרוב מדי (נותרו ${Math.max(0, Math.round(diffHours))} שעות). חוק קשיח: הגשת בקשה לפחות 48 שעות מראש!`
+      message: `חסימת 48 שעות: תאריך הביטול המבוקש (${startDate}) קרוב מדי. ניתן להגיש ביטול עד 48 שעות מראש בלבד (עד השעה 12:00 בצהריים יומיים לפני).`
     });
   }
 

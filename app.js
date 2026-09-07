@@ -468,12 +468,14 @@ function validateDateCutoff() {
   }
 
   const now = new Date();
-  const eventDate = new Date(startDateVal);
-  const diffHours = (eventDate - now) / (1000 * 60 * 60);
+  const [year, month, day] = startDateVal.split('-').map(Number);
+  // Target event time is set to 12:00 PM (noon) on the event day
+  const eventTargetDate = new Date(year, month - 1, day, 12, 0, 0);
+  const diffHours = (eventTargetDate - now) / (1000 * 60 * 60);
 
   if (diffHours < 48) {
     alertBox.style.display = 'block';
-    alertText.innerHTML = `<strong>חסימת 48 שעות:</strong> תאריך האירוע (${startDateVal}) קרוב מדי (נותרו <strong>${Math.max(0, Math.round(diffHours))}</strong> שעות). חוק מוסדי קשיח: הגשת ביטול לפחות 48 שעות מראש!`;
+    alertText.innerHTML = `<strong>חסימת 48 שעות:</strong> תאריך הביטול המבוקש (${startDateVal}) קרוב מדי. ניתן להגיש ביטול עד 48 שעות מראש בלבד (עד השעה 12:00 בצהריים יומיים לפני).`;
     submitBtn.disabled = true;
     return false;
   } else {
