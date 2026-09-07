@@ -752,7 +752,7 @@ window.toggleSelectBothMeals = function() {
   const bothSelected = cbBreakfast && cbLunch && cbBreakfast.checked && cbLunch.checked;
 
   if (bothSelected) {
-    if (cbBreakfast) cbBreakfast.checked = true;
+    if (cbBreakfast) cbBreakfast.checked = false;
     if (cbLunch) cbLunch.checked = false;
   } else {
     if (cbBreakfast) cbBreakfast.checked = true;

@@ -340,19 +340,19 @@
             <div class="form-group">
               <label><i class="fa-solid fa-utensils"></i> ארוחות מבוטלות (ניתן לבחור אחת או את שתיהן) *</label>
               <div class="checkbox-group">
-                <label class="custom-checkbox-card active" id="mealCardBreakfast">
-                  <input type="checkbox" name="mealType" value="ארוחת בוקר" id="mealCbBreakfast" checked onchange="updateMealCardStates()">
+                <label class="custom-checkbox-card" id="mealCardBreakfast">
+                  <input type="checkbox" name="mealType" value="ארוחת בוקר" id="mealCbBreakfast" onchange="updateMealCardStates()">
                   <span class="checkbox-box"><i class="fa-solid fa-sun"></i></span>
                   <span class="checkbox-label">ארוחת בוקר</span>
                   <i class="fa-solid fa-circle-check meal-check-icon"></i>
                 </label>
-                <label class="custom-checkbox-card active" id="mealCardLunch">
-                  <input type="checkbox" name="mealType" value="ארוחת צהריים" id="mealCbLunch" checked onchange="updateMealCardStates()">
+                <label class="custom-checkbox-card" id="mealCardLunch">
+                  <input type="checkbox" name="mealType" value="ארוחת צהריים" id="mealCbLunch" onchange="updateMealCardStates()">
                   <span class="checkbox-box"><i class="fa-solid fa-bowl-food"></i></span>
                   <span class="checkbox-label">ארוחת צהריים</span>
                   <i class="fa-solid fa-circle-check meal-check-icon"></i>
                 </label>
-                <div class="custom-checkbox-card active" id="mealCardBoth" onclick="toggleSelectBothMeals()" style="cursor: pointer;" title="לחץ לבחירה/ביטול של שתי הארוחות יחד">
+                <div class="custom-checkbox-card" id="mealCardBoth" onclick="toggleSelectBothMeals()" style="cursor: pointer;" title="לחץ לבחירה/ביטול של שתי הארוחות יחד">
                   <span class="checkbox-box" style="background: var(--primary); color: #fff;"><i class="fa-solid fa-utensils"></i></span>
                   <span class="checkbox-label">שתיהן (גם בוקר וגם צהריים)</span>
                 </div>
