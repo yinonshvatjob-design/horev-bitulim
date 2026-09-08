@@ -410,7 +410,6 @@ app.delete('/api/requests', (req, res) => {
   const admins = db.getAllAdmins();
   const reqAdmin = admins.find(a => a.id === adminId);
   const isSoftwareManager = reqAdmin && (
-    reqAdmin.id === '0542065606' || 
     (reqAdmin.name && reqAdmin.name.includes('ינון')) || 
     (reqAdmin.role && reqAdmin.role.includes('תוכנה')) ||
     (reqAdmin.roleTitle && reqAdmin.roleTitle.includes('תוכנה'))

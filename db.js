@@ -8,7 +8,7 @@ const { Pool } = require('pg');
 
 // Initial Admins (Yinon, Hagai, Esther)
 const SEED_ADMINS = [
-  { id: "0542065606", name: "ינון", role: "מנהל תוכנה (Admin)", email: "yinonshvat@horev.org.il", pass: "yinon2026" },
+  { id: "ADMIN_DEV", name: "ינון", role: "מנהל תוכנה (Admin)", email: "yinonshvat@horev.org.il", pass: "yinon2026" },
   { id: "0584220463", name: "חגי", role: "מנהל המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "hagai2026" },
   { id: "0545540828", name: "אסתר", role: "מזכירת המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "esther2026" }
 ];

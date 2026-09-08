@@ -190,7 +190,7 @@ window.setTestEmailRecipient = function(roleKey) {
     const admin = (AppStore.admins || []).find(a => a.id === '0545540828' || (a.name && a.name.includes('אסתר')));
     input.value = admin ? admin.email : 'yinonshvat@gmail.com';
   } else if (roleKey === 'software') {
-    const admin = (AppStore.admins || []).find(a => a.id === '0542065606' || (a.name && a.name.includes('ינון')));
+    const admin = (AppStore.admins || []).find(a => (a.name && a.name.includes('ינון')) || (a.roleTitle && a.roleTitle.includes('תוכנה')));
     input.value = admin ? admin.email : 'yinonshvat@horev.org.il';
   }
 };
@@ -380,9 +380,9 @@ function showMainApp() {
   const appNav = document.querySelector('.app-nav');
 
   const isSoftwareManager = AppStore.currentUser.role === 'ADMIN' && 
-    (AppStore.currentUser.id === '0542065606' || 
-     (AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
-     (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')));
+    ((AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
+     (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')) ||
+     (AppStore.currentUser.role && AppStore.currentUser.role.includes('תוכנה')));
 
   if (AppStore.currentUser.role === 'ADMIN') {
     adminLinks.forEach(el => el.style.display = 'block');
@@ -423,9 +423,9 @@ window.switchTab = function(tabId) {
   // STRICT ACCESS GUARD: Block non-software-managers from opening emailSettingsView
   if (tabId === 'emailSettingsView') {
     const isSoftwareManager = AppStore.currentUser.role === 'ADMIN' && 
-      (AppStore.currentUser.id === '0542065606' || 
-       (AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
-       (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')));
+      ((AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
+       (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')) ||
+       (AppStore.currentUser.role && AppStore.currentUser.role.includes('תוכנה')));
 
     if (!isSoftwareManager) {
       showToast('אין לך הרשאה לגשת להגדרות Google/Gmail. מסך זה מורשה למנהל התוכנה בלבד!', 'warning');
@@ -2000,9 +2000,9 @@ window.deleteSelectedRequests = async function() {
 
 window.clearAllHistory = async function() {
   const isSoftwareManager = AppStore.currentUser && AppStore.currentUser.role === 'ADMIN' && 
-    (AppStore.currentUser.id === '0542065606' || 
-     (AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
-     (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')));
+    ((AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
+     (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')) ||
+     (AppStore.currentUser.role && AppStore.currentUser.role.includes('תוכנה')));
 
   if (!isSoftwareManager) {
     showToast('פעולה זו (איפוס ומחיקת כל ההיסטוריה) מורשית למנהל תוכנה בלבד', 'danger');

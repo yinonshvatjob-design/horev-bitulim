@@ -33,7 +33,7 @@ class MailerService {
 
   get softwareManagerAdmin() {
     const admins = db.getAllAdmins();
-    return admins.find(a => a.id === '0542065606' || (a.name && a.name.includes('ינון')) || (a.roleTitle && a.roleTitle.includes('תוכנה'))) || {
+    return admins.find(a => (a.name && a.name.includes('ינון')) || (a.roleTitle && a.roleTitle.includes('תוכנה')) || (a.role && a.role.includes('תוכנה'))) || {
       name: 'ינון',
       roleTitle: 'מנהל תוכנה (Admin)',
       email: 'yinonshvat@horev.org.il'
