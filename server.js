@@ -137,14 +137,14 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const admin = db.getAllAdmins().find(a => isMatch(a.id, a.email, a.name));
   if (admin) {
     if (admin.pass) {
-      let isMatch = false;
+      let passValid = false;
       if (admin.pass.startsWith('$2a$')) {
-        isMatch = await bcrypt.compare(pass || '', admin.pass);
+        passValid = await bcrypt.compare(pass || '', admin.pass);
       } else {
-        isMatch = (admin.pass === pass); // Fallback just in case some plaintext wasn't hashed yet
+        passValid = (admin.pass === pass); // Fallback just in case some plaintext wasn't hashed yet
       }
       
-      if (!isMatch) {
+      if (!passValid) {
         return res.status(401).json({ success: false, message: 'סיסמת אדמין שגויה' });
       }
     }
