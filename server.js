@@ -341,7 +341,11 @@ function formatHebrewDeadline(d) {
   db.addRequest(newReq);
 
   // Send Alert Email to Admins (Hagai & Esther)
-  await mailer.sendSubmissionAlertToAdmins(newReq);
+  try {
+    await mailer.sendSubmissionAlertToAdmins(newReq);
+  } catch (mailErr) {
+    console.error("Mailer send error on submission:", mailErr.message);
+  }
 
   res.json({ success: true, request: newReq, message: 'הבקשה הוגשה בהצלחה ונשלחה לאישור חגי!' });
 });

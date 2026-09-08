@@ -1229,10 +1229,10 @@ window.openTimelineModal = function(id) {
       <div class="step-icon"><i class="fa-solid ${step.type === 'success' ? 'fa-check' : step.type === 'danger' ? 'fa-xmark' : 'fa-envelope'}"></i></div>
       <div class="step-content">
         <div class="step-header">
-          <span class="step-title">${step.title}</span>
-          <span class="step-time">${step.time}</span>
+          <span class="step-title">${escapeHtml(step.title)}</span>
+          <span class="step-time">${escapeHtml(step.time)}</span>
         </div>
-        <p class="step-desc">${step.desc}</p>
+        <p class="step-desc">${escapeHtml(step.desc)}</p>
       </div>
     </div>
   `).join('');
@@ -1338,8 +1338,9 @@ function exportToCSV() {
   if (AppStore.currentUser.role !== 'ADMIN') return;
 
   let csv = 'מזהה בקשה,שם הרכז,כיתה/שכבה,תאריך התחלה,תאריך סיום,ארוחות שאושרו,סכום החזר ב-ש"ח,סטטוס\n';
+  const escapeCsv = (str) => String(str || '').replace(/"/g, '""');
   AppStore.requests.forEach(r => {
-    csv += `"${r.id}","${escapeHtml(r.applicantName)}","${escapeHtml(r.group)}","${r.startDate}","${r.endDate}","${r.approvedDetails || r.requestedMeals.join('; ')}","${r.approvedRefund || 0}","${getStatusHebrew(r.status)}"\n`;
+    csv += `"${r.id}","${escapeCsv(r.applicantName)}","${escapeCsv(r.group)}","${r.startDate}","${r.endDate}","${escapeCsv(r.approvedDetails || r.requestedMeals.join('; '))}","${r.approvedRefund || 0}","${getStatusHebrew(r.status)}"\n`;
   });
 
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
