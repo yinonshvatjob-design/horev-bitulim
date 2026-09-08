@@ -8,6 +8,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const db = require('./db');
 const mailer = require('./mailer');
 
@@ -16,10 +17,35 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-horev-123';
 const app = express();
 const PORT = process.env.PORT || 4050;
 
-// Middlewares & Anti-Cache Headers for Desktop Browsers
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+// Security: Helmet for HTTP Headers (CSP disabled to allow Google Fonts / CDN)
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
+
+// Security: Strict CORS
+const allowedOrigins = ['http://localhost:4050', 'http://localhost:3000', 'https://bitulim.horevit.com'];
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
+// Security: Lower global payload limits to prevent DoS (5MB limit)
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
+
+// Security: Global API Rate Limiter
+const apiLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 200, // Limit each IP to 200 requests per `window`
+  message: { success: false, message: 'עברת את מכסת הפעולות המותרת. אנא המתן מספר דקות.' }
+});
+app.use('/api', apiLimiter);
 
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
