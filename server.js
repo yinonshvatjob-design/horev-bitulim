@@ -43,6 +43,14 @@ app.post('/api/auth/login', (req, res) => {
   const unpaddedDigits = cleanDigits.replace(/^0+/, '');
   const paddedDigits = cleanDigits ? cleanDigits.padStart(9, '0') : '';
 
+  // Explicit Gate: Block removed phone/ID 0542065606 completely
+  if (rawInput === '0542065606' || cleanDigits === '0542065606' || rawInput.includes('0542065606')) {
+    return res.status(403).json({
+      success: false,
+      message: 'הפרטים שהוזנו (0542065606) אינם מופיעים ברשימת המורשים.'
+    });
+  }
+
   // Helper matcher
   const isMatch = (targetId, targetEmail, targetName) => {
     if (!targetId) return false;
@@ -62,7 +70,7 @@ app.post('/api/auth/login', (req, res) => {
   // 1. Check if user is an Admin
   const admin = db.getAllAdmins().find(a => isMatch(a.id, a.email, a.name));
   if (admin) {
-    if (pass && admin.pass && admin.pass !== pass) {
+    if (admin.pass && admin.pass !== pass) {
       return res.status(401).json({ success: false, message: 'סיסמת אדמין שגויה' });
     }
     return res.json({

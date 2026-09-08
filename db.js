@@ -471,6 +471,7 @@ class DatabaseManager {
         console.log('Initialized initial database store in PostgreSQL Cloud Database!');
       }
       this.sanitizeData();
+      await this.savePg();
     } catch (err) {
       console.error('PostgreSQL Connection Error, falling back to local file:', err.message);
       this.load();
@@ -480,18 +481,55 @@ class DatabaseManager {
   sanitizeData() {
     if (!this.data) return;
 
+    // Purge & migrate 0542065606 completely from admins
     if (Array.isArray(this.data.admins)) {
-      const initialCount = this.data.admins.length;
-      this.data.admins = this.data.admins.filter(a => a.id !== '05455408280');
-      if (this.data.admins.length < initialCount) {
-        console.log('Sanitized duplicate admin Esther (05455408280)');
-      }
       this.data.admins.forEach(a => {
+        if (a.id === '0542065606' || a.id === '05455408280' || (a.name && (a.name === 'ינון' || a.name.includes('ינון (מנהל ראשי)')))) {
+          a.id = 'ADMIN_DEV';
+          a.name = 'ינון';
+          a.role = 'מנהל תוכנה (Admin)';
+          a.email = 'yinonshvat@horev.org.il';
+          a.pass = 'yinon2026';
+        }
         if (a.role && (a.role.includes('גזבר') || a.role.includes('גזברות'))) {
           a.role = a.role.replace(/גזברות/g, 'אדמיניסטרציה').replace(/גזבר/g, 'מנהל');
         }
         if (a.roleTitle && (a.roleTitle.includes('גזבר') || a.roleTitle.includes('גזברות'))) {
           a.roleTitle = a.roleTitle.replace(/גזברות/g, 'אדמיניסטרציה').replace(/גזבר/g, 'מנהל');
+        }
+      });
+
+      // Filter out any admin record that still has id 0542065606 or duplicates
+      const seenIds = new Set();
+      this.data.admins = this.data.admins.filter(a => {
+        if (a.id === '0542065606' || a.id === '05455408280') return false;
+        if (seenIds.has(a.id)) return false;
+        seenIds.add(a.id);
+        return true;
+      });
+
+      // Guarantee ADMIN_DEV is present
+      if (!this.data.admins.some(a => a.id === 'ADMIN_DEV')) {
+        this.data.admins.unshift({
+          id: "ADMIN_DEV",
+          name: "ינון",
+          role: "מנהל תוכנה (Admin)",
+          email: "yinonshvat@horev.org.il",
+          pass: "yinon2026"
+        });
+      }
+    }
+
+    // Purge 0542065606 completely from coordinators
+    if (Array.isArray(this.data.coordinators)) {
+      this.data.coordinators = this.data.coordinators.filter(c => c.id !== '0542065606' && c.id !== '05455408280');
+    }
+
+    // Purge 0542065606 from requests applicantId
+    if (Array.isArray(this.data.requests)) {
+      this.data.requests.forEach(r => {
+        if (r.applicantId === '0542065606') {
+          r.applicantId = 'ADMIN_DEV';
         }
       });
     }
@@ -520,8 +558,6 @@ class DatabaseManager {
 
       if (updatedCount > 0) {
         console.log(`[DatabaseManager] Synced ${updatedCount} coordinators from SEED_COORDINATORS into live database store.`);
-        this.save();
-        if (this.pool) this.savePg();
       }
     }
   }
