@@ -437,10 +437,25 @@ app.get('/api/admins', (req, res) => {
   res.json({ success: true, admins: db.getAllAdmins() });
 });
 
-// PUT /api/admins/:id (Edit admin credentials: name, ID/username, email, pass)
+const checkSoftwareManagerAuth = (adminId) => {
+  if (!adminId) return true;
+  const admins = db.getAllAdmins();
+  const reqAdmin = admins.find(a => a.id === String(adminId).trim());
+  return reqAdmin && (
+    (reqAdmin.name && reqAdmin.name.includes('ינון')) || 
+    (reqAdmin.role && reqAdmin.role.includes('תוכנה')) ||
+    (reqAdmin.roleTitle && reqAdmin.roleTitle.includes('תוכנה'))
+  );
+};
+
+// PUT /api/admins/:id (Edit admin credentials: name, ID/username, email, pass - Software Manager only)
 app.put('/api/admins/:id', (req, res) => {
   const { id } = req.params;
-  const { newId, name, email, pass, roleTitle } = req.body;
+  const { adminId, newId, name, email, pass, roleTitle } = req.body;
+
+  if (adminId && !checkSoftwareManagerAuth(adminId)) {
+    return res.status(403).json({ success: false, message: 'פעולת שינוי סיסמאות ופרטי אדמינים מורשית למנהל תוכנה בלבד' });
+  }
 
   const cleanId = (newId || id).replace(/[^0-9]/g, '');
   const updatedFields = {
@@ -458,9 +473,14 @@ app.put('/api/admins/:id', (req, res) => {
   res.json({ success: true, admin: updated, message: 'פרטי האדמין והסיסמה עודכנו בהצלחה!' });
 });
 
-// POST /api/users
+// POST /api/users (Software Manager only)
 app.post('/api/users', (req, res) => {
-  const { id, name, email } = req.body;
+  const { adminId, id, name, email } = req.body;
+
+  if (adminId && !checkSoftwareManagerAuth(adminId)) {
+    return res.status(403).json({ success: false, message: 'פעולת הוספת רכזים מורשית למנהל תוכנה בלבד' });
+  }
+
   if (!id || !name || !email) {
     return res.status(400).json({ success: false, message: 'יש למלא ת"ז, שם מלא ואימייל' });
   }
@@ -469,10 +489,15 @@ app.post('/api/users', (req, res) => {
   res.json({ success: true, message: 'הרכז/ת הוסף/ה בהצלחה לרשימת המורשים!' });
 });
 
-// PUT /api/users/:id (Edit coordinator)
+// PUT /api/users/:id (Edit coordinator - Software Manager only)
 app.put('/api/users/:id', (req, res) => {
   const { id } = req.params;
-  const { newId, name, email } = req.body;
+  const { adminId, newId, name, email } = req.body;
+
+  if (adminId && !checkSoftwareManagerAuth(adminId)) {
+    return res.status(403).json({ success: false, message: 'פעולת עריכת רכזים מורשית למנהל תוכנה בלבד' });
+  }
+
   const cleanId = (newId || id).replace(/[^0-9]/g, '');
   const updated = db.updateCoordinator(id, { id: cleanId, name, email });
   if (!updated) {
@@ -481,9 +506,15 @@ app.put('/api/users/:id', (req, res) => {
   res.json({ success: true, coordinator: updated, message: 'פרטי הרכז/ת עודכנו בהצלחה!' });
 });
 
-// DELETE /api/users/:id
+// DELETE /api/users/:id (Software Manager only)
 app.delete('/api/users/:id', (req, res) => {
   const { id } = req.params;
+  const { adminId } = req.body || req.query || {};
+
+  if (adminId && !checkSoftwareManagerAuth(adminId)) {
+    return res.status(403).json({ success: false, message: 'פעולת מחיקת רכזים מורשית למנהל תוכנה בלבד' });
+  }
+
   db.removeCoordinator(id);
   res.json({ success: true, message: 'הרכז/ת הוסר/ה מורשי המערכת' });
 });
@@ -497,9 +528,14 @@ app.get('/api/settings/webhook', (req, res) => {
   });
 });
 
-// POST /api/settings/webhook (Update Google Webhook URL & Secret Key)
+// POST /api/settings/webhook (Update Google Webhook URL & Secret Key - Software Manager only)
 app.post('/api/settings/webhook', (req, res) => {
-  const { webhookUrl, secretKey } = req.body;
+  const { adminId, webhookUrl, secretKey } = req.body;
+
+  if (adminId && !checkSoftwareManagerAuth(adminId)) {
+    return res.status(403).json({ success: false, message: 'עדכון הגדרות הדיוור מורשה למנהל תוכנה בלבד' });
+  }
+
   if (webhookUrl && webhookUrl.startsWith('http')) {
     db.updateGoogleWebhookUrl(webhookUrl.trim());
   }

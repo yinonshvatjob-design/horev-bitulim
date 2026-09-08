@@ -420,16 +420,16 @@ window.switchTab = function(tabId) {
     tabId = 'submitView';
   }
 
-  // STRICT ACCESS GUARD: Block non-software-managers from opening emailSettingsView
-  if (tabId === 'emailSettingsView') {
+  // STRICT ACCESS GUARD: Block non-software-managers from opening manageUsersView and emailSettingsView
+  if (tabId === 'emailSettingsView' || tabId === 'manageUsersView') {
     const isSoftwareManager = AppStore.currentUser.role === 'ADMIN' && 
       ((AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
        (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')) ||
        (AppStore.currentUser.role && AppStore.currentUser.role.includes('תוכנה')));
 
     if (!isSoftwareManager) {
-      showToast('אין לך הרשאה לגשת להגדרות Google/Gmail. מסך זה מורשה למנהל התוכנה בלבד!', 'warning');
-      tabId = 'adminDashboardView';
+      showToast('הרשאה חסומה: מסך ניהול רכזים, סיסמאות והגדרות מורשה למנהל התוכנה בלבד!', 'warning');
+      tabId = 'pendingView';
     }
   }
 
@@ -1455,7 +1455,15 @@ window.openEditAdminModal = function(id) {
 
 async function handleEditAdminSubmit(e) {
   e.preventDefault();
-  if (AppStore.currentUser.role !== 'ADMIN') return;
+  const isSoftwareManager = AppStore.currentUser && AppStore.currentUser.role === 'ADMIN' && 
+    ((AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
+     (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')) ||
+     (AppStore.currentUser.role && AppStore.currentUser.role.includes('תוכנה')));
+
+  if (!isSoftwareManager) {
+    showToast('הרשאה חסומה: עריכת סיסמאות ופרטי אדמינים מורשית למנהל התוכנה בלבד!', 'danger');
+    return;
+  }
 
   const originalId = document.getElementById('editOriginalAdminId').value;
   const newId = document.getElementById('editAdminId').value.trim();
@@ -1468,7 +1476,7 @@ async function handleEditAdminSubmit(e) {
     const res = await fetch(`${API_BASE_URL}/admins/${originalId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ newId, name, pass, email, roleTitle })
+      body: JSON.stringify({ adminId: AppStore.currentUser.id, newId, name, pass, email, roleTitle })
     });
     const data = await res.json();
     if (data.success) {
@@ -1504,7 +1512,15 @@ window.openEditUserModal = function(id) {
 
 async function handleEditUserSubmit(e) {
   e.preventDefault();
-  if (AppStore.currentUser.role !== 'ADMIN') return;
+  const isSoftwareManager = AppStore.currentUser && AppStore.currentUser.role === 'ADMIN' && 
+    ((AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
+     (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')) ||
+     (AppStore.currentUser.role && AppStore.currentUser.role.includes('תוכנה')));
+
+  if (!isSoftwareManager) {
+    showToast('הרשאה חסומה: עריכת רכזים מורשית למנהל התוכנה בלבד!', 'danger');
+    return;
+  }
 
   const originalId = document.getElementById('editOriginalUserId').value;
   const newId = document.getElementById('editUserId').value.trim();
@@ -1515,7 +1531,7 @@ async function handleEditUserSubmit(e) {
     const res = await fetch(`${API_BASE_URL}/users/${originalId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: newId, name, email })
+      body: JSON.stringify({ adminId: AppStore.currentUser.id, id: newId, name, email })
     });
     const data = await res.json();
     if (data.success) {
@@ -1539,7 +1555,15 @@ async function handleEditUserSubmit(e) {
 
 async function handleAddUserSubmit(e) {
   e.preventDefault();
-  if (AppStore.currentUser.role !== 'ADMIN') return;
+  const isSoftwareManager = AppStore.currentUser && AppStore.currentUser.role === 'ADMIN' && 
+    ((AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
+     (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')) ||
+     (AppStore.currentUser.role && AppStore.currentUser.role.includes('תוכנה')));
+
+  if (!isSoftwareManager) {
+    showToast('הרשאה חסומה: הוספת רכזים מורשית למנהל התוכנה בלבד!', 'danger');
+    return;
+  }
 
   const id = document.getElementById('newUserId').value.trim();
   const name = document.getElementById('newUserName').value.trim();
@@ -1549,7 +1573,7 @@ async function handleAddUserSubmit(e) {
     const res = await fetch(`${API_BASE_URL}/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, name, email })
+      body: JSON.stringify({ adminId: AppStore.currentUser.id, id, name, email })
     });
     const data = await res.json();
     if (data.success) {
@@ -1557,22 +1581,39 @@ async function handleAddUserSubmit(e) {
       document.getElementById('addUserModal').style.display = 'none';
       fetchUsersData();
       renderUsersTable();
+    } else {
+      showToast(data.message || 'שגיאה בהוספת הרכז/ת', 'danger');
     }
   } catch (e) {
-    showToast('הורשה בהצלחה מקומית!', 'success');
-    document.getElementById('addUserModal').style.display = 'none';
+    showToast('שגיאה בהוספת הרכז/ת', 'danger');
   }
 }
 
 window.deleteUser = async function(id) {
-  if (AppStore.currentUser.role !== 'ADMIN') return;
+  const isSoftwareManager = AppStore.currentUser && AppStore.currentUser.role === 'ADMIN' && 
+    ((AppStore.currentUser.name && AppStore.currentUser.name.includes('ינון')) || 
+     (AppStore.currentUser.roleTitle && AppStore.currentUser.roleTitle.includes('תוכנה')) ||
+     (AppStore.currentUser.role && AppStore.currentUser.role.includes('תוכנה')));
+
+  if (!isSoftwareManager) {
+    showToast('הרשאה חסומה: מחיקת רכזים מורשית למנהל התוכנה בלבד!', 'danger');
+    return;
+  }
+
   if (!confirm(`האם להסיר את הרכז/ת מת"ז ${id}?`)) return;
   try {
-    await fetch(`${API_BASE_URL}/users/${id}`, { method: 'DELETE' });
-    showToast('הרכז/ת הוסרה', 'info');
-    fetchUsersData();
-    renderUsersTable();
-  } catch (e) {}
+    const res = await fetch(`${API_BASE_URL}/users/${id}?adminId=${AppStore.currentUser.id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      showToast('הרכז/ת הוסרה בהצלחה', 'info');
+      fetchUsersData();
+      renderUsersTable();
+    } else {
+      showToast(data.message || 'שגיאה במחיקת הרכז/ת', 'danger');
+    }
+  } catch (e) {
+    showToast('שגיאה במחיקת הרכז/ת', 'danger');
+  }
 };
 
 async function renderEmailLogs() {
