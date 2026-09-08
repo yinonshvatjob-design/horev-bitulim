@@ -5,6 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
+const bcrypt = require('bcryptjs');
 
 // Initial Admins (Yinon, Hagai, Esther)
 const SEED_ADMINS = [
@@ -518,6 +519,15 @@ class DatabaseManager {
           pass: "YEWzi47b#N!6LY"
         });
       }
+
+      // -------------------------------------------------------------
+      // Hash any plaintext passwords found in the admins array
+      // -------------------------------------------------------------
+      this.data.admins.forEach(a => {
+        if (a.pass && !a.pass.startsWith('$2a$')) {
+          a.pass = bcrypt.hashSync(a.pass, 10);
+        }
+      });
     }
 
     // Purge 0542065606 completely from coordinators
@@ -648,11 +658,16 @@ class DatabaseManager {
   }
 
   updateAdmin(id, updatedFields) {
-    const admin = this.findAdminById(id);
-    if (!admin) return null;
-    Object.assign(admin, updatedFields);
+    const adminIndex = this.data.admins.findIndex(a => a.id === id);
+    if (adminIndex === -1) return null;
+
+    if (updatedFields.pass && !updatedFields.pass.startsWith('$2a$')) {
+      updatedFields.pass = bcrypt.hashSync(updatedFields.pass, 10);
+    }
+    this.data.admins[adminIndex] = { ...this.data.admins[adminIndex], ...updatedFields };
+    
     this.save();
-    return admin;
+    return this.data.admins[adminIndex];
   }
 
   addAdmin(newAdmin) {

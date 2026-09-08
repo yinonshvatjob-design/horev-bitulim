@@ -6,6 +6,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const rateLimit = require('express-rate-limit');
 const db = require('./db');
 const mailer = require('./mailer');
 
@@ -62,8 +64,14 @@ const requireSoftwareManager = (req, res, next) => {
 // 1. Auth REST API
 // --------------------------------------------------------------------------
 
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15, // limit each IP to 15 login requests per windowMs
+  message: { success: false, message: 'יותר מדי ניסיונות התחברות כושלים. אנא נסה שוב בעוד 15 דקות.' }
+});
+
 // POST /api/auth/login (Ultra-Flexible Smart Authentication)
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', loginLimiter, (req, res) => {
   const { role, id, pass } = req.body;
 
   if (!id || !String(id).trim()) {
@@ -102,8 +110,14 @@ app.post('/api/auth/login', (req, res) => {
   // 1. Check if user is an Admin
   const admin = db.getAllAdmins().find(a => isMatch(a.id, a.email, a.name));
   if (admin) {
-    if (admin.pass && admin.pass !== pass) {
-      return res.status(401).json({ success: false, message: 'סיסמת אדמין שגויה' });
+    if (admin.pass) {
+      const isMatch = admin.pass.startsWith('$2a$') 
+        ? bcrypt.compareSync(pass || '', admin.pass)
+        : admin.pass === pass; // Fallback just in case some plaintext wasn't hashed yet
+      
+      if (!isMatch) {
+        return res.status(401).json({ success: false, message: 'סיסמת אדמין שגויה' });
+      }
     }
     const userData = {
       id: admin.id,
@@ -413,6 +427,14 @@ app.post('/api/requests/:id/receipt', authenticateToken, async (req, res) => {
     const request = db.getRequestById(id);
     if (!request) {
       return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
+    }
+
+    if (fileData) {
+      const allowedMimes = ['data:image/png', 'data:image/jpeg', 'data:image/jpg', 'data:application/pdf'];
+      const isAllowed = allowedMimes.some(mime => fileData.startsWith(mime));
+      if (!isAllowed) {
+        return res.status(400).json({ success: false, message: 'סוג קובץ אינו נתמך. מותר להעלות רק תמונות (PNG/JPG) או מסמכי PDF.' });
+      }
     }
 
     const updatedReq = db.addReceiptToRequest(id, { amount, store, notes, fileName, fileData });

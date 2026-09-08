@@ -18,7 +18,7 @@ async function apiFetch(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
   
-  const res = await apiFetch(`${endpoint}`, {
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers
   });
@@ -33,7 +33,16 @@ async function apiFetch(endpoint, options = {}) {
   return res;
 }
 
-
+// XSS Protection: Escape malicious HTML characters
+function escapeHtml(unsafe) {
+  if (typeof unsafe !== 'string') return unsafe;
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 // Safe Local Storage Reader
 function getInitialUser() {
   try {
@@ -1052,7 +1061,7 @@ function renderMySubmissions() {
     return `
       <tr>
         <td><strong>#${r.id}</strong></td>
-        <td>${r.group}</td>
+        <td>${escapeHtml(r.group)}</td>
         <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
         <td>${budget.storesStr}</td>
         <td>${r.submittedAt}</td>
@@ -1100,13 +1109,13 @@ function renderPendingRequests() {
       <div class="pending-card card mb-3 ${borderClass}">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
-            <h4 class="mb-1 text-primary">#${r.id} — ${r.applicantName} (${r.group})</h4>
+            <h4 class="mb-1 text-primary">#${r.id} — ${escapeHtml(r.applicantName)} (${escapeHtml(r.group)})</h4>
             <div>
               <span class="badge ${urgency.badgeClass} p-2 ml-2" style="font-size: 13px;"><i class="fa-solid ${urgency.icon}"></i> ${urgency.label}</span>
               <span class="req-date"><i class="fa-solid fa-clock"></i> תאריך אירוע: <strong>${r.startDate}</strong></span>
             </div>
           </div>
-          <p class="text-muted mb-2"><strong>ארוחות שבוטלו:</strong> ${r.requestedMeals ? r.requestedMeals.join(', ') : ''} | <strong>סיבה:</strong> ${r.reason}</p>
+          <p class="text-muted mb-2"><strong>ארוחות שבוטלו:</strong> ${r.requestedMeals ? r.requestedMeals.join(', ') : ''} | <strong>סיבה:</strong> ${escapeHtml(r.reason)}</p>
           <div class="approval-controls-box p-3 mt-2 bg-light border-radius">
             <div class="row align-items-center">
               <div class="col-md-4">
@@ -1265,8 +1274,8 @@ function renderReports() {
           <input type="checkbox" class="req-select-cb" value="${r.id}" onchange="updateSelectedCount()">
         </td>
         <td><strong>#${r.id}</strong></td>
-        <td>${r.applicantName}</td>
-        <td>${r.group}</td>
+        <td>${escapeHtml(r.applicantName)}</td>
+        <td>${escapeHtml(r.group)}</td>
         <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
         <td>${budget.storesStr}</td>
         <td class="text-primary font-weight-bold">${budget.allocatedStr}</td>
@@ -1330,7 +1339,7 @@ function exportToCSV() {
 
   let csv = 'מזהה בקשה,שם הרכז,כיתה/שכבה,תאריך התחלה,תאריך סיום,ארוחות שאושרו,סכום החזר ב-ש"ח,סטטוס\n';
   AppStore.requests.forEach(r => {
-    csv += `"${r.id}","${r.applicantName}","${r.group}","${r.startDate}","${r.endDate}","${r.approvedDetails || r.requestedMeals.join('; ')}","${r.approvedRefund || 0}","${getStatusHebrew(r.status)}"\n`;
+    csv += `"${r.id}","${escapeHtml(r.applicantName)}","${escapeHtml(r.group)}","${r.startDate}","${r.endDate}","${r.approvedDetails || r.requestedMeals.join('; ')}","${r.approvedRefund || 0}","${getStatusHebrew(r.status)}"\n`;
   });
 
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -1647,7 +1656,7 @@ async function renderEmailLogs() {
     <div class="log-entry">
       <span class="log-time">${log.time}</span>
       <span class="log-to">אל: <strong>${log.to}</strong></span>
-      <span class="log-subject">${log.subject}</span>
+      <span class="log-subject">${escapeHtml(log.subject)}</span>
       <span class="badge badge-success">${log.status}</span>
     </div>
   `).join('');
@@ -1842,12 +1851,12 @@ window.openViewReceiptModal = function(reqId) {
     return `
       <div class="card mb-3 text-right" style="border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden;">
         <div class="card-header bg-light d-flex justify-content-between align-items-center py-2 px-3">
-          <span class="font-weight-bold text-dark"><i class="fa-solid fa-receipt"></i> קבלה #${idx + 1}: ${r.store || 'לא צוין ספק'}</span>
+          <span class="font-weight-bold text-dark"><i class="fa-solid fa-receipt"></i> קבלה #${idx + 1}: ${escapeHtml(r.store || 'לא צוין ספק')}</span>
           <span class="badge badge-success font-weight-bold" style="font-size: 14px;">₪${(r.amount || 0).toLocaleString()}</span>
         </div>
         <div class="card-body p-3">
           <p class="mb-1 text-muted small"><strong>זמן העלאה:</strong> ${r.uploadedAt || '-'}</p>
-          ${r.notes ? `<p class="mb-2 text-dark small"><strong>הערה לאסתר:</strong> "${r.notes}"</p>` : ''}
+          ${r.notes ? `<p class="mb-2 text-dark small"><strong>הערה לאסתר:</strong> "${escapeHtml(r.notes)}"</p>` : ''}
           ${isImage ? `
             <div class="text-center my-2" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; background: #fafafa;">
               <img src="${r.fileData}" alt="תמונת קבלה #${idx + 1}" style="max-width: 100%; height: auto; border-radius: 4px;">
@@ -1925,7 +1934,7 @@ window.printReceipt = function(reqId) {
     } else if (isPdf) {
       return `<div class="page-break"><iframe src="${r.fileData}"></iframe></div>`;
     } else {
-      return `<div class="page-break"><p style="font-family: Arial; font-size: 18px;">${r.store || 'ספק'} — ₪${r.amount} (${r.fileName || 'קובץ'})</p></div>`;
+      return `<div class="page-break"><p style="font-family: Arial; font-size: 18px;">${escapeHtml(r.store || 'ספק')} — ₪${r.amount} (${r.fileName || 'קובץ'})</p></div>`;
     }
   }).join('');
 
@@ -1997,13 +2006,13 @@ window.copyReceiptToClipboard = async function(reqId) {
       ]);
       showToast('תמונת הקבלה הועתקה ללוח! ניתן להדביק (Ctrl+V) ב-WhatsApp / Gmail', 'success');
     } else {
-      const textToCopy = `🧾 קבלה מוסדות חורב\nבקשה #${req.id} (${req.applicantName} - ${req.group})\nספק: ${r.store || 'לא צוין'}\nסכום: ₪${r.amount}\nתאריך: ${r.uploadedAt}`;
+      const textToCopy = `🧾 קבלה מוסדות חורב\nבקשה #${req.id} (${req.applicantName} - ${req.group})\nספק: ${escapeHtml(r.store || 'לא צוין')}\nסכום: ₪${r.amount}\nתאריך: ${r.uploadedAt}`;
       await navigator.clipboard.writeText(textToCopy);
       showToast('פרטי הקבלה הועתקו ללוח!', 'success');
     }
   } catch (err) {
     console.error('Clipboard error:', err);
-    const textToCopy = `🧾 קבלה מוסדות חורב\nבקשה #${req.id} (${req.applicantName} - ${req.group})\nספק: ${r.store || 'לא צוין'}\nסכום: ₪${r.amount}\nתאריך: ${r.uploadedAt}`;
+    const textToCopy = `🧾 קבלה מוסדות חורב\nבקשה #${req.id} (${req.applicantName} - ${req.group})\nספק: ${escapeHtml(r.store || 'לא צוין')}\nסכום: ₪${r.amount}\nתאריך: ${r.uploadedAt}`;
     navigator.clipboard.writeText(textToCopy);
     showToast('פרטי הקבלה הועתקו ללוח (טקסט)!', 'success');
   }
