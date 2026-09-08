@@ -639,13 +639,18 @@
 
             <div class="form-group mb-3">
               <label for="webhookUrlInput"><i class="fa-solid fa-link"></i> כתובת Google Apps Script Webhook URL (מנוע הדיוור)</label>
+              <input type="url" id="webhookUrlInput" class="form-control mb-3" placeholder="https://script.google.com/macros/s/.../exec" required>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="secretKeyInput"><i class="fa-solid fa-shield-halved"></i> מפתח אבטחה ייחודי (Secret Token) לחסימת גישה זרה לסקריפט</label>
               <div class="d-flex gap-2 align-items-center flex-wrap" style="gap: 8px;">
-                <input type="url" id="webhookUrlInput" class="form-control" placeholder="https://script.google.com/macros/s/.../exec" required style="flex: 1; min-width: 280px;">
+                <input type="text" id="secretKeyInput" class="form-control" placeholder="HOREV_SECURE_MAIL_2026_SECRET_KEY" style="flex: 1; min-width: 280px;">
                 <button type="button" class="btn btn-primary" onclick="handleSaveWebhookUrl(event)">
-                  <i class="fa-solid fa-floppy-disk"></i> שמור כתובת Webhook
+                  <i class="fa-solid fa-floppy-disk"></i> שמור הגדרות אבטחת מייל
                 </button>
               </div>
-              <small class="text-muted">ניתן להחליף או לעדכן את מנוע ה-Webhook של גוגל בכל עת באופן דינמי.</small>
+              <small class="text-muted">מפתח זה מגן על סקריפט גוגל כך **שרק השרת שלך מורשה** להורות על שליחת מיילים!</small>
             </div>
             
             <div class="alert alert-info p-3 my-3" style="background: #eef2ff; border-right: 4px solid #4f46e5; color: #312e81; border-radius: 8px;">

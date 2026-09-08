@@ -565,7 +565,7 @@ class DatabaseManager {
     }
   }
 
-  // --- Webhook Settings ---
+  // --- Webhook Settings & Security Secret Key ---
   getGoogleWebhookUrl() {
     if (this.data && this.data.settings && this.data.settings.googleWebhookUrl) {
       return this.data.settings.googleWebhookUrl;
@@ -580,6 +580,22 @@ class DatabaseManager {
     this.data.settings.googleWebhookUrl = url;
     this.save();
     return url;
+  }
+
+  getMailerSecretKey() {
+    if (this.data && this.data.settings && this.data.settings.mailerSecretKey) {
+      return this.data.settings.mailerSecretKey;
+    }
+    return process.env.MAILER_SECRET_KEY || 'HOREV_SECURE_MAIL_2026_SECRET_KEY';
+  }
+
+  updateMailerSecretKey(secretKey) {
+    if (!this.data.settings) {
+      this.data.settings = {};
+    }
+    this.data.settings.mailerSecretKey = secretKey;
+    this.save();
+    return secretKey;
   }
 
   // --- Admins & Coordinators ---

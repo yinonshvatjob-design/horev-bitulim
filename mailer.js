@@ -56,8 +56,11 @@ class MailerService {
                                  .replace(/\s+/g, ' ')
                                  .trim() : '';
 
+    const secretKey = db.getMailerSecretKey();
+
     return new Promise((resolve) => {
       const payload = JSON.stringify({
+        secretKey: secretKey,
         to: Array.isArray(to) ? to.join(',') : (to || ''),
         cc: Array.isArray(cc) ? cc.join(',') : (cc || ''),
         subject: subject || 'עדכון מוסדות חורב',

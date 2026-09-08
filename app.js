@@ -1333,12 +1333,14 @@ async function fetchWebhookUrl() {
   try {
     const res = await fetch(`${API_BASE_URL}/settings/webhook`);
     const data = await res.json();
-    if (data.success && data.webhookUrl) {
+    if (data.success) {
       const input = document.getElementById('webhookUrlInput');
-      if (input) input.value = data.webhookUrl;
+      const keyInput = document.getElementById('secretKeyInput');
+      if (input && data.webhookUrl) input.value = data.webhookUrl;
+      if (keyInput && data.secretKey) keyInput.value = data.secretKey;
     }
   } catch (err) {
-    console.error('Error fetching webhook URL:', err);
+    console.error('Error fetching webhook settings:', err);
   }
 }
 
@@ -1347,7 +1349,9 @@ window.handleSaveWebhookUrl = async function(e) {
   if (!AppStore.currentUser || AppStore.currentUser.role !== 'ADMIN') return;
 
   const webhookUrlInput = document.getElementById('webhookUrlInput');
+  const secretKeyInput = document.getElementById('secretKeyInput');
   const webhookUrl = webhookUrlInput ? webhookUrlInput.value.trim() : '';
+  const secretKey = secretKeyInput ? secretKeyInput.value.trim() : '';
 
   if (!webhookUrl || !webhookUrl.startsWith('http')) {
     showToast('יש להזין כתובת Google Webhook URL תקינה', 'warning');
@@ -1358,11 +1362,11 @@ window.handleSaveWebhookUrl = async function(e) {
     const res = await fetch(`${API_BASE_URL}/settings/webhook`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ webhookUrl })
+      body: JSON.stringify({ webhookUrl, secretKey })
     });
     const data = await res.json();
     if (data.success) {
-      showToast('כתובת ה-Webhook של גוגל עודכנה ונשמרה בהצלחה!', 'success');
+      showToast(data.message || 'הגדרות ה-Webhook ומפתח האבטחה עודכנו בהצלחה!', 'success');
     } else {
       showToast(data.message || 'שגיאה בעדכון ה-Webhook', 'danger');
     }

@@ -488,19 +488,30 @@ app.delete('/api/users/:id', (req, res) => {
   res.json({ success: true, message: 'הרכז/ת הוסר/ה מורשי המערכת' });
 });
 
-// GET /api/settings/webhook (Get Google Webhook URL)
+// GET /api/settings/webhook (Get Google Webhook URL & Secret Key)
 app.get('/api/settings/webhook', (req, res) => {
-  res.json({ success: true, webhookUrl: db.getGoogleWebhookUrl() });
+  res.json({
+    success: true,
+    webhookUrl: db.getGoogleWebhookUrl(),
+    secretKey: db.getMailerSecretKey()
+  });
 });
 
-// POST /api/settings/webhook (Update Google Webhook URL)
+// POST /api/settings/webhook (Update Google Webhook URL & Secret Key)
 app.post('/api/settings/webhook', (req, res) => {
-  const { webhookUrl } = req.body;
-  if (!webhookUrl || !webhookUrl.startsWith('http')) {
-    return res.status(400).json({ success: false, message: 'יש להזין כתובת Google Webhook URL תקינה (מתחילה ב-https)' });
+  const { webhookUrl, secretKey } = req.body;
+  if (webhookUrl && webhookUrl.startsWith('http')) {
+    db.updateGoogleWebhookUrl(webhookUrl.trim());
   }
-  const updatedUrl = db.updateGoogleWebhookUrl(webhookUrl.trim());
-  res.json({ success: true, webhookUrl: updatedUrl, message: 'כתובת ה-Webhook של גוגל עודכנה בהצלחה!' });
+  if (secretKey && secretKey.trim()) {
+    db.updateMailerSecretKey(secretKey.trim());
+  }
+  res.json({
+    success: true,
+    webhookUrl: db.getGoogleWebhookUrl(),
+    secretKey: db.getMailerSecretKey(),
+    message: 'הגדרות ה-Webhook ומפתח האבטחה (Secret Key) עודכנו בהצלחה!'
+  });
 });
 
 // GET /api/email-logs
