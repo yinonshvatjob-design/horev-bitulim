@@ -442,7 +442,14 @@ app.get('/api/users', (req, res) => {
 
 // GET /api/admins
 app.get('/api/admins', (req, res) => {
-  res.json({ success: true, admins: db.getAllAdmins() });
+  const safeAdmins = db.getAllAdmins().map(a => ({
+    id: a.id,
+    name: a.name,
+    email: a.email,
+    role: a.role,
+    roleTitle: a.roleTitle || 'אדמין מוסדות חורב'
+  }));
+  res.json({ success: true, admins: safeAdmins });
 });
 
 const checkSoftwareManagerAuth = (adminId) => {

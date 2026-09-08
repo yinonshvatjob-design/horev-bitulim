@@ -1411,10 +1411,7 @@ function renderAdminsTable() {
       <td><strong>${a.name}</strong></td>
       <td><code>${a.id}</code></td>
       <td>
-        <span id="passText_${a.id}" style="letter-spacing: 2px;">••••••••</span>
-        <button class="btn btn-sm btn-link text-secondary py-0" onclick="togglePassVisibility('${a.id}', '${a.pass}')" title="הצג/הסתר סיסמה">
-          <i class="fa-solid fa-eye" id="passEye_${a.id}"></i>
-        </button>
+        <span style="letter-spacing: 2px; color: #6c757d;">••••••••</span>
       </td>
       <td>${a.email}</td>
       <td>
@@ -1426,20 +1423,6 @@ function renderAdminsTable() {
   `).join('');
 }
 
-window.togglePassVisibility = function(id, pass) {
-  const textEl = document.getElementById(`passText_${id}`);
-  const eyeEl = document.getElementById(`passEye_${id}`);
-  if (!textEl) return;
-
-  if (textEl.innerText === '••••••••') {
-    textEl.innerText = pass;
-    eyeEl.className = 'fa-solid fa-eye-slash';
-  } else {
-    textEl.innerText = '••••••••';
-    eyeEl.className = 'fa-solid fa-eye';
-  }
-};
-
 window.openEditAdminModal = function(id) {
   const admin = (AppStore.admins || []).find(a => a.id === id);
   if (!admin) return;
@@ -1448,7 +1431,7 @@ window.openEditAdminModal = function(id) {
   document.getElementById('editAdminRoleTitle').value = admin.roleTitle || '';
   document.getElementById('editAdminName').value = admin.name;
   document.getElementById('editAdminId').value = admin.id;
-  document.getElementById('editAdminPass').value = admin.pass;
+  document.getElementById('editAdminPass').value = admin.pass || '';
   document.getElementById('editAdminEmail').value = admin.email;
   document.getElementById('editAdminModal').style.display = 'flex';
 };
