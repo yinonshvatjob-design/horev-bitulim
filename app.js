@@ -314,14 +314,11 @@ async function handleLogin(role, id, pass = '') {
     showMainApp();
   } catch (error) {
     console.error('Login error', error);
-    // Fallback local auth demo
-    if (id === '0542065606' || id === '0584220463' || id === '0545540828') {
-      AppStore.currentUser = { id, name: id === '0542065606' ? 'ינון' : id === '0584220463' ? 'חגי' : 'אסתר', role: 'ADMIN', roleTitle: 'אדמין מוסדות חורב' };
-    } else {
-      AppStore.currentUser = { id, name: 'הרכז/ת', role: 'COORDINATOR', roleTitle: 'רכז/ת מורש/ת' };
+    if (alertBox) {
+      alertBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> שגיאת תקשורת עם השרת: אנא ודא חיבור לרשת ונסה שוב`;
+      alertBox.style.display = 'block';
     }
-    localStorage.setItem('horev_current_user', JSON.stringify(AppStore.currentUser));
-    showMainApp();
+    showToast('שגיאה בתקשורת עם השרת בעת ההתחברות', 'danger');
   } finally {
     isLoggingIn = false;
     if (coordBtn) { coordBtn.disabled = false; coordBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> הכנס למערכת'; }
