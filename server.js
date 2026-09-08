@@ -5,8 +5,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const db = require('./db');
 const mailer = require('./mailer');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-horev-123';
 
 const app = express();
 const PORT = process.env.PORT || 4050;
@@ -25,6 +28,35 @@ app.use((req, res, next) => {
 
 // Serve Static Frontend Assets (Web Client)
 app.use(express.static(__dirname));
+
+// --------------------------------------------------------------------------
+// Security Middlewares (JWT)
+// --------------------------------------------------------------------------
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ success: false, message: 'גישה נדחתה. לא סופק מפתח אימות (Token).' });
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ success: false, message: 'פג תוקף החיבור, או שהמפתח אינו חוקי. נא להתחבר מחדש.' });
+    req.user = user;
+    next();
+  });
+};
+
+const requireAdmin = (req, res, next) => {
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ success: false, message: 'פעולה זו מורשית למנהלים בלבד.' });
+  }
+  next();
+};
+
+const requireSoftwareManager = (req, res, next) => {
+  if (req.user.role !== 'ADMIN' || !req.user.roleTitle?.includes('תוכנה')) {
+    return res.status(403).json({ success: false, message: 'פעולה זו מורשית למנהל תוכנה בלבד.' });
+  }
+  next();
+};
 
 // --------------------------------------------------------------------------
 // 1. Auth REST API
@@ -73,44 +105,53 @@ app.post('/api/auth/login', (req, res) => {
     if (admin.pass && admin.pass !== pass) {
       return res.status(401).json({ success: false, message: 'סיסמת אדמין שגויה' });
     }
+    const userData = {
+      id: admin.id,
+      name: admin.name,
+      email: admin.email,
+      role: 'ADMIN',
+      roleTitle: admin.roleTitle || 'אדמין מוסדות חורב'
+    };
+    const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
     return res.json({
       success: true,
-      user: {
-        id: admin.id,
-        name: admin.name,
-        email: admin.email,
-        role: 'ADMIN',
-        roleTitle: admin.roleTitle || 'אדמין מוסדות חורב'
-      }
+      token,
+      user: userData
     });
   }
 
   // 2. Check if user is a Coordinator
   const coordinator = db.getAllCoordinators().find(c => isMatch(c.id, c.email, c.name));
   if (coordinator) {
+    const userData = {
+      id: coordinator.id,
+      name: coordinator.name,
+      email: coordinator.email,
+      role: 'COORDINATOR',
+      roleTitle: 'רכז/ת מורש/ת'
+    };
+    const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
     return res.json({
       success: true,
-      user: {
-        id: coordinator.id,
-        name: coordinator.name,
-        email: coordinator.email,
-        role: 'COORDINATOR',
-        roleTitle: 'רכז/ת מורש/ת'
-      }
+      token,
+      user: userData
     });
   }
 
   // 3. Fallback: Allow any coordinator input to log in smoothly as a Coordinator
   if (role === 'coordinator' || !pass) {
+    const userData = {
+      id: rawInput,
+      name: rawInput.length >= 2 ? rawInput : `רכז/ת (${rawInput})`,
+      email: rawInput.includes('@') ? rawInput : `${cleanDigits || rawInput}@horev.org.il`,
+      role: 'COORDINATOR',
+      roleTitle: 'רכז/ת מורש/ת'
+    };
+    const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
     return res.json({
       success: true,
-      user: {
-        id: rawInput,
-        name: rawInput.length >= 2 ? rawInput : `רכז/ת (${rawInput})`,
-        email: rawInput.includes('@') ? rawInput : `${cleanDigits || rawInput}@horev.org.il`,
-        role: 'COORDINATOR',
-        roleTitle: 'רכז/ת מורש/ת'
-      }
+      token,
+      user: userData
     });
   }
 
@@ -125,7 +166,7 @@ app.post('/api/auth/login', (req, res) => {
 // --------------------------------------------------------------------------
 
 // GET /api/requests
-app.get('/api/requests', (req, res) => {
+app.get('/api/requests', authenticateToken, (req, res) => {
   const { applicantId, status } = req.query;
   let requests = db.getAllRequests();
 
@@ -144,7 +185,7 @@ app.get('/api/requests', (req, res) => {
 });
 
 // POST /api/requests (Submit Request with 48h check)
-app.post('/api/requests', async (req, res) => {
+app.post('/api/requests', authenticateToken, async (req, res) => {
   const { applicantId, applicantName, applicantEmail, group, startDate, endDate, requestedMeals, reason, mandatoryConfirmed } = req.body;
 
   if (!group || !startDate || !endDate || !requestedMeals || requestedMeals.length === 0 || !reason) {
@@ -255,10 +296,11 @@ function formatHebrewDeadline(d) {
 });
 
 // POST /api/requests/:id/approve (Custom Approval & Manual Refund in ₪)
-app.post('/api/requests/:id/approve', async (req, res) => {
+app.post('/api/requests/:id/approve', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { approvedRefund, approvedMeals, adminNotes, adminName } = req.body;
+    const { approvedRefund, approvedMeals, adminNotes } = req.body;
+    const adminName = req.user.name;
 
     const request = db.getAllRequests().find(r => r.id === id);
     if (!request) {
@@ -310,10 +352,11 @@ app.post('/api/requests/:id/approve', async (req, res) => {
 });
 
 // POST /api/requests/:id/reject (Rejection with Email to Coordinator)
-app.post('/api/requests/:id/reject', async (req, res) => {
+app.post('/api/requests/:id/reject', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { adminNotes, adminName } = req.body;
+    const { adminNotes } = req.body;
+    const adminName = req.user.name;
 
     const request = db.getAllRequests().find(r => r.id === id);
     if (!request) {
@@ -362,7 +405,7 @@ app.post('/api/requests/:id/reject', async (req, res) => {
 });
 
 // POST /api/requests/:id/receipt (Upload receipt and send alert to Esther)
-app.post('/api/requests/:id/receipt', async (req, res) => {
+app.post('/api/requests/:id/receipt', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { amount, store, notes, fileName, fileData } = req.body;
@@ -393,7 +436,7 @@ app.post('/api/requests/:id/receipt', async (req, res) => {
 });
 
 // DELETE /api/requests/:id (Delete single request)
-app.delete('/api/requests/:id', (req, res) => {
+app.delete('/api/requests/:id', authenticateToken, requireAdmin, (req, res) => {
   const { id } = req.params;
   const deleted = db.deleteRequest(id);
   if (!deleted) {
@@ -403,7 +446,7 @@ app.delete('/api/requests/:id', (req, res) => {
 });
 
 // POST /api/requests/delete-batch (Delete selected requests)
-app.post('/api/requests/delete-batch', (req, res) => {
+app.post('/api/requests/delete-batch', authenticateToken, requireAdmin, (req, res) => {
   const { ids } = req.body;
   if (!Array.isArray(ids) || ids.length === 0) {
     return res.status(400).json({ success: false, message: 'יש לבחור לפחות בקשה אחת למחיקה' });
@@ -412,7 +455,6 @@ app.post('/api/requests/delete-batch', (req, res) => {
   res.json({ success: true, count: deletedCount, message: `${deletedCount} בקשות נמחקו בהצלחה מהמערכת.` });
 });
 
-// DELETE /api/requests (Clear all request history - Software Manager only)
 app.delete('/api/requests', (req, res) => {
   const { adminId } = req.body || {};
   const admins = db.getAllAdmins();
@@ -436,12 +478,12 @@ app.delete('/api/requests', (req, res) => {
 // --------------------------------------------------------------------------
 
 // GET /api/users
-app.get('/api/users', (req, res) => {
+app.get('/api/users', authenticateToken, requireSoftwareManager, (req, res) => {
   res.json({ success: true, coordinators: db.data.coordinators });
 });
 
 // GET /api/admins
-app.get('/api/admins', (req, res) => {
+app.get('/api/admins', authenticateToken, requireSoftwareManager, (req, res) => {
   const safeAdmins = db.getAllAdmins().map(a => ({
     id: a.id,
     name: a.name,
@@ -452,25 +494,10 @@ app.get('/api/admins', (req, res) => {
   res.json({ success: true, admins: safeAdmins });
 });
 
-const checkSoftwareManagerAuth = (adminId) => {
-  if (!adminId) return true;
-  const admins = db.getAllAdmins();
-  const reqAdmin = admins.find(a => a.id === String(adminId).trim());
-  return reqAdmin && (
-    (reqAdmin.name && reqAdmin.name.includes('ינון')) || 
-    (reqAdmin.role && reqAdmin.role.includes('תוכנה')) ||
-    (reqAdmin.roleTitle && reqAdmin.roleTitle.includes('תוכנה'))
-  );
-};
-
 // PUT /api/admins/:id (Edit admin credentials: name, ID/username, email, pass - Software Manager only)
-app.put('/api/admins/:id', (req, res) => {
+app.put('/api/admins/:id', authenticateToken, requireSoftwareManager, (req, res) => {
   const { id } = req.params;
-  const { adminId, newId, name, email, pass, roleTitle } = req.body;
-
-  if (adminId && !checkSoftwareManagerAuth(adminId)) {
-    return res.status(403).json({ success: false, message: 'פעולת שינוי סיסמאות ופרטי אדמינים מורשית למנהל תוכנה בלבד' });
-  }
+  const { newId, name, email, pass, roleTitle } = req.body;
 
   // Allow arbitrary text-based usernames for Admins by just trimming without stripping non-digits
   const cleanId = (newId || id).trim();
@@ -491,12 +518,8 @@ app.put('/api/admins/:id', (req, res) => {
 });
 
 // POST /api/users (Software Manager only)
-app.post('/api/users', (req, res) => {
-  const { adminId, id, name, email } = req.body;
-
-  if (adminId && !checkSoftwareManagerAuth(adminId)) {
-    return res.status(403).json({ success: false, message: 'פעולת הוספת רכזים מורשית למנהל תוכנה בלבד' });
-  }
+app.post('/api/users', authenticateToken, requireSoftwareManager, (req, res) => {
+  const { id, name, email } = req.body;
 
   if (!id || !name || !email) {
     return res.status(400).json({ success: false, message: 'יש למלא ת"ז, שם מלא ואימייל' });
@@ -507,13 +530,9 @@ app.post('/api/users', (req, res) => {
 });
 
 // PUT /api/users/:id (Edit coordinator - Software Manager only)
-app.put('/api/users/:id', (req, res) => {
+app.put('/api/users/:id', authenticateToken, requireSoftwareManager, (req, res) => {
   const { id } = req.params;
-  const { adminId, newId, name, email } = req.body;
-
-  if (adminId && !checkSoftwareManagerAuth(adminId)) {
-    return res.status(403).json({ success: false, message: 'פעולת עריכת רכזים מורשית למנהל תוכנה בלבד' });
-  }
+  const { newId, name, email } = req.body;
 
   const cleanId = (newId || id).replace(/[^0-9]/g, '');
   const updated = db.updateCoordinator(id, { id: cleanId, name, email });
@@ -524,20 +543,15 @@ app.put('/api/users/:id', (req, res) => {
 });
 
 // DELETE /api/users/:id (Software Manager only)
-app.delete('/api/users/:id', (req, res) => {
+app.delete('/api/users/:id', authenticateToken, requireSoftwareManager, (req, res) => {
   const { id } = req.params;
-  const { adminId } = req.body || req.query || {};
-
-  if (adminId && !checkSoftwareManagerAuth(adminId)) {
-    return res.status(403).json({ success: false, message: 'פעולת מחיקת רכזים מורשית למנהל תוכנה בלבד' });
-  }
 
   db.removeCoordinator(id);
   res.json({ success: true, message: 'הרכז/ת הוסר/ה מורשי המערכת' });
 });
 
 // GET /api/settings/webhook (Get Google Webhook URL & Secret Key)
-app.get('/api/settings/webhook', (req, res) => {
+app.get('/api/settings/webhook', authenticateToken, requireSoftwareManager, (req, res) => {
   res.json({
     success: true,
     webhookUrl: db.getGoogleWebhookUrl(),
@@ -546,12 +560,8 @@ app.get('/api/settings/webhook', (req, res) => {
 });
 
 // POST /api/settings/webhook (Update Google Webhook URL & Secret Key - Software Manager only)
-app.post('/api/settings/webhook', (req, res) => {
-  const { adminId, webhookUrl, secretKey } = req.body;
-
-  if (adminId && !checkSoftwareManagerAuth(adminId)) {
-    return res.status(403).json({ success: false, message: 'עדכון הגדרות הדיוור מורשה למנהל תוכנה בלבד' });
-  }
+app.post('/api/settings/webhook', authenticateToken, requireSoftwareManager, (req, res) => {
+  const { webhookUrl, secretKey } = req.body;
 
   if (webhookUrl && webhookUrl.startsWith('http')) {
     db.updateGoogleWebhookUrl(webhookUrl.trim());
@@ -568,12 +578,12 @@ app.post('/api/settings/webhook', (req, res) => {
 });
 
 // GET /api/email-logs
-app.get('/api/email-logs', (req, res) => {
+app.get('/api/email-logs', authenticateToken, requireSoftwareManager, (req, res) => {
   res.json({ success: true, logs: db.data.emailLogs });
 });
 
 // POST /api/email/test (Live Email Verification Test)
-app.post('/api/email/test', async (req, res) => {
+app.post('/api/email/test', authenticateToken, requireSoftwareManager, async (req, res) => {
   const { recipientEmail } = req.body;
   if (!recipientEmail) {
     return res.status(400).json({ success: false, message: 'יש להזין כתובת אימייל לבדיקה' });

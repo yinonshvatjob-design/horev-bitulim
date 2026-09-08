@@ -4,6 +4,36 @@
 
 const API_BASE_URL = window.location.origin.includes('localhost') ? 'http://localhost:4050/api' : '/api';
 
+// =========================================================================
+// API Fetch Wrapper (JWT Authentication)
+// =========================================================================
+async function apiFetch(endpoint, options = {}) {
+  const token = localStorage.getItem('horev_auth_token');
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  const res = await apiFetch(`${endpoint}`, {
+    ...options,
+    headers
+  });
+  
+  if (res.status === 401 || res.status === 403) {
+    const data = await res.json().catch(() => ({}));
+    showToast(data.message || 'פג תוקף החיבור, או שאין לך הרשאה. נא להתחבר מחדש.', 'danger');
+    handleLogout();
+    throw new Error('Unauthorized');
+  }
+  
+  return res;
+}
+
+
 // Safe Local Storage Reader
 function getInitialUser() {
   try {
@@ -16,7 +46,8 @@ function getInitialUser() {
     return null;
   } catch (e) {
     console.error('Error parsing localStorage user:', e);
-    try { localStorage.removeItem('horev_current_user'); } catch (err) {}
+    try { localStorage.removeItem('horev_current_user');
+  localStorage.removeItem('horev_auth_token'); } catch (err) {}
     return null;
   }
 }
@@ -222,7 +253,7 @@ window.handleTestEmailSubmit = async function(e) {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/email/test`, {
+    const res = await apiFetch(`/email/test`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ recipientEmail })
@@ -310,6 +341,7 @@ async function handleLogin(role, id, pass = '') {
 
     AppStore.currentUser = data.user;
     localStorage.setItem('horev_current_user', JSON.stringify(data.user));
+    localStorage.setItem('horev_auth_token', data.token);
     showToast(`ברוך הבא, ${data.user.name}! התחברת בהצלחה.`, 'success');
     showMainApp();
   } catch (error) {
@@ -866,7 +898,7 @@ async function handleFormSubmit(e) {
   };
 
   try {
-    const res = await fetch(`${API_BASE_URL}/requests`, {
+    const res = await apiFetch(`/requests`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -968,7 +1000,7 @@ window.getReceiptBudgetStatus = function(r) {
 // --------------------------------------------------------------------------
 async function fetchRequestsData() {
   try {
-    const res = await fetch(`${API_BASE_URL}/requests`);
+    const res = await apiFetch(`/requests`);
     const data = await res.json();
     if (data.success) {
       AppStore.requests = data.requests;
@@ -1113,7 +1145,7 @@ async function approveRequest(id) {
   const adminNotes = document.getElementById(`adminNotes_${id}`).value;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/requests/${id}/approve`, {
+    const res = await apiFetch(`/requests/${id}/approve`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1152,7 +1184,7 @@ async function rejectRequest(id) {
   const adminNotes = document.getElementById(`adminNotes_${id}`).value;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/requests/${id}/reject`, {
+    const res = await apiFetch(`/requests/${id}/reject`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1311,13 +1343,13 @@ function exportToCSV() {
 
 async function fetchUsersData() {
   try {
-    const resCoordinators = await fetch(`${API_BASE_URL}/users`);
+    const resCoordinators = await apiFetch(`/users`);
     const dataCoordinators = await resCoordinators.json();
     if (dataCoordinators.success) {
       AppStore.coordinators = dataCoordinators.coordinators;
     }
 
-    const resAdmins = await fetch(`${API_BASE_URL}/admins`);
+    const resAdmins = await apiFetch(`/admins`);
     const dataAdmins = await resAdmins.json();
     if (dataAdmins.success) {
       AppStore.admins = dataAdmins.admins;
@@ -1331,7 +1363,7 @@ async function fetchUsersData() {
 
 async function fetchWebhookUrl() {
   try {
-    const res = await fetch(`${API_BASE_URL}/settings/webhook`);
+    const res = await apiFetch(`/settings/webhook`);
     const data = await res.json();
     if (data.success) {
       const input = document.getElementById('webhookUrlInput');
@@ -1359,7 +1391,7 @@ window.handleSaveWebhookUrl = async function(e) {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/settings/webhook`, {
+    const res = await apiFetch(`/settings/webhook`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ webhookUrl, secretKey })
@@ -1456,7 +1488,7 @@ async function handleEditAdminSubmit(e) {
   const roleTitle = document.getElementById('editAdminRoleTitle').value.trim();
 
   try {
-    const res = await fetch(`${API_BASE_URL}/admins/${originalId}`, {
+    const res = await apiFetch(`/admins/${originalId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ adminId: AppStore.currentUser.id, newId, name, pass, email, roleTitle })
@@ -1511,7 +1543,7 @@ async function handleEditUserSubmit(e) {
   const email = document.getElementById('editUserEmail').value.trim();
 
   try {
-    const res = await fetch(`${API_BASE_URL}/users/${originalId}`, {
+    const res = await apiFetch(`/users/${originalId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ adminId: AppStore.currentUser.id, id: newId, name, email })
@@ -1553,7 +1585,7 @@ async function handleAddUserSubmit(e) {
   const email = document.getElementById('newUserEmail').value.trim();
 
   try {
-    const res = await fetch(`${API_BASE_URL}/users`, {
+    const res = await apiFetch(`/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ adminId: AppStore.currentUser.id, id, name, email })
@@ -1585,7 +1617,7 @@ window.deleteUser = async function(id) {
 
   if (!confirm(`האם להסיר את הרכז/ת מת"ז ${id}?`)) return;
   try {
-    const res = await fetch(`${API_BASE_URL}/users/${id}?adminId=${AppStore.currentUser.id}`, { method: 'DELETE' });
+    const res = await apiFetch(`/users/${id}?adminId=${AppStore.currentUser.id}`, { method: 'DELETE' });
     const data = await res.json();
     if (data.success) {
       showToast('הרכז/ת הוסרה בהצלחה', 'info');
@@ -1606,7 +1638,7 @@ async function renderEmailLogs() {
   if (!container) return;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/email-logs`);
+    const res = await apiFetch(`/email-logs`);
     const data = await res.json();
     if (data.success) AppStore.emailLogs = data.logs;
   } catch (e) {}
@@ -1757,7 +1789,7 @@ window.handleUploadReceiptSubmit = async function(e) {
       });
     }
 
-    const res = await fetch(`${API_BASE_URL}/requests/${reqId}/receipt`, {
+    const res = await apiFetch(`/requests/${reqId}/receipt`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1982,7 +2014,7 @@ window.deleteSingleRequest = async function(id) {
   if (!confirm(`האם אתה בטוח שברצונך למחוק את בקשה #${id} מהמערכת?`)) return;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/requests/${id}`, { method: 'DELETE' });
+    const res = await apiFetch(`/requests/${id}`, { method: 'DELETE' });
     const data = await res.json();
     if (data.success) {
       showToast(data.message, 'success');
@@ -2009,7 +2041,7 @@ window.deleteSelectedRequests = async function() {
   if (!confirm(`האם אתה בטוח שברצונך למחוק ${ids.length} בקשות שנבחרו?`)) return;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/requests/delete-batch`, {
+    const res = await apiFetch(`/requests/delete-batch`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ids })
@@ -2040,7 +2072,7 @@ window.clearAllHistory = async function() {
   if (!confirm('⚠️ אזהרה חמורה: פעולה זו תמחק את כל היסטוריית הבקשות מהמערכת 100%.\nהאם אתה בטוח לחלוטין ברצונך לאפס ולמחוק את כל היסטוריית ההזמנות?')) return;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/requests`, {
+    const res = await apiFetch(`/requests`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ adminId: AppStore.currentUser.id })
