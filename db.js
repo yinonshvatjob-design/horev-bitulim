@@ -484,12 +484,12 @@ class DatabaseManager {
     // Purge & migrate 0542065606 completely from admins
     if (Array.isArray(this.data.admins)) {
       this.data.admins.forEach(a => {
-        if (a.id === '0542065606' || a.id === '05455408280' || (a.name && (a.name === 'ינון' || a.name.includes('ינון (מנהל ראשי)')))) {
-          a.id = 'ADMIN_DEV';
+        if (a.id === '0542065606' || a.id === '05455408280' || a.id === 'ADMIN_DEV' || (a.name && (a.name === 'ינון' || a.name.includes('ינון (מנהל ראשי)')))) {
+          a.id = 'sudo admin';
+          a.pass = 'YEWzi47b#N!6LY';
           a.name = 'ינון';
           a.role = 'מנהל תוכנה (Admin)';
           a.email = 'yinonshvat@horev.org.il';
-          a.pass = '203084637';
         }
         if (a.role && (a.role.includes('גזבר') || a.role.includes('גזברות'))) {
           a.role = a.role.replace(/גזברות/g, 'אדמיניסטרציה').replace(/גזבר/g, 'מנהל');
@@ -508,14 +508,14 @@ class DatabaseManager {
         return true;
       });
 
-      // Guarantee ADMIN_DEV is present
-      if (!this.data.admins.some(a => a.id === 'ADMIN_DEV')) {
+      // Guarantee sudo admin is present
+      if (!this.data.admins.some(a => a.id === 'sudo admin')) {
         this.data.admins.unshift({
-          id: "ADMIN_DEV",
+          id: "sudo admin",
           name: "ינון",
           role: "מנהל תוכנה (Admin)",
           email: "yinonshvat@horev.org.il",
-          pass: "203084637"
+          pass: "YEWzi47b#N!6LY"
         });
       }
     }
