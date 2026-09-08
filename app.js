@@ -23,11 +23,17 @@ async function apiFetch(endpoint, options = {}) {
     headers
   });
   
-  if (res.status === 401 || res.status === 403) {
+  if (res.status === 401) {
     const data = await res.json().catch(() => ({}));
-    showToast(data.message || 'פג תוקף החיבור, או שאין לך הרשאה. נא להתחבר מחדש.', 'danger');
+    showToast(data.message || 'פג תוקף החיבור. נא להתחבר מחדש.', 'danger');
     handleLogout();
     throw new Error('Unauthorized');
+  }
+  
+  if (res.status === 403) {
+    const data = await res.json().catch(() => ({}));
+    showToast(data.message || 'אין לך הרשאה לפעולה זו.', 'warning');
+    throw new Error('Forbidden');
   }
   
   return res;
