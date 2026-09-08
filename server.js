@@ -472,7 +472,10 @@ app.put('/api/admins/:id', (req, res) => {
     return res.status(403).json({ success: false, message: 'פעולת שינוי סיסמאות ופרטי אדמינים מורשית למנהל תוכנה בלבד' });
   }
 
-  const cleanId = (newId || id).replace(/[^0-9]/g, '');
+  const rawNewId = (newId || id).trim();
+  // Allow text-based IDs for software managers (like ADMIN_DEV) while cleaning numeric IDs
+  const cleanId = rawNewId === 'ADMIN_DEV' ? rawNewId : rawNewId.replace(/[^0-9]/g, '');
+  
   const updatedFields = {
     id: cleanId,
     name,
