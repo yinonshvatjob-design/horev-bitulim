@@ -602,7 +602,10 @@ class DatabaseManager {
 
   save() {
     try {
-      fs.writeFileSync(DB_FILE, JSON.stringify(this.data, null, 2), 'utf-8');
+      const tmpFile = DB_FILE + '.tmp';
+      fs.writeFileSync(tmpFile, JSON.stringify(this.data, null, 2), 'utf-8');
+      fs.renameSync(tmpFile, DB_FILE);
+      
       if (this.pool) {
         this.savePg().catch(err => console.error('Background PG save error:', err));
       }

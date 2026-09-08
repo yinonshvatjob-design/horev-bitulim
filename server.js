@@ -97,7 +97,7 @@ const loginLimiter = rateLimit({
 });
 
 // POST /api/auth/login (Ultra-Flexible Smart Authentication)
-app.post('/api/auth/login', loginLimiter, (req, res) => {
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const { role, id, pass } = req.body;
 
   if (!id || !String(id).trim()) {
@@ -137,9 +137,12 @@ app.post('/api/auth/login', loginLimiter, (req, res) => {
   const admin = db.getAllAdmins().find(a => isMatch(a.id, a.email, a.name));
   if (admin) {
     if (admin.pass) {
-      const isMatch = admin.pass.startsWith('$2a$') 
-        ? bcrypt.compareSync(pass || '', admin.pass)
-        : admin.pass === pass; // Fallback just in case some plaintext wasn't hashed yet
+      let isMatch = false;
+      if (admin.pass.startsWith('$2a$')) {
+        isMatch = await bcrypt.compare(pass || '', admin.pass);
+      } else {
+        isMatch = (admin.pass === pass); // Fallback just in case some plaintext wasn't hashed yet
+      }
       
       if (!isMatch) {
         return res.status(401).json({ success: false, message: 'סיסמת אדמין שגויה' });
@@ -395,7 +398,7 @@ app.post('/api/requests/:id/approve', authenticateToken, requireAdmin, async (re
     res.json({ success: true, request: updatedReq, message: `הבקשה אושרה בהצלחה! נשלח מייל עדכון לרכז/ת (${request.applicantEmail}) עם סכום החזר ₪${refundAmount}.` });
   } catch (err) {
     console.error("Approve route error:", err);
-    res.status(500).json({ success: false, message: "שגיאה באישור הבקשה: " + err.message });
+    res.status(500).json({ success: false, message: "שגיאה פנימית במערכת בעת אישור הבקשה. פנה למנהל." });
   }
 });
 
@@ -448,7 +451,7 @@ app.post('/api/requests/:id/reject', authenticateToken, requireAdmin, async (req
     res.json({ success: true, request: updatedReq, message: 'הבקשה נדחתה. נשלח מייל עדכון לרכז/ת.' });
   } catch (err) {
     console.error("Reject route error:", err);
-    res.status(500).json({ success: false, message: "שגיאה בדחיית הבקשה: " + err.message });
+    res.status(500).json({ success: false, message: "שגיאה פנימית במערכת בעת דחיית הבקשה. פנה למנהל." });
   }
 });
 
@@ -492,7 +495,7 @@ app.post('/api/requests/:id/receipt', authenticateToken, async (req, res) => {
     });
   } catch (err) {
     console.error("Receipt upload route error:", err);
-    res.status(500).json({ success: false, message: "שגיאה בהעלאת הקבלה: " + err.message });
+    res.status(500).json({ success: false, message: "שגיאה פנימית בהעלאת הקבלה. ייתכן והקובץ גדול מדי. פנה למנהל." });
   }
 });
 
@@ -550,6 +553,10 @@ app.put('/api/admins/:id', authenticateToken, requireSoftwareManager, (req, res)
 
   // Allow arbitrary text-based usernames for Admins by just trimming without stripping non-digits
   const cleanId = (newId || id).trim();
+  
+  if (pass && pass.length < 8) {
+    return res.status(400).json({ success: false, message: 'הסיסמה חייבת להכיל לפחות 8 תווים לאבטחה מירבית.' });
+  }
   
   const updatedFields = {
     id: cleanId,
