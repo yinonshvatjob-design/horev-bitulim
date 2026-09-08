@@ -184,7 +184,10 @@ app.get('/api/requests', authenticateToken, (req, res) => {
   const { applicantId, status } = req.query;
   let requests = db.getAllRequests();
 
-  if (applicantId) {
+  // Authorization Enforcement: Coordinators can ONLY see their own requests
+  if (req.user.role !== 'ADMIN') {
+    requests = requests.filter(r => r.applicantId === req.user.id);
+  } else if (applicantId) {
     requests = requests.filter(r => r.applicantId === applicantId);
   }
 
@@ -201,6 +204,11 @@ app.get('/api/requests', authenticateToken, (req, res) => {
 // POST /api/requests (Submit Request with 48h check)
 app.post('/api/requests', authenticateToken, async (req, res) => {
   const { applicantId, applicantName, applicantEmail, group, startDate, endDate, requestedMeals, reason, mandatoryConfirmed } = req.body;
+
+  // Authorization Enforcement: Coordinators cannot submit for others
+  if (req.user.role !== 'ADMIN' && applicantId !== req.user.id) {
+    return res.status(403).json({ success: false, message: 'אינך מורשה להגיש בקשה בשם משתמש אחר' });
+  }
 
   if (!group || !startDate || !endDate || !requestedMeals || requestedMeals.length === 0 || !reason) {
     return res.status(400).json({ success: false, message: 'יש למלא את כל שדות החובה בטופס' });
@@ -427,6 +435,11 @@ app.post('/api/requests/:id/receipt', authenticateToken, async (req, res) => {
     const request = db.getRequestById(id);
     if (!request) {
       return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
+    }
+
+    // Authorization Enforcement: Coordinators can only upload receipts for their own requests
+    if (req.user.role !== 'ADMIN' && request.applicantId !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'גישה נדחתה. אינך מורשה להעלות קבלה לבקשה שאינה שלך.' });
     }
 
     if (fileData) {
