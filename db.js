@@ -8,7 +8,7 @@ const { Pool } = require('pg');
 
 // Initial Admins (Yinon, Hagai, Esther)
 const SEED_ADMINS = [
-  { id: "ADMIN_DEV", name: "ינון", role: "מנהל תוכנה (Admin)", email: "yinonshvat@horev.org.il", pass: "yinon2026" },
+  { id: "ADMIN_DEV", name: "ינון", role: "מנהל תוכנה (Admin)", email: "yinonshvat@horev.org.il", pass: "203084637" },
   { id: "0584220463", name: "חגי", role: "מנהל המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "hagai2026" },
   { id: "0545540828", name: "אסתר", role: "מזכירת המוסד (Admin)", email: "yinonshvat@gmail.com", pass: "esther2026" }
 ];
@@ -489,7 +489,7 @@ class DatabaseManager {
           a.name = 'ינון';
           a.role = 'מנהל תוכנה (Admin)';
           a.email = 'yinonshvat@horev.org.il';
-          a.pass = 'yinon2026';
+          a.pass = '203084637';
         }
         if (a.role && (a.role.includes('גזבר') || a.role.includes('גזברות'))) {
           a.role = a.role.replace(/גזברות/g, 'אדמיניסטרציה').replace(/גזבר/g, 'מנהל');
@@ -515,7 +515,7 @@ class DatabaseManager {
           name: "ינון",
           role: "מנהל תוכנה (Admin)",
           email: "yinonshvat@horev.org.il",
-          pass: "yinon2026"
+          pass: "203084637"
         });
       }
     }
