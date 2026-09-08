@@ -298,12 +298,58 @@ class MailerService {
     return this.sendMail(targetEmail, subject, htmlContent, [this.treasurerEmail, this.secretaryEmail]);
   }
 
-  // 3. Send Receipt Upload Alert to Esther (with CC to Hagai)
-  async sendReceiptNotificationToEsther(reqData, receiptObj) {
+  // 3. Send Concentrated Receipt Upload Alert to Esther (with CC to Hagai) containing ALL receipts
+  async sendReceiptNotificationToEsther(reqData, latestReceiptObj) {
     const treasurer = this.treasurerAdmin;
     const secretary = this.secretaryAdmin;
 
-    const subject = `קבלה חדשה לבקשה #${reqData.id} מאת ${reqData.applicantName} (₪${(receiptObj.amount || 0).toLocaleString()})`;
+    const receiptsList = Array.isArray(reqData.receipts) && reqData.receipts.length > 0
+      ? reqData.receipts
+      : (latestReceiptObj ? [latestReceiptObj] : (reqData.receipt ? [reqData.receipt] : []));
+
+    const totalReceiptsAmount = receiptsList.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
+    const approvedBudget = parseFloat(reqData.approvedRefund) || 0;
+    const utilizationPct = approvedBudget > 0 ? Math.round((totalReceiptsAmount / approvedBudget) * 100) : 100;
+    const balance = approvedBudget - totalReceiptsAmount;
+    
+    let balanceText = '';
+    if (balance === 0) {
+      balanceText = 'נוצל במלואו (100%)';
+    } else if (balance > 0) {
+      balanceText = `עודף ₪${balance.toLocaleString()} (${utilizationPct}%)`;
+    } else {
+      balanceText = `חריגה ₪${Math.abs(balance).toLocaleString()} (${utilizationPct}%)`;
+    }
+
+    const subject = `ריכוז קבלות לבקשה #${reqData.id} מאת ${reqData.applicantName} (${receiptsList.length} קבלות, סה"כ ₪${totalReceiptsAmount.toLocaleString()})`;
+
+    const receiptsRows = receiptsList.map((r, idx) => `
+      <tr style="border-bottom: 1px solid #edf2f7;">
+        <td style="padding: 8px; text-align: center;">${idx + 1}</td>
+        <td style="padding: 8px; font-weight: bold;">${r.store || 'לא צוין ספק'}</td>
+        <td style="padding: 8px; font-weight: bold; color: #059669;">₪${(r.amount || 0).toLocaleString()}</td>
+        <td style="padding: 8px; color: #64748b; font-size: 13px;">${r.uploadedAt || ''}</td>
+        <td style="padding: 8px; color: #475569; font-size: 13px;">${r.notes ? `"${r.notes}"` : '-'}</td>
+      </tr>
+    `).join('');
+
+    const receiptsImages = receiptsList.map((r, idx) => {
+      if (r.fileData && r.fileData.startsWith('data:image')) {
+        return `
+          <div style="margin-top: 15px; background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+            <div style="font-weight: bold; color: #334155; margin-bottom: 8px; font-size: 14px;">
+              קבלה #${idx + 1}: ${r.store || 'ספק'} — ₪${(r.amount || 0).toLocaleString()} (${r.uploadedAt || ''})
+            </div>
+            <img src="${r.fileData}" alt="תמונת קבלה #${idx + 1}" style="max-width: 100%; max-height: 450px; border-radius: 6px; border: 1px solid #cbd5e1;">
+          </div>
+        `;
+      }
+      return `
+        <div style="margin-top: 10px; background: #ffffff; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+          <strong>קבלה #${idx + 1}:</strong> ${r.store || 'ספק'} — ₪${(r.amount || 0).toLocaleString()} (${r.fileName || 'קובץ'})
+        </div>
+      `;
+    }).join('');
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -312,10 +358,10 @@ class MailerService {
         <meta charset="UTF-8">
       </head>
       <body style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b; direction: rtl; text-align: right;">
-        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="max-width: 650px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           
           <div style="background: #4f46e5; color: #ffffff; padding: 20px; text-align: center;">
-            <h2 style="margin: 0; font-size: 22px;">התקבלה קבלה/חשבונית חדשה במזכירות</h2>
+            <h2 style="margin: 0; font-size: 22px;">ריכוז קבלות לבקשת ביטול #${reqData.id}</h2>
             <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">מוסדות חורב ירושלים - מערכת קבלות דיגיטלית</p>
           </div>
 
@@ -331,26 +377,44 @@ class MailerService {
               </div>
             </div>
 
-            <h3 style="color: #4f46e5; margin-top: 0;">פרטי הקבלה שהועלתה:</h3>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>מספר בקשה:</strong></td><td style="padding: 8px 0; font-weight: bold;">#${reqData.id} (${reqData.group})</td></tr>
-              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>הרכז/ת המעלה:</strong></td><td style="padding: 8px 0; font-weight: bold;">${reqData.applicantName}</td></tr>
-              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>ספק / שם החנות:</strong></td><td style="padding: 8px 0; font-weight: bold;">${receiptObj.store || 'לא צוין ספק'}</td></tr>
-              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #059669;"><strong>סכום בקבלה:</strong></td><td style="padding: 8px 0; font-weight: bold; color: #059669; font-size: 18px;">₪${(receiptObj.amount || 0).toLocaleString()}</td></tr>
-              <tr style="border-bottom: 1px solid #edf2f7;"><td style="padding: 8px 0; color: #64748b;"><strong>זמן העלאה:</strong></td><td style="padding: 8px 0; font-weight: bold;">${receiptObj.uploadedAt}</td></tr>
+            <!-- Request Details & Budget Comparison Box -->
+            <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-right: 4px solid #4f46e5;">
+              <h3 style="color: #4f46e5; margin: 0 0 10px 0; font-size: 16px;">פרטי הבקשה ומאזן ניצול תקציב:</h3>
+              <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <tr style="border-bottom: 1px solid #e2e8f0;"><td style="padding: 6px 0; color: #64748b;"><strong>מספר בקשה:</strong></td><td style="padding: 6px 0; font-weight: bold;">#${reqData.id} (${reqData.group})</td></tr>
+                <tr style="border-bottom: 1px solid #e2e8f0;"><td style="padding: 6px 0; color: #64748b;"><strong>הרכז/ת המעלה:</strong></td><td style="padding: 6px 0; font-weight: bold;">${reqData.applicantName}</td></tr>
+                <tr style="border-bottom: 1px solid #e2e8f0;"><td style="padding: 6px 0; color: #64748b;"><strong>תקציב שאושר בבקשה:</strong></td><td style="padding: 6px 0; font-weight: bold; color: #2563eb;">₪${approvedBudget.toLocaleString()}</td></tr>
+                <tr style="border-bottom: 1px solid #e2e8f0;"><td style="padding: 6px 0; color: #64748b;"><strong>סך כל הקבלות הקיים (${receiptsList.length}):</strong></td><td style="padding: 6px 0; font-weight: bold; color: #059669; font-size: 16px;">₪${totalReceiptsAmount.toLocaleString()}</td></tr>
+                <tr><td style="padding: 6px 0; color: #64748b;"><strong>סטטוס ניצול תקציב:</strong></td><td style="padding: 6px 0; font-weight: bold; color: ${balance < 0 ? '#dc2626' : '#059669'};">${balanceText}</td></tr>
+              </table>
+            </div>
+
+            <!-- Itemized Receipts Table -->
+            <h3 style="color: #334155; margin-top: 0; font-size: 16px;">פירוט הקבלות/חשבוניות שהועלו לבקשה:</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; text-align: right;">
+              <thead>
+                <tr style="background: #e2e8f0; color: #334155;">
+                  <th style="padding: 8px; text-align: center;">#</th>
+                  <th style="padding: 8px;">שם החנות / ספק</th>
+                  <th style="padding: 8px;">סכום</th>
+                  <th style="padding: 8px;">זמן העלאה</th>
+                  <th style="padding: 8px;">הערות</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${receiptsRows}
+              </tbody>
             </table>
 
-            ${receiptObj.notes ? `
-              <div style="background: #f8fafc; border-right: 4px solid #4f46e5; padding: 12px 15px; margin-bottom: 20px;">
-                <strong>הערת הרכז/ת לאסתר:</strong><br>
-                <span style="color: #334155;">"${receiptObj.notes}"</span>
-              </div>
-            ` : ''}
+            <!-- Receipts Images -->
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+              <h4 style="margin: 0 0 10px 0; color: #334155; font-size: 15px;"><i class="fa-solid fa-images"></i> צפייה בתמונות / מסמכי הקבלות:</h4>
+              ${receiptsImages}
+            </div>
 
             <div style="text-align: center; margin: 30px 0 10px 0;">
               <a href="https://bitulim.horevit.com" style="background: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 16px;">
-                פתח את המערכת לצפייה בקבלה
+                פתח את המערכת לצפייה בקבלות
               </a>
             </div>
           </div>

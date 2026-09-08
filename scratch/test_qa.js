@@ -72,11 +72,16 @@ app.post('/api/requests', async (req, res) => {
   }
 
   const now = new Date();
-  const eventDate = new Date(startDate);
-  const diffHours = (eventDate - now) / (1000 * 60 * 60);
+  const dayOfWeek = (d) => { const dw = d.getDay(); return dw === 5 || dw === 6; };
+  let curr = new Date(startDate + 'T12:00:00');
+  let needed = 2;
+  while (needed > 0) {
+    curr.setDate(curr.getDate() - 1);
+    if (!dayOfWeek(curr)) needed--;
+  }
 
-  if (diffHours < 48) {
-    return res.status(400).json({ success: false, message: `חסימת 48 שעות: תאריך הביטול קרוב מדי` });
+  if (now > curr) {
+    return res.status(400).json({ success: false, message: `חסימת ימי עסקים: תאריך הביטול קרוב מדי` });
   }
 
   const reqId = "REQ-" + (Math.floor(Math.random() * 900) + 100);
@@ -253,7 +258,7 @@ const server = app.listen(9876, async () => {
       reason: "ניסיון הגשה בתוך פחות מ-48 שעות",
       mandatoryConfirmed: true
     });
-    test('48-Hour Cutoff Enforcement Blocks Close Date', res.status === 400 && res.data.message.includes('48'));
+    test('Business Days Cutoff Enforcement Blocks Close Date', res.status === 400 && (res.data.message.includes('ימי עסקים') || res.data.message.includes('חסימת')));
 
     res = await reqHelper('POST', '/api/requests', {
       applicantId: '021395694',

@@ -900,6 +900,8 @@ window.getReceiptBudgetStatus = function(r) {
     return {
       allocatedStr: r.approvedRefund ? `₪${r.approvedRefund.toLocaleString()}` : '-',
       actualStr: '-',
+      pctStr: '-',
+      storesStr: '-',
       code: 'ממתין',
       badgeHtml: `<span class="badge badge-secondary py-1 px-2" style="font-size: 11px;"><i class="fa-solid fa-hourglass"></i> ${getStatusHebrew(r.status)}</span>`
     };
@@ -908,24 +910,37 @@ window.getReceiptBudgetStatus = function(r) {
   const allocated = parseFloat(r.approvedRefund) || 0;
   const allocatedStr = `₪${allocated.toLocaleString()}`;
 
-  if (!r.receipt) {
+  const receiptsList = Array.isArray(r.receipts) && r.receipts.length > 0
+    ? r.receipts
+    : (r.receipt ? [r.receipt] : []);
+
+  const storesStr = receiptsList.length > 0
+    ? receiptsList.map(item => item.store || 'לא צוין').join(', ')
+    : '-';
+
+  if (receiptsList.length === 0) {
     return {
       allocatedStr,
       actualStr: '-',
+      pctStr: '0%',
+      storesStr: '-',
       code: 'ממתין לקבלה',
       badgeHtml: `<span class="badge badge-warning py-1 px-2" style="font-size: 11px;"><i class="fa-solid fa-clock"></i> ממתין לקבלה</span>`
     };
   }
 
-  const actual = parseFloat(r.receipt.amount) || 0;
+  const actual = receiptsList.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
   const actualStr = `₪${actual.toLocaleString()}`;
   const diff = allocated - actual;
   const pct = allocated > 0 ? Math.round((actual / allocated) * 100) : 100;
+  const pctStr = `${pct}%`;
 
   if (actual === allocated) {
     return {
       allocatedStr,
       actualStr,
+      pctStr,
+      storesStr,
       code: 'נוצל במלואו',
       badgeHtml: `<span class="badge badge-success py-1 px-2" style="font-size: 11px;" title="נוצרו ₪${actual} מתוך ₪${allocated}"><i class="fa-solid fa-circle-check"></i> נוצל במלואו (100%)</span>`
     };
@@ -933,6 +948,8 @@ window.getReceiptBudgetStatus = function(r) {
     return {
       allocatedStr,
       actualStr,
+      pctStr,
+      storesStr,
       code: 'ניצול חלקי',
       badgeHtml: `<span class="badge badge-info py-1 px-2" style="font-size: 11px;" title="נוצלו ₪${actual} מתוך ₪${allocated} מוקצים"><i class="fa-solid fa-piggy-bank"></i> ניצול חלקי (${pct}%) — עודף ₪${diff.toLocaleString()}</span>`
     };
@@ -941,6 +958,8 @@ window.getReceiptBudgetStatus = function(r) {
     return {
       allocatedStr,
       actualStr,
+      pctStr,
+      storesStr,
       code: 'חריגה',
       badgeHtml: `<span class="badge badge-danger py-1 px-2" style="font-size: 11px;" title="הוגש ₪${actual} מתוך ₪${allocated} מוקצים"><i class="fa-solid fa-triangle-exclamation"></i> חריגה (${pct}%) — חריגה ₪${over.toLocaleString()}</span>`
     };
@@ -967,8 +986,6 @@ async function fetchRequestsData() {
   updatePendingCounter();
 }
 
-
-
 function renderMySubmissions() {
   const tbody = document.getElementById('mySubmissionsTbody');
   if (!tbody) return;
@@ -984,10 +1001,20 @@ function renderMySubmissions() {
 
   tbody.innerHTML = myReqs.map(r => {
     const budget = getReceiptBudgetStatus(r);
+    const receiptsList = Array.isArray(r.receipts) && r.receipts.length > 0
+      ? r.receipts
+      : (r.receipt ? [r.receipt] : []);
+
     let receiptBtn = '-';
     if (r.status === 'APPROVED') {
-      if (r.receipt) {
-        receiptBtn = `<button class="btn btn-sm btn-outline-success py-0" onclick="openViewReceiptModal('${r.id}')"><i class="fa-solid fa-receipt"></i> קבלה (₪${r.receipt.amount})</button>`;
+      if (receiptsList.length > 0) {
+        const totalAmt = receiptsList.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+        receiptBtn = `
+          <div class="d-flex flex-column gap-1" style="gap: 4px;">
+            <button class="btn btn-sm btn-outline-success py-0" onclick="openViewReceiptModal('${r.id}')"><i class="fa-solid fa-receipt"></i> ${receiptsList.length} קבלות (₪${totalAmt.toLocaleString()})</button>
+            <button class="btn btn-sm btn-success py-0" onclick="openUploadReceiptModal('${r.id}')" title="הוסף קבלה נוספת לבקשה זו"><i class="fa-solid fa-plus-circle"></i> + העלה עוד קבלה</button>
+          </div>
+        `;
       } else {
         receiptBtn = `<button class="btn btn-sm btn-success py-0" onclick="openUploadReceiptModal('${r.id}')"><i class="fa-solid fa-upload"></i> 📸 העלה קבלה לאסתר</button>`;
       }
@@ -998,7 +1025,7 @@ function renderMySubmissions() {
         <td><strong>#${r.id}</strong></td>
         <td>${r.group}</td>
         <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
-        <td>${r.approvedDetails || r.requestedMeals.join(', ')}</td>
+        <td>${budget.storesStr}</td>
         <td>${r.submittedAt}</td>
         <td><span class="badge ${getStatusBadgeClass(r.status)}">${getStatusHebrew(r.status)}</span></td>
         <td class="text-primary font-weight-bold">${budget.allocatedStr}</td>
@@ -1193,9 +1220,14 @@ function renderReports() {
 
   tbody.innerHTML = filtered.map(r => {
     const budget = getReceiptBudgetStatus(r);
+    const receiptsList = Array.isArray(r.receipts) && r.receipts.length > 0
+      ? r.receipts
+      : (r.receipt ? [r.receipt] : []);
+
     let receiptCell = '<span class="text-muted small">אין</span>';
-    if (r.receipt) {
-      receiptCell = `<button class="btn btn-sm btn-outline-success py-0" onclick="openViewReceiptModal('${r.id}')"><i class="fa-solid fa-receipt"></i> קבלה (₪${r.receipt.amount})</button>`;
+    if (receiptsList.length > 0) {
+      const totalAmt = receiptsList.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+      receiptCell = `<button class="btn btn-sm btn-outline-success py-0" onclick="openViewReceiptModal('${r.id}')"><i class="fa-solid fa-receipt"></i> ${receiptsList.length} קבלות (₪${totalAmt.toLocaleString()})</button>`;
     }
 
     return `
@@ -1207,7 +1239,7 @@ function renderReports() {
         <td>${r.applicantName}</td>
         <td>${r.group}</td>
         <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
-        <td>${r.approvedDetails || (r.requestedMeals ? r.requestedMeals.join(', ') : '')}</td>
+        <td>${budget.storesStr}</td>
         <td class="text-primary font-weight-bold">${budget.allocatedStr}</td>
         <td class="text-success font-weight-bold">${budget.actualStr}</td>
         <td>${budget.badgeHtml}</td>
@@ -1228,7 +1260,12 @@ function renderReports() {
   // Update Financial KPIs
   const approvedReqs = filtered.filter(r => r.status === 'APPROVED');
   const totalAllocated = approvedReqs.reduce((sum, r) => sum + (r.approvedRefund || 0), 0);
-  const totalReceipts = approvedReqs.filter(r => r.receipt).reduce((sum, r) => sum + (r.receipt.amount || 0), 0);
+  const totalReceipts = approvedReqs.reduce((sum, r) => {
+    const list = Array.isArray(r.receipts) && r.receipts.length > 0
+      ? r.receipts
+      : (r.receipt ? [r.receipt] : []);
+    return sum + list.reduce((s, item) => s + (parseFloat(item.amount) || 0), 0);
+  }, 0);
   const totalSurplus = totalAllocated - totalReceipts;
 
   const totalRefundEl = document.getElementById('kpiTotalApprovedRefund');
@@ -1579,7 +1616,7 @@ window.openUploadReceiptModal = function(reqId) {
   const modalEl = document.getElementById('uploadReceiptModal');
 
   if (reqIdEl) reqIdEl.value = req.id;
-  if (amountEl) amountEl.value = req.approvedRefund || '';
+  if (amountEl) amountEl.value = '';
   if (storeEl) storeEl.value = '';
   if (notesEl) notesEl.value = '';
   if (fileEl) fileEl.value = '';
@@ -1731,50 +1768,75 @@ window.handleUploadReceiptSubmit = async function(e) {
 
 window.openViewReceiptModal = function(reqId) {
   const req = AppStore.requests.find(r => r.id === reqId);
-  if (!req || !req.receipt) {
+  const receiptsList = req && Array.isArray(req.receipts) && req.receipts.length > 0
+    ? req.receipts
+    : (req && req.receipt ? [req.receipt] : []);
+
+  if (!req || receiptsList.length === 0) {
     showToast('עדיין לא הועלתה קבלה לבקשה זו', 'warning');
     return;
   }
 
-  const r = req.receipt;
-  const isImage = r.fileData && r.fileData.startsWith('data:image');
+  const budget = getReceiptBudgetStatus(req);
+  const totalAmount = receiptsList.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+
+  const receiptsListHtml = receiptsList.map((r, idx) => {
+    const isImage = r.fileData && r.fileData.startsWith('data:image');
+    return `
+      <div class="card mb-3 text-right" style="border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden;">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center py-2 px-3">
+          <span class="font-weight-bold text-dark"><i class="fa-solid fa-receipt"></i> קבלה #${idx + 1}: ${r.store || 'לא צוין ספק'}</span>
+          <span class="badge badge-success font-weight-bold" style="font-size: 14px;">₪${(r.amount || 0).toLocaleString()}</span>
+        </div>
+        <div class="card-body p-3">
+          <p class="mb-1 text-muted small"><strong>זמן העלאה:</strong> ${r.uploadedAt || '-'}</p>
+          ${r.notes ? `<p class="mb-2 text-dark small"><strong>הערה לאסתר:</strong> "${r.notes}"</p>` : ''}
+          ${isImage ? `
+            <div class="text-center my-2" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; background: #fafafa;">
+              <img src="${r.fileData}" alt="תמונת קבלה #${idx + 1}" style="max-width: 100%; height: auto; border-radius: 4px;">
+            </div>
+            <div class="text-center mt-2">
+              <a href="${r.fileData}" download="receipt_${req.id}_${idx + 1}.png" class="btn btn-sm btn-outline-success">
+                <i class="fa-solid fa-download"></i> הורד תמונת קבלה זו
+              </a>
+            </div>
+          ` : r.fileData ? `
+            <div class="my-2 text-center">
+              <a href="${r.fileData}" download="${r.fileName || `receipt_${req.id}_${idx + 1}.pdf`}" class="btn btn-sm btn-primary">
+                <i class="fa-solid fa-download"></i> הורד קובץ קבלה (${r.fileName || 'PDF'})
+              </a>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
 
   const contentHtml = `
     <div class="p-2 text-right">
       <h4 class="text-primary mb-2" style="font-size: 18px;">בקשה #${req.id} — ${req.applicantName} (${req.group})</h4>
       <div class="bg-light p-3 mb-3" style="border-radius: 8px; border: 1px solid #e2e8f0;">
-        <p class="mb-1"><strong>ספק / חנות:</strong> ${r.store || 'לא צוין'}</p>
-        <p class="mb-1 text-success font-weight-bold" style="font-size: 18px;"><strong>סכום בקבלה:</strong> ₪${(r.amount || 0).toLocaleString()}</p>
-        <p class="mb-1"><strong>זמן העלאה:</strong> ${r.uploadedAt || ''}</p>
-        ${r.notes ? `<p class="mb-0 text-muted"><strong>הערות לאסתר:</strong> "${r.notes}"</p>` : ''}
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span><strong>סכום מוקצה שאושר:</strong> <span class="text-primary font-weight-bold">₪${(req.approvedRefund || 0).toLocaleString()}</span></span>
+          <span><strong>סך קבלות שהוגשו (${receiptsList.length}):</strong> <span class="text-success font-weight-bold">₪${totalAmount.toLocaleString()}</span></span>
+        </div>
+        <div class="mt-2 pt-2 border-top">
+          <strong>מאזן ניצול תקציב:</strong> ${budget.badgeHtml}
+        </div>
       </div>
 
-      ${isImage ? `
-        <div class="text-center my-3" style="max-height: 380px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 10px; padding: 8px; background: #f8fafc;">
-          <img src="${r.fileData}" alt="תמונת קבלה" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.06);">
-        </div>
-      ` : r.fileData ? `
-        <div class="my-3 text-center">
-          <a href="${r.fileData}" download="${r.fileName || `receipt_${req.id}.pdf`}" class="btn btn-primary btn-block">
-            <i class="fa-solid fa-download"></i> הורד קובץ קבלה (${r.fileName || 'PDF'})
-          </a>
-        </div>
-      ` : '<p class="text-muted">אין קובץ מצורף</p>'}
+      <h5 class="text-secondary font-weight-bold mb-3" style="font-size: 16px;"><i class="fa-solid fa-layer-group"></i> פירוט כל הקבלות שהועלו (${receiptsList.length}):</h5>
+      <div style="max-height: 450px; overflow-y: auto; padding-left: 5px;">
+        ${receiptsListHtml}
+      </div>
 
-      <!-- Action Buttons Bar: Download, Print, Copy -->
+      <!-- Action Buttons Bar -->
       <div class="d-flex flex-wrap justify-content-center mt-3 pt-3" style="gap: 10px; border-top: 1px solid #e2e8f0;">
-        ${isImage ? `
-          <a href="${r.fileData}" download="receipt_${req.id}_${r.store || 'horev'}.png" class="btn btn-success px-3" style="flex: 1; min-width: 140px;">
-            <i class="fa-solid fa-download"></i> שמור / הורד תמונה
-          </a>
-        ` : ''}
-        
         <button type="button" class="btn btn-primary px-3" onclick="printReceipt('${req.id}')" style="flex: 1; min-width: 130px;">
-          <i class="fa-solid fa-print"></i> הדפס קבלה / PDF
+          <i class="fa-solid fa-print"></i> הדפס קבלות / PDF
         </button>
-
         <button type="button" class="btn btn-outline-dark px-3" onclick="copyReceiptToClipboard('${req.id}')" style="flex: 1; min-width: 130px;">
-          <i class="fa-solid fa-copy"></i> העתק תמונה / פרטים
+          <i class="fa-solid fa-copy"></i> העתק פרטי קבלות
         </button>
       </div>
     </div>
@@ -1786,8 +1848,11 @@ window.openViewReceiptModal = function(reqId) {
 
 window.printReceipt = function(reqId) {
   const req = AppStore.requests.find(r => r.id === reqId);
-  if (!req || !req.receipt) return;
-  const r = req.receipt;
+  const receiptsList = req && Array.isArray(req.receipts) && req.receipts.length > 0
+    ? req.receipts
+    : (req && req.receipt ? [req.receipt] : []);
+
+  if (!req || receiptsList.length === 0) return;
 
   const printWindow = window.open('', '_blank', 'width=850,height=950');
   if (!printWindow) {
@@ -1795,42 +1860,47 @@ window.printReceipt = function(reqId) {
     return;
   }
 
-  const isImage = r.fileData && r.fileData.startsWith('data:image');
-  const isPdf = r.fileData && r.fileData.startsWith('data:application/pdf');
+  const printItemsHtml = receiptsList.map(r => {
+    const isImage = r.fileData && r.fileData.startsWith('data:image');
+    const isPdf = r.fileData && r.fileData.startsWith('data:application/pdf');
+    if (isImage) {
+      return `<div class="page-break"><img src="${r.fileData}" alt="תמונת קבלה"></div>`;
+    } else if (isPdf) {
+      return `<div class="page-break"><iframe src="${r.fileData}"></iframe></div>`;
+    } else {
+      return `<div class="page-break"><p style="font-family: Arial; font-size: 18px;">${r.store || 'ספק'} — ₪${r.amount} (${r.fileName || 'קובץ'})</p></div>`;
+    }
+  }).join('');
 
   printWindow.document.write(`
     <!DOCTYPE html>
     <html dir="rtl" lang="he">
     <head>
       <meta charset="UTF-8">
-      <title>קבלה - בקשה #${req.id}</title>
+      <title>קבלות - בקשה #${req.id}</title>
       <style>
         * { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #fff; }
-        body { display: flex; justify-content: center; align-items: center; }
-        img { max-width: 100%; max-height: 100vh; object-fit: contain; display: block; margin: auto; }
-        iframe { width: 100vw; height: 100vh; border: none; }
+        html, body { margin: 0; padding: 0; width: 100%; background: #fff; text-align: center; }
+        .page-break { page-break-after: always; display: flex; justify-content: center; align-items: center; min-height: 98vh; margin-bottom: 20px; }
+        .page-break:last-child { page-break-after: auto; }
+        img { max-width: 100%; max-height: 98vh; object-fit: contain; display: block; margin: auto; }
+        iframe { width: 100vw; height: 98vh; border: none; }
         @media print {
           html, body { margin: 0; padding: 0; background: #fff; }
+          .page-break { page-break-after: always; page-break-inside: avoid; min-height: 100vh; margin: 0; }
+          .page-break:last-child { page-break-after: auto; }
           img { max-width: 100%; max-height: 100vh; width: auto; height: auto; display: block; margin: auto; page-break-inside: avoid; }
           iframe { width: 100vw; height: 100vh; border: none; }
         }
       </style>
     </head>
     <body>
-      ${isImage ? `
-        <img src="${r.fileData}" alt="תמונת קבלה">
-      ` : isPdf ? `
-        <iframe src="${r.fileData}"></iframe>
-      ` : `
-        <p style="font-family: Arial, sans-serif; font-size: 18px; color: #333;">קובץ קבלה מצורף במערכת (${r.fileName || 'PDF'})</p>
-      `}
-
+      ${printItemsHtml}
       <script>
         window.onload = function() {
           setTimeout(function() {
             window.print();
-          }, 300);
+          }, 350);
         };
       </script>
     </body>

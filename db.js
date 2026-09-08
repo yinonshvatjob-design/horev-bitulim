@@ -748,6 +748,7 @@ class DatabaseManager {
 
     const nowStr = this.formatDate(new Date());
     const receiptObj = {
+      id: "REC-" + Date.now().toString(36) + "-" + Math.floor(Math.random() * 1000),
       amount: parseFloat(receiptData.amount) || 0,
       store: receiptData.store || "לא צוין ספק",
       notes: receiptData.notes || "",
@@ -756,12 +757,19 @@ class DatabaseManager {
       uploadedAt: nowStr
     };
 
-    req.receipt = receiptObj;
+    if (!Array.isArray(req.receipts)) {
+      req.receipts = req.receipt ? [req.receipt] : [];
+    }
+    req.receipts.push(receiptObj);
+    req.receipt = receiptObj; // latest receipt fallback
+
+    const totalReceiptsAmount = req.receipts.reduce((sum, r) => sum + (r.amount || 0), 0);
+
     if (!req.timeline) req.timeline = [];
     req.timeline.push({
       time: nowStr,
-      title: "📸 הועלתה קבלה / חשבונית ע\"י הרכז/ת",
-      desc: `הועלתה קבלה ע"ס ₪${receiptObj.amount} (ספק/חנות: ${receiptObj.store}). נשלחה התראה לאסתר במזכירות.`,
+      title: `📸 הועלתה קבלה ע"ס ₪${receiptObj.amount} (${receiptObj.store})`,
+      desc: `הועלתה קבלה #${req.receipts.length} ע"ס ₪${receiptObj.amount} (חנות/ספק: ${receiptObj.store}). סך מצטבר בקבלות: ₪${totalReceiptsAmount.toLocaleString()}. נשלח מייל מרוכז לאסתר וחגי.`,
       type: "success"
     });
 
