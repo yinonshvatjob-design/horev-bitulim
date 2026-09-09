@@ -1386,18 +1386,75 @@ function resetFilters() {
 function exportToCSV() {
   if (AppStore.currentUser.role !== 'ADMIN') return;
 
-  let csv = 'מזהה בקשה,שם הרכז,כיתה/שכבה,תאריך התחלה,תאריך סיום,ארוחות שאושרו,סכום החזר ב-ש"ח,סטטוס\n';
   const escapeCsv = (str) => String(str || '').replace(/"/g, '""');
+
+  // Find max receipts count to create dynamic columns
+  let maxReceipts = 0;
   AppStore.requests.forEach(r => {
-    csv += `"${r.id}","${escapeCsv(r.applicantName)}","${escapeCsv(r.group)}","${r.startDate}","${r.endDate}","${escapeCsv(r.approvedDetails || r.requestedMeals.join('; '))}","${r.approvedRefund || 0}","${getStatusHebrew(r.status)}"\n`;
+    const list = Array.isArray(r.receipts) && r.receipts.length > 0
+      ? r.receipts : (r.receipt ? [r.receipt] : []);
+    if (list.length > maxReceipts) maxReceipts = list.length;
+  });
+
+  // Build header
+  let header = 'מזהה בקשה,שם הרכז/ת,כיתה/שכבה,תאריך התחלה,תאריך סיום,ארוחות מבוטלות,סיבת ביטול,סטטוס,תאריך הגשה,טופל ע"י,הערות אדמין,סכום מוקצה (₪),סה"כ קבלות בפועל (₪),ניצולת %,מאזן/עודף (₪),סטטוס ניצולת,רשימת חנויות';
+
+  // Add dynamic receipt columns
+  for (let i = 1; i <= maxReceipts; i++) {
+    header += `,קבלה ${i} - חנות,קבלה ${i} - סכום (₪),קבלה ${i} - הערות`;
+  }
+
+  let csv = header + '\n';
+
+  AppStore.requests.forEach(r => {
+    const budget = getReceiptBudgetStatus(r);
+    const receiptsList = Array.isArray(r.receipts) && r.receipts.length > 0
+      ? r.receipts : (r.receipt ? [r.receipt] : []);
+
+    const allocated = parseFloat(r.approvedRefund) || 0;
+    const actual = receiptsList.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+    const pct = allocated > 0 ? Math.round((actual / allocated) * 100) : (actual > 0 ? 100 : 0);
+    const balance = allocated - actual;
+
+    let row = `"${r.id}"`;
+    row += `,"${escapeCsv(r.applicantName)}"`;
+    row += `,"${escapeCsv(r.group)}"`;
+    row += `,"${r.startDate}"`;
+    row += `,"${r.endDate}"`;
+    row += `,"${escapeCsv(r.approvedDetails || (Array.isArray(r.requestedMeals) ? r.requestedMeals.join('; ') : ''))}"`;
+    row += `,"${escapeCsv(r.reason)}"`;
+    row += `,"${getStatusHebrew(r.status)}"`;
+    row += `,"${r.submittedAt || ''}"`;
+    row += `,"${escapeCsv(r.handledBy)}"`;
+    row += `,"${escapeCsv(r.adminNotes)}"`;
+    row += `,"${allocated}"`;
+    row += `,"${actual}"`;
+    row += `,"${pct}%"`;
+    row += `,"${balance}"`;
+    row += `,"${escapeCsv(budget.code)}"`;
+    row += `,"${escapeCsv(budget.storesStr)}"`;
+
+    // Add each receipt's data
+    for (let i = 0; i < maxReceipts; i++) {
+      if (i < receiptsList.length) {
+        const rcpt = receiptsList[i];
+        row += `,"${escapeCsv(rcpt.store)}"`;
+        row += `,"${parseFloat(rcpt.amount) || 0}"`;
+        row += `,"${escapeCsv(rcpt.notes)}"`;
+      } else {
+        row += `,,,`;
+      }
+    }
+
+    csv += row + '\n';
   });
 
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = `דוח_ביטולי_ארוחות_מוסדות_חורב_${new Date().toISOString().split('T')[0]}.csv`;
+  link.download = `דוח_מלא_ביטולי_ארוחות_חורב_${new Date().toISOString().split('T')[0]}.csv`;
   link.click();
-  showToast('דוח CSV הורד בהצלחה!', 'success');
+  showToast('דוח CSV מלא הורד בהצלחה! (כולל קבלות, ניצולת ומאזנים)', 'success');
 }
 
 async function fetchUsersData() {
