@@ -1255,11 +1255,49 @@ function renderReports() {
   const tbody = document.getElementById('reportsTbody');
   if (!tbody) return;
 
+  // Populate coordinator filter dropdown with actual names from requests
+  const coordSelect = document.getElementById('filterCoordinator');
+  if (coordSelect) {
+    const currentVal = coordSelect.value;
+    const uniqueNames = [...new Set(AppStore.requests.map(r => r.applicantName).filter(Boolean))].sort();
+    
+    // Only rebuild if the options changed
+    const existingNames = Array.from(coordSelect.options).slice(1).map(o => o.value);
+    if (JSON.stringify(existingNames) !== JSON.stringify(uniqueNames)) {
+      coordSelect.innerHTML = '<option value="ALL">כל הרכזים</option>';
+      uniqueNames.forEach(name => {
+        const count = AppStore.requests.filter(r => r.applicantName === name).length;
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = `${name} (${count} בקשות)`;
+        coordSelect.appendChild(opt);
+      });
+      coordSelect.value = currentVal;
+    }
+  }
+
   let filtered = [...AppStore.requests];
 
+  // Filter by coordinator
+  const coordVal = coordSelect?.value || 'ALL';
+  if (coordVal !== 'ALL') {
+    filtered = filtered.filter(r => r.applicantName === coordVal);
+  }
+
+  // Filter by status
   const statusVal = document.getElementById('filterStatus')?.value || 'ALL';
   if (statusVal !== 'ALL') {
     filtered = filtered.filter(r => r.status === statusVal);
+  }
+
+  // Filter by date range
+  const filterStart = document.getElementById('filterStartDate')?.value;
+  const filterEnd = document.getElementById('filterEndDate')?.value;
+  if (filterStart) {
+    filtered = filtered.filter(r => r.startDate >= filterStart);
+  }
+  if (filterEnd) {
+    filtered = filtered.filter(r => r.startDate <= filterEnd);
   }
 
   tbody.innerHTML = filtered.map(r => {
@@ -1337,6 +1375,11 @@ window.updateSelectedCount = function() {
 
 function resetFilters() {
   document.getElementById('filterStatus').value = 'ALL';
+  document.getElementById('filterCoordinator').value = 'ALL';
+  const startDateEl = document.getElementById('filterStartDate');
+  const endDateEl = document.getElementById('filterEndDate');
+  if (startDateEl) startDateEl.value = '';
+  if (endDateEl) endDateEl.value = '';
   renderReports();
 }
 
