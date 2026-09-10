@@ -530,23 +530,34 @@
           </div>
 
           <!-- Orders Table -->
-          <div class="table-responsive mt-4">
-            <table class="table table-striped table-hover" id="reportsTable">
+          <div class="d-flex justify-content-between align-items-center mt-4 mb-2 flex-wrap" style="gap: 8px;">
+            <span class="text-muted small" id="reportResultsCount"></span>
+            <span class="text-muted small"><i class="fa-solid fa-circle-info"></i> הייצוא ל-Excel מייצא רק את הנתונים המסוננים כרגע</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover" id="reportsTable" style="font-size: 0.82rem;">
               <thead>
                 <tr>
-                  <th style="width: 40px; text-align: center;">
+                  <th style="width: 36px; text-align: center;">
                     <input type="checkbox" id="selectAllRequestsCb" title="בחר הכל למחיקה">
                   </th>
                   <th>מזהה</th>
-                  <th>רכז/ת מגיש/ה</th>
+                  <th>רכז/ת</th>
                   <th>כיתה/שכבה</th>
-                  <th>טווח תאריכים</th>
-                  <th>שם החנות / ספקים</th>
-                  <th>סכום מוקצה</th>
-                  <th>סכום קבלות</th>
-                  <th>ניצולת % ומאזן ניצול</th>
+                  <th>תאריכים</th>
+                  <th>ארוחות</th>
+                  <th>סיבת ביטול</th>
                   <th>סטטוס</th>
-                  <th>קבלות</th>
+                  <th>תאריך הגשה</th>
+                  <th>טופל ע"י</th>
+                  <th>הערות אדמין</th>
+                  <th>חנויות</th>
+                  <th style="color: #1e40af;">סכום מוקצה</th>
+                  <th style="color: #059669;">סה"כ קבלות</th>
+                  <th style="color: #7c3aed;">ניצולת %</th>
+                  <th>מאזן</th>
+                  <th>סטטוס ניצולת</th>
+                  <th>פירוט קבלות</th>
                   <th>ציר זמן</th>
                   <th>פעולות</th>
                 </tr>

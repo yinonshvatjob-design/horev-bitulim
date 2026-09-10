@@ -1300,17 +1300,35 @@ function renderReports() {
     filtered = filtered.filter(r => r.startDate <= filterEnd);
   }
 
+  // Store filtered data for CSV export
+  AppStore._filteredRequests = filtered;
+
   tbody.innerHTML = filtered.map(r => {
     const budget = getReceiptBudgetStatus(r);
     const receiptsList = Array.isArray(r.receipts) && r.receipts.length > 0
       ? r.receipts
       : (r.receipt ? [r.receipt] : []);
 
-    let receiptCell = '<span class="text-muted small">אין</span>';
+    const allocated = parseFloat(r.approvedRefund) || 0;
+    const actual = receiptsList.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+    const balance = allocated - actual;
+    const pct = allocated > 0 ? Math.round((actual / allocated) * 100) : (actual > 0 ? 100 : 0);
+    const mealsStr = r.approvedDetails || (Array.isArray(r.requestedMeals) ? r.requestedMeals.join(', ') : '');
+
+    // Build receipt detail cell
+    let receiptDetailCell = '<span class="text-muted small">—</span>';
     if (receiptsList.length > 0) {
-      const totalAmt = receiptsList.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
-      receiptCell = `<button class="btn btn-sm btn-outline-success py-0" onclick="openViewReceiptModal('${r.id}')"><i class="fa-solid fa-receipt"></i> ${receiptsList.length} קבלות (₪${totalAmt.toLocaleString()})</button>`;
+      receiptDetailCell = receiptsList.map((rcpt, i) =>
+        `<div class="small" style="border-bottom: 1px solid #eee; padding: 2px 0;">
+          <strong>${i + 1}.</strong> ${escapeHtml(rcpt.store || '?')} — <span class="text-success font-weight-bold">₪${(parseFloat(rcpt.amount) || 0).toLocaleString()}</span>
+          ${rcpt.notes ? `<br><span class="text-muted">${escapeHtml(rcpt.notes)}</span>` : ''}
+        </div>`
+      ).join('');
     }
+
+    // Balance color
+    const balColor = balance > 0 ? 'color: #059669;' : balance < 0 ? 'color: #dc2626;' : '';
+    const balPrefix = balance > 0 ? '+' : '';
 
     return `
       <tr>
@@ -1320,22 +1338,33 @@ function renderReports() {
         <td><strong>#${r.id}</strong></td>
         <td>${escapeHtml(r.applicantName)}</td>
         <td>${escapeHtml(r.group)}</td>
-        <td>${r.startDate} ${r.startDate !== r.endDate ? 'עד ' + r.endDate : ''}</td>
-        <td>${budget.storesStr}</td>
-        <td class="text-primary font-weight-bold">${budget.allocatedStr}</td>
-        <td class="text-success font-weight-bold">${budget.actualStr}</td>
-        <td>${budget.badgeHtml}</td>
+        <td>${r.startDate}${r.startDate !== r.endDate ? ' עד ' + r.endDate : ''}</td>
+        <td>${escapeHtml(mealsStr)}</td>
+        <td><span class="small">${escapeHtml(r.reason || '')}</span></td>
         <td><span class="badge ${getStatusBadgeClass(r.status)}">${getStatusHebrew(r.status)}</span></td>
-        <td>${receiptCell}</td>
-        <td><button class="btn btn-sm btn-outline-primary py-0" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i> ציר זמן</button></td>
+        <td class="small">${r.submittedAt || ''}</td>
+        <td>${escapeHtml(r.handledBy || '')}</td>
+        <td class="small">${escapeHtml(r.adminNotes || '')}</td>
+        <td>${budget.storesStr}</td>
+        <td class="font-weight-bold" style="color: #1e40af;">₪${allocated.toLocaleString()}</td>
+        <td class="font-weight-bold" style="color: #059669;">₪${actual.toLocaleString()}</td>
+        <td><span class="badge ${pct > 100 ? 'badge-danger' : pct === 100 ? 'badge-success' : 'badge-info'}">${pct}%</span></td>
+        <td class="font-weight-bold" style="${balColor}">${balPrefix}₪${balance.toLocaleString()}</td>
+        <td>${budget.badgeHtml}</td>
+        <td>${receiptDetailCell}</td>
+        <td><button class="btn btn-sm btn-outline-primary py-0" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i></button></td>
         <td>
-          <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteSingleRequest('${r.id}')" title="מחק בקשה זו">
+          <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteSingleRequest('${r.id}')" title="מחק">
             <i class="fa-solid fa-trash"></i>
           </button>
         </td>
       </tr>
     `;
   }).join('');
+
+  // Update results count
+  const countEl = document.getElementById('reportResultsCount');
+  if (countEl) countEl.textContent = `מציג ${filtered.length} מתוך ${AppStore.requests.length} בקשות`;
 
   window.updateSelectedCount();
 
@@ -1388,9 +1417,12 @@ function exportToCSV() {
 
   const escapeCsv = (str) => String(str || '').replace(/"/g, '""');
 
+  // Use filtered requests if available, otherwise all requests
+  const dataToExport = AppStore._filteredRequests || AppStore.requests;
+
   // Find max receipts count to create dynamic columns
   let maxReceipts = 0;
-  AppStore.requests.forEach(r => {
+  dataToExport.forEach(r => {
     const list = Array.isArray(r.receipts) && r.receipts.length > 0
       ? r.receipts : (r.receipt ? [r.receipt] : []);
     if (list.length > maxReceipts) maxReceipts = list.length;
@@ -1406,7 +1438,7 @@ function exportToCSV() {
 
   let csv = header + '\n';
 
-  AppStore.requests.forEach(r => {
+  dataToExport.forEach(r => {
     const budget = getReceiptBudgetStatus(r);
     const receiptsList = Array.isArray(r.receipts) && r.receipts.length > 0
       ? r.receipts : (r.receipt ? [r.receipt] : []);
