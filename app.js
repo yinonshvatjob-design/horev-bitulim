@@ -1848,14 +1848,18 @@ async function renderEmailLogs() {
     if (data.success) AppStore.emailLogs = data.logs;
   } catch (e) {}
 
-  container.innerHTML = AppStore.emailLogs.map(log => `
-    <div class="log-entry">
-      <span class="log-time">${log.time}</span>
-      <span class="log-to">אל: <strong>${log.to}</strong></span>
-      <span class="log-subject">${escapeHtml(log.subject)}</span>
-      <span class="badge badge-success">${log.status}</span>
-    </div>
-  `).join('');
+  container.innerHTML = AppStore.emailLogs.map(log => {
+    const isError = log.status && log.status.includes('שגיאה');
+    const badgeClass = isError ? 'badge-danger' : 'badge-success';
+    return `
+      <div class="log-entry">
+        <span class="log-time">${log.time}</span>
+        <span class="log-to">אל: <strong>${log.to}</strong></span>
+        <span class="log-subject">${escapeHtml(log.subject)}</span>
+        <span class="badge ${badgeClass}" style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(log.status)}">${escapeHtml(log.status)}</span>
+      </div>
+    `;
+  }).join('');
 }
 
 // --------------------------------------------------------------------------
