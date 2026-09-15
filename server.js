@@ -17,6 +17,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-horev-123';
 const app = express();
 
 // Security: Helmet for HTTP Headers (CSP disabled to allow Google Fonts / CDN)
+// Vercel proxy configuration for express-rate-limit
+app.set('trust proxy', 1);
+
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false
