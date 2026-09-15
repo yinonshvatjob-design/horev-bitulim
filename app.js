@@ -1389,17 +1389,11 @@ function renderReports() {
         <td>${escapeHtml(r.applicantName)}</td>
         <td>${escapeHtml(r.group)}</td>
         <td>${r.startDate}${r.startDate !== r.endDate ? ' עד ' + r.endDate : ''}</td>
-        <td>${escapeHtml(mealsStr)}</td>
         <td><span class="small">${escapeHtml(r.reason || '')}</span></td>
         <td><span class="badge ${getStatusBadgeClass(r.status)}">${getStatusHebrew(r.status)}</span></td>
-        <td class="small">${r.submittedAt || ''}</td>
-        <td>${escapeHtml(r.handledBy || '')}</td>
         <td class="small">${escapeHtml(r.adminNotes || '')}</td>
-        <td>${budget.storesStr}</td>
         <td class="font-weight-bold" style="color: #1e40af;">₪${allocated.toLocaleString()}</td>
         <td class="font-weight-bold" style="color: #059669;">₪${actual.toLocaleString()}</td>
-        <td><span class="badge ${pct > 100 ? 'badge-danger' : pct === 100 ? 'badge-success' : 'badge-info'}">${pct}%</span></td>
-        <td class="font-weight-bold" style="${balColor}">${balPrefix}₪${balance.toLocaleString()}</td>
         <td>${budget.badgeHtml}</td>
         <td>${receiptDetailCell}</td>
         <td><button class="btn btn-sm btn-outline-primary py-0" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i></button></td>
