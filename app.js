@@ -1318,12 +1318,23 @@ function renderReports() {
     // Build receipt detail cell
     let receiptDetailCell = '<span class="text-muted small">—</span>';
     if (receiptsList.length > 0) {
-      receiptDetailCell = receiptsList.map((rcpt, i) =>
-        `<div class="small" style="border-bottom: 1px solid #eee; padding: 2px 0;">
+      const detailsHtml = receiptsList.map((rcpt, i) =>
+        `<div class="small" style="border-bottom: 1px solid #eee; padding: 2px 0; text-align: right;">
           <strong>${i + 1}.</strong> ${escapeHtml(rcpt.store || '?')} — <span class="text-success font-weight-bold">₪${(parseFloat(rcpt.amount) || 0).toLocaleString()}</span>
           ${rcpt.notes ? `<br><span class="text-muted">${escapeHtml(rcpt.notes)}</span>` : ''}
         </div>`
       ).join('');
+      
+      receiptDetailCell = `
+        <div style="min-width: 150px;">
+          ${detailsHtml}
+          <div class="mt-2 text-center">
+            <button class="btn btn-sm btn-outline-success py-0" onclick="openViewReceiptModal('${r.id}')">
+              <i class="fa-solid fa-image"></i> צפה בקבלות
+            </button>
+          </div>
+        </div>
+      `;
     }
 
     // Balance color
