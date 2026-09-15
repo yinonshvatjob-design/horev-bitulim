@@ -18,10 +18,23 @@ async function apiFetch(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
   
-  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers
-  });
+  let res;
+  try {
+    res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers
+    });
+  } catch (err) {
+    console.warn('Network error or server unreachable:', err);
+    
+    // Only show toast if it's a GET request (silent refresh) or if it's a user action
+    // To prevent spamming, we can throttle the network error toast.
+    if (!window.lastNetworkErrorTime || Date.now() - window.lastNetworkErrorTime > 10000) {
+      showToast('תקלה זמנית בחיבור, המערכת תנסה שוב אוטומטית...', 'warning');
+      window.lastNetworkErrorTime = Date.now();
+    }
+    throw err;
+  }
   
   if (res.status === 401) {
     const data = await res.json().catch(() => ({}));
@@ -2216,6 +2229,37 @@ window.deleteSingleRequest = async function(id) {
     }
   } catch (err) {
     showToast('שגיאה במחיקת הבקשה', 'danger');
+  }
+};
+
+// ==========================================
+// SYSTEM BACKUP
+// ==========================================
+window.downloadFullBackup = async function() {
+  try {
+    showToast('מכין נתוני גיבוי מהענן...', 'info');
+    const res = await apiFetch('/backup');
+    const data = await res.json();
+    
+    if (data.success && data.backup) {
+      const blob = new Blob([JSON.stringify(data.backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const dateStr = new Date().toISOString().split('T')[0];
+      a.download = `bitulim_backup_${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showToast('הגיבוי הורד בהצלחה!', 'success');
+    } else {
+      showToast(data.message || 'שגיאה ביצירת גיבוי', 'danger');
+    }
+  } catch (err) {
+    console.error('Backup error:', err);
+    showToast('שגיאה בתקשורת לשליפת הגיבוי', 'danger');
   }
 };
 

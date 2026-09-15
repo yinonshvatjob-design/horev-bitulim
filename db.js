@@ -34,6 +34,46 @@ class DatabaseManager {
     this.db = db;
   }
 
+  // ==========================================
+  // SYSTEM BACKUP
+  // ==========================================
+  async getAllData() {
+    try {
+      const admins = await this.getAllAdmins();
+      const coordinators = await this.getAllCoordinators();
+      const requests = await this.getAllRequests();
+      const webhook = await this.getWebhookSettings();
+
+      return {
+        timestamp: new Date().toISOString(),
+        version: '2.0',
+        counts: {
+          admins: admins.length,
+          coordinators: coordinators.length,
+          requests: requests.length
+        },
+        data: {
+          admins,
+          coordinators,
+          requests,
+          webhook
+        }
+      };
+    } catch (err) {
+      console.error('Error fetching all data for backup:', err);
+      throw err;
+    }
+  }
+
+  async getWebhookSettings() {
+    const doc = await this.db.collection('system').doc('settings').get();
+    if (doc.exists) return doc.data();
+    return {
+      googleWebhookUrl: process.env.GOOGLE_MAILER_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbygzoipBy6omG2rtrJPnSJJIFK-IJF6P6szb0y-YVzzxro45Ht9rlb5l9-_Zdd-Fx6h/exec',
+      mailerSecretKey: process.env.MAILER_SECRET_KEY || 'HOREV_SECURE_MAIL_2026_SECRET_KEY'
+    };
+  }
+
   // Helper date formats
   getFutureDate(daysAhead) {
     const d = new Date();

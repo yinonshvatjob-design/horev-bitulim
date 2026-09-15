@@ -73,8 +73,9 @@ const requireAdmin = (req, res, next) => {
 };
 
 const requireSoftwareManager = (req, res, next) => {
-  if (req.user.role !== 'ADMIN') {
-    return res.status(403).json({ success: false, message: 'פעולה זו מורשית למנהלים בלבד.' });
+  // Only the designated Software Manager (Yinon) can access system settings
+  if (req.user.role !== 'ADMIN' || (req.user.id !== '203084637' && req.user.id !== 'ADMIN_DEV')) {
+    return res.status(403).json({ success: false, message: 'פעולה זו מורשית למנהל התוכנה בלבד.' });
   }
   next();
 };
@@ -649,12 +650,27 @@ app.post('/api/email/test', authenticateToken, requireSoftwareManager, async (re
     res.json({ success: false, message: `שגיאה בשליחת מייל בדיקה: ${result.error ? result.error.message : 'לא ידוע'}` });
   }
 });
+// --------------------------------------------------------------------------
+// 7. System Backup
+// --------------------------------------------------------------------------
+app.get('/api/backup', authenticateToken, requireSoftwareManager, async (req, res) => {
+  try {
+    const backupData = await db.getAllData();
+    res.json({ success: true, backup: backupData });
+  } catch (err) {
+    console.error('Error creating backup:', err);
+    res.status(500).json({ success: false, message: 'שגיאה ביצירת גיבוי.' });
+  }
+});
+
 
 // --------------------------------------------------------------------------
 // Start Server on Port 4050
 // --------------------------------------------------------------------------
 if (process.env.NODE_ENV !== 'production' || process.env.RUN_LOCAL) {
   const PORT = process.env.PORT || 4050;
+
+  // Start Server
   app.listen(PORT, () => {
     console.log(`==================================================`);
     console.log(`פלטפורמת ביטול ארוחות - מוסדות חורב ירושלים`);
