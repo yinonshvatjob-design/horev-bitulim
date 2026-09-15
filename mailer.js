@@ -56,7 +56,8 @@ class MailerService {
                                  .replace(/\s+/g, ' ')
                                  .trim() : '';
 
-    const secretKey = db.getMailerSecretKey();
+    const secretKey = await db.getMailerSecretKey();
+    const googleWebhookUrl = await db.getGoogleWebhookUrl();
 
     return new Promise((resolve) => {
       const payload = JSON.stringify({
@@ -133,7 +134,7 @@ class MailerService {
         req.end();
       };
 
-      sendRequest(db.getGoogleWebhookUrl(), false, 0);
+      sendRequest(googleWebhookUrl, false, 0);
     });
   }
 
