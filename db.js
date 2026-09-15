@@ -99,14 +99,34 @@ class DatabaseManager {
   }
 
   async updateAdmin(id, updatedFields) {
-    const docRef = this.db.collection('admins').doc(String(id));
-    const doc = await docRef.get();
-    if (!doc.exists) return null;
+    // Note: 'id' here might not match the document ID for legacy accounts (like ADMIN_DEV).
+    // We should search by doc ID if it exists, otherwise we'll try searching the collection.
+    let docRef = this.db.collection('admins').doc(String(id));
+    let doc = await docRef.get();
+    
+    if (!doc.exists) {
+      // Fallback: search by 'id' field in case doc ID doesn't match
+      const snap = await this.db.collection('admins').where('id', '==', String(id)).limit(1).get();
+      if (snap.empty) return null;
+      doc = snap.docs[0];
+      docRef = doc.ref;
+    }
+
     if (updatedFields.pass && !updatedFields.pass.startsWith('$2a$')) {
       updatedFields.pass = bcrypt.hashSync(updatedFields.pass, 10);
     }
-    await docRef.update(updatedFields);
-    return { ...(doc.data()), ...updatedFields };
+
+    const mergedData = { ...(doc.data()), ...updatedFields };
+
+    if (updatedFields.id && String(updatedFields.id) !== doc.id) {
+      // Create new doc, delete old
+      await this.db.collection('admins').doc(String(updatedFields.id)).set(mergedData);
+      await docRef.delete();
+    } else {
+      await docRef.update(updatedFields);
+    }
+    
+    return mergedData;
   }
 
   async addAdmin(newAdmin) {
@@ -134,11 +154,26 @@ class DatabaseManager {
   }
 
   async updateCoordinator(id, updatedFields) {
-    const docRef = this.db.collection('coordinators').doc(String(id));
-    const doc = await docRef.get();
-    if (!doc.exists) return null;
-    await docRef.update(updatedFields);
-    return { ...(doc.data()), ...updatedFields };
+    let docRef = this.db.collection('coordinators').doc(String(id));
+    let doc = await docRef.get();
+    
+    if (!doc.exists) {
+      // Fallback: search by 'id' field
+      const snap = await this.db.collection('coordinators').where('id', '==', String(id)).limit(1).get();
+      if (snap.empty) return null;
+      doc = snap.docs[0];
+      docRef = doc.ref;
+    }
+
+    const mergedData = { ...(doc.data()), ...updatedFields };
+
+    if (updatedFields.id && String(updatedFields.id) !== doc.id) {
+      await this.db.collection('coordinators').doc(String(updatedFields.id)).set(mergedData);
+      await docRef.delete();
+    } else {
+      await docRef.update(updatedFields);
+    }
+    return mergedData;
   }
 
   async removeCoordinator(id) {
