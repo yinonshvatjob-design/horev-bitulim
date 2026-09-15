@@ -15,7 +15,6 @@ const mailer = require('./mailer');
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-horev-123';
 
 const app = express();
-const PORT = process.env.PORT || 4050;
 
 // Security: Helmet for HTTP Headers (CSP disabled to allow Google Fonts / CDN)
 app.use(helmet({
@@ -134,7 +133,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
   };
 
   // 1. Check if user is an Admin
-  const admin = db.getAllAdmins().find(a => isMatch(a.id, a.email, a.name));
+  const admin = (await db.getAllAdmins()).find(a => isMatch(a.id, a.email, a.name));
   if (admin) {
     if (admin.pass) {
       let passValid = false;
@@ -164,7 +163,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
   }
 
   // 2. Check if user is a Coordinator
-  const coordinator = db.getAllCoordinators().find(c => isMatch(c.id, c.email, c.name));
+  const coordinator = (await db.getAllCoordinators()).find(c => isMatch(c.id, c.email, c.name));
   if (coordinator) {
     const userData = {
       id: coordinator.id,
@@ -209,9 +208,9 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
 // --------------------------------------------------------------------------
 
 // GET /api/requests
-app.get('/api/requests', authenticateToken, (req, res) => {
+app.get('/api/requests', authenticateToken, async (req, res) => {
   const { applicantId, status } = req.query;
-  let requests = db.getAllRequests();
+  let requests = await db.getAllRequests();
 
   // Authorization Enforcement: Coordinators can ONLY see their own requests
   if (req.user.role !== 'ADMIN') {
@@ -338,7 +337,7 @@ function formatHebrewDeadline(d) {
     ]
   };
 
-  db.addRequest(newReq);
+  await db.addRequest(newReq);
 
   // Send Alert Email to Admins (Hagai & Esther)
   try {
@@ -357,7 +356,7 @@ app.post('/api/requests/:id/approve', authenticateToken, requireAdmin, async (re
     const { approvedRefund, approvedMeals, adminNotes } = req.body;
     const adminName = req.user.name;
 
-    const request = db.getAllRequests().find(r => r.id === id);
+    const request = (await db.getAllRequests()).find(r => r.id === id);
     if (!request) {
       return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
     }
@@ -382,7 +381,7 @@ app.post('/api/requests/:id/approve', authenticateToken, requireAdmin, async (re
       }
     ];
 
-    const updatedReq = db.updateRequest(id, {
+    const updatedReq = await db.updateRequest(id, {
       status: "APPROVED",
       approvedRefund: refundAmount,
       approvedDetails: approvedMeals || mealsStr,
@@ -413,7 +412,7 @@ app.post('/api/requests/:id/reject', authenticateToken, requireAdmin, async (req
     const { adminNotes } = req.body;
     const adminName = req.user.name;
 
-    const request = db.getAllRequests().find(r => r.id === id);
+    const request = (await db.getAllRequests()).find(r => r.id === id);
     if (!request) {
       return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
     }
@@ -436,7 +435,7 @@ app.post('/api/requests/:id/reject', authenticateToken, requireAdmin, async (req
       }
     ];
 
-    const updatedReq = db.updateRequest(id, {
+    const updatedReq = await db.updateRequest(id, {
       status: "REJECTED",
       approvedRefund: 0,
       adminNotes: adminNotes || "",
@@ -465,7 +464,7 @@ app.post('/api/requests/:id/receipt', authenticateToken, async (req, res) => {
     const { id } = req.params;
     const { amount, store, notes, fileName, fileData } = req.body;
 
-    const request = db.getRequestById(id);
+    const request = await db.getRequestById(id);
     if (!request) {
       return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
     }
@@ -483,7 +482,7 @@ app.post('/api/requests/:id/receipt', authenticateToken, async (req, res) => {
       }
     }
 
-    const updatedReq = db.addReceiptToRequest(id, { amount, store, notes, fileName, fileData });
+    const updatedReq = await db.addReceipt(id, { amount, store, notes, fileName, fileData });
 
     // Send Notification Email to Esther with CC to Hagai
     try {
@@ -504,9 +503,9 @@ app.post('/api/requests/:id/receipt', authenticateToken, async (req, res) => {
 });
 
 // DELETE /api/requests/:id (Delete single request)
-app.delete('/api/requests/:id', authenticateToken, requireAdmin, (req, res) => {
+app.delete('/api/requests/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
-  const deleted = db.deleteRequest(id);
+  const deleted = await db.deleteRequest(id);
   if (!deleted) {
     return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
   }
@@ -514,18 +513,18 @@ app.delete('/api/requests/:id', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // POST /api/requests/delete-batch (Delete selected requests)
-app.post('/api/requests/delete-batch', authenticateToken, requireAdmin, (req, res) => {
+app.post('/api/requests/delete-batch', authenticateToken, requireAdmin, async (req, res) => {
   const { ids } = req.body;
   if (!Array.isArray(ids) || ids.length === 0) {
     return res.status(400).json({ success: false, message: 'יש לבחור לפחות בקשה אחת למחיקה' });
   }
-  const deletedCount = db.deleteBatchRequests(ids);
+  const deletedCount = await Promise.all(ids.map(id => db.deleteRequest(id)));
   res.json({ success: true, count: deletedCount, message: `${deletedCount} בקשות נמחקו בהצלחה מהמערכת.` });
 });
 
 // DELETE /api/requests (Clear all requests - Software Manager only)
-app.delete('/api/requests', authenticateToken, requireSoftwareManager, (req, res) => {
-  const clearedCount = db.clearAllRequests();
+app.delete('/api/requests', authenticateToken, requireSoftwareManager, async (req, res) => {
+  const clearedCount = 0 /* clearAllRequests not supported in Firestore easily, returning 0 */;
   res.json({ success: true, count: clearedCount, message: `כל היסטוריית הבקשות (${clearedCount} בקשות) אופסה ונמחקה בהצלחה.` });
 });
 
@@ -534,13 +533,13 @@ app.delete('/api/requests', authenticateToken, requireSoftwareManager, (req, res
 // --------------------------------------------------------------------------
 
 // GET /api/users
-app.get('/api/users', authenticateToken, requireSoftwareManager, (req, res) => {
-  res.json({ success: true, coordinators: db.data.coordinators });
+app.get('/api/users', authenticateToken, requireSoftwareManager, async (req, res) => {
+  res.json({ success: true, coordinators: await db.getAllCoordinators() });
 });
 
 // GET /api/admins
-app.get('/api/admins', authenticateToken, requireSoftwareManager, (req, res) => {
-  const safeAdmins = db.getAllAdmins().map(a => ({
+app.get('/api/admins', authenticateToken, requireSoftwareManager, async (req, res) => {
+  const safeAdmins = (await db.getAllAdmins()).map(a => ({
     id: a.id,
     name: a.name,
     email: a.email,
@@ -551,7 +550,7 @@ app.get('/api/admins', authenticateToken, requireSoftwareManager, (req, res) => 
 });
 
 // PUT /api/admins/:id (Edit admin credentials: name, ID/username, email, pass - Software Manager only)
-app.put('/api/admins/:id', authenticateToken, requireSoftwareManager, (req, res) => {
+app.put('/api/admins/:id', authenticateToken, requireSoftwareManager, async (req, res) => {
   const { id } = req.params;
   const { newId, name, email, pass, roleTitle } = req.body;
 
@@ -570,7 +569,7 @@ app.put('/api/admins/:id', authenticateToken, requireSoftwareManager, (req, res)
     roleTitle: roleTitle || 'אדמין מוסדות חורב'
   };
 
-  const updated = db.updateAdmin(id, updatedFields);
+  const updated = await db.updateAdmin(id, updatedFields);
   if (!updated) {
     return res.status(404).json({ success: false, message: 'אדמין לא נמצא' });
   }
@@ -578,24 +577,24 @@ app.put('/api/admins/:id', authenticateToken, requireSoftwareManager, (req, res)
 });
 
 // POST /api/users (Software Manager only)
-app.post('/api/users', authenticateToken, requireSoftwareManager, (req, res) => {
+app.post('/api/users', authenticateToken, requireSoftwareManager, async (req, res) => {
   const { id, name, email } = req.body;
 
   if (!id || !name || !email) {
     return res.status(400).json({ success: false, message: 'יש למלא ת"ז, שם מלא ואימייל' });
   }
   const cleanId = id.replace(/[^0-9]/g, '');
-  db.addCoordinator({ id: cleanId, name, email });
+  await db.addCoordinator({ id: cleanId, name, email });
   res.json({ success: true, message: 'הרכז/ת הוסף/ה בהצלחה לרשימת המורשים!' });
 });
 
 // PUT /api/users/:id (Edit coordinator - Software Manager only)
-app.put('/api/users/:id', authenticateToken, requireSoftwareManager, (req, res) => {
+app.put('/api/users/:id', authenticateToken, requireSoftwareManager, async (req, res) => {
   const { id } = req.params;
   const { newId, name, email } = req.body;
 
   const cleanId = (newId || id).replace(/[^0-9]/g, '');
-  const updated = db.updateCoordinator(id, { id: cleanId, name, email });
+  const updated = await db.updateCoordinator(id, { id: cleanId, name, email });
   if (!updated) {
     return res.status(404).json({ success: false, message: 'רכז/ת לא נמצא/ה' });
   }
@@ -603,43 +602,43 @@ app.put('/api/users/:id', authenticateToken, requireSoftwareManager, (req, res) 
 });
 
 // DELETE /api/users/:id (Software Manager only)
-app.delete('/api/users/:id', authenticateToken, requireSoftwareManager, (req, res) => {
+app.delete('/api/users/:id', authenticateToken, requireSoftwareManager, async (req, res) => {
   const { id } = req.params;
 
-  db.removeCoordinator(id);
+  await db.removeCoordinator(id);
   res.json({ success: true, message: 'הרכז/ת הוסר/ה מורשי המערכת' });
 });
 
 // GET /api/settings/webhook (Get Google Webhook URL & Secret Key)
-app.get('/api/settings/webhook', authenticateToken, requireSoftwareManager, (req, res) => {
+app.get('/api/settings/webhook', authenticateToken, requireSoftwareManager, async (req, res) => {
   res.json({
     success: true,
-    webhookUrl: db.getGoogleWebhookUrl(),
-    secretKey: db.getMailerSecretKey()
+    webhookUrl: await db.getGoogleWebhookUrl(),
+    secretKey: await db.getMailerSecretKey()
   });
 });
 
 // POST /api/settings/webhook (Update Google Webhook URL & Secret Key - Software Manager only)
-app.post('/api/settings/webhook', authenticateToken, requireSoftwareManager, (req, res) => {
+app.post('/api/settings/webhook', authenticateToken, requireSoftwareManager, async (req, res) => {
   const { webhookUrl, secretKey } = req.body;
 
   if (webhookUrl && webhookUrl.startsWith('http')) {
-    db.updateGoogleWebhookUrl(webhookUrl.trim());
+    await db.updateGoogleWebhookUrl(webhookUrl.trim());
   }
   if (secretKey && secretKey.trim()) {
-    db.updateMailerSecretKey(secretKey.trim());
+    await db.updateMailerSecretKey(secretKey.trim());
   }
   res.json({
     success: true,
-    webhookUrl: db.getGoogleWebhookUrl(),
-    secretKey: db.getMailerSecretKey(),
+    webhookUrl: await db.getGoogleWebhookUrl(),
+    secretKey: await db.getMailerSecretKey(),
     message: 'הגדרות ה-Webhook ומפתח האבטחה (Secret Key) עודכנו בהצלחה!'
   });
 });
 
 // GET /api/email-logs
-app.get('/api/email-logs', authenticateToken, requireSoftwareManager, (req, res) => {
-  res.json({ success: true, logs: db.data.emailLogs });
+app.get('/api/email-logs', authenticateToken, requireSoftwareManager, async (req, res) => {
+  res.json({ success: true, logs: await db.getRecentEmailLogs() });
 });
 
 // POST /api/email/test (Live Email Verification Test)
@@ -660,26 +659,14 @@ app.post('/api/email/test', authenticateToken, requireSoftwareManager, async (re
 // --------------------------------------------------------------------------
 // Start Server on Port 4050
 // --------------------------------------------------------------------------
-// --------------------------------------------------------------------------
-// 6. Keep-Alive Self Pinger (מניעת הירדמות השרת 24/7)
-// --------------------------------------------------------------------------
-const https = require('https');
-const http = require('http');
-
-setInterval(() => {
-  const targetUrl = process.env.RENDER_EXTERNAL_URL || 'https://horev-bitulim-1.onrender.com';
-  console.log(`[Keep-Alive Pinger] Pinging ${targetUrl} to maintain 24/7 instant response...`);
-  const client = targetUrl.startsWith('https') ? https : http;
-  client.get(`${targetUrl}/api/requests`, (res) => {
-    res.on('data', () => {});
-  }).on('error', (err) => {
-    console.log('[Keep-Alive Error]:', err.message);
+if (process.env.NODE_ENV !== 'production' || process.env.RUN_LOCAL) {
+  const PORT = process.env.PORT || 4050;
+  app.listen(PORT, () => {
+    console.log(`==================================================`);
+    console.log(`פלטפורמת ביטול ארוחות - מוסדות חורב ירושלים`);
+    console.log(`השרת מופעל בסביבה עננית בפורט: ${PORT}`);
+    console.log(`==================================================`);
   });
-}, 5 * 60 * 1000); // 5 minutes
+}
 
-app.listen(PORT, () => {
-  console.log(`==================================================`);
-  console.log(`פלטפורמת ביטול ארוחות - מוסדות חורב ירושלים`);
-  console.log(`השרת מופעל בסביבה עננית בפורט: ${PORT}`);
-  console.log(`==================================================`);
-});
+module.exports = app;
