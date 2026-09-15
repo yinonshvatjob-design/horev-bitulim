@@ -13,8 +13,8 @@ class MailerService {
     this.user = process.env.GMAIL_USER || 'bitulim@horev.org.il';
   }
 
-  get treasurerAdmin() {
-    const admins = db.getAllAdmins();
+  async getTreasurerAdmin() {
+    const admins = await db.getAllAdmins();
     return admins.find(a => a.id === '0584220463' || (a.name && a.name.includes('חגי')) || (a.roleTitle && (a.roleTitle.includes('מנהל') || a.roleTitle.includes('גזבר')))) || {
       name: 'חגי',
       roleTitle: 'מנהל המוסד (Admin)',
@@ -22,8 +22,8 @@ class MailerService {
     };
   }
 
-  get secretaryAdmin() {
-    const admins = db.getAllAdmins();
+  async getSecretaryAdmin() {
+    const admins = await db.getAllAdmins();
     return admins.find(a => a.id === '0545540828' || (a.name && a.name.includes('אסתר')) || (a.roleTitle && a.roleTitle.includes('מזכיר'))) || {
       name: 'אסתר',
       roleTitle: 'מזכירת המוסד (Admin)',
@@ -31,8 +31,8 @@ class MailerService {
     };
   }
 
-  get softwareManagerAdmin() {
-    const admins = db.getAllAdmins();
+  async getSoftwareManagerAdmin() {
+    const admins = await db.getAllAdmins();
     return admins.find(a => (a.name && a.name.includes('ינון')) || (a.roleTitle && a.roleTitle.includes('תוכנה')) || (a.role && a.role.includes('תוכנה'))) || {
       name: 'ינון',
       roleTitle: 'מנהל תוכנה (Admin)',
@@ -40,12 +40,14 @@ class MailerService {
     };
   }
 
-  get treasurerEmail() {
-    return (this.treasurerAdmin && this.treasurerAdmin.email) ? this.treasurerAdmin.email : 'yinonshvat@gmail.com';
+  async getTreasurerEmail() {
+    const admin = await this.getTreasurerAdmin();
+    return admin.email ? admin.email : 'yinonshvat@gmail.com';
   }
 
-  get secretaryEmail() {
-    return (this.secretaryAdmin && this.secretaryAdmin.email) ? this.secretaryAdmin.email : 'yinonshvat@gmail.com';
+  async getSecretaryEmail() {
+    const admin = await this.getSecretaryAdmin();
+    return admin.email ? admin.email : 'yinonshvat@gmail.com';
   }
 
   // Send Email via Official Google Apps Script Webhook (POST + GET Redirect)
@@ -140,8 +142,10 @@ class MailerService {
 
   // 1. Send Alert Email to Hagai & Esther on New Submission
   async sendSubmissionAlertToAdmins(reqData) {
-    const treasurer = this.treasurerAdmin;
-    const secretary = this.secretaryAdmin;
+    const treasurer = await this.getTreasurerAdmin();
+    const secretary = await this.getSecretaryAdmin();
+    const treasurerEmail = await this.getTreasurerEmail();
+    const secretaryEmail = await this.getSecretaryEmail();
 
     const mealsStr = Array.isArray(reqData.requestedMeals) ? reqData.requestedMeals.join(', ') : (reqData.requestedMeals || '');
     const subject = `בקשת ביטול ארוחות חדשה מאת ${reqData.applicantName} - ${reqData.group} (${reqData.startDate})`;
@@ -195,14 +199,16 @@ class MailerService {
       </html>
     `;
 
-    return this.sendMail(this.treasurerEmail, subject, htmlContent, [this.secretaryEmail]);
+    return this.sendMail(treasurerEmail, subject, htmlContent, [secretaryEmail]);
   }
 
   // 2. Send Decision Email to Coordinator on Approval/Rejection (with CC to Admins for confirmation)
   async sendDecisionToCoordinator(reqData) {
-    const treasurer = this.treasurerAdmin;
-    const secretary = this.secretaryAdmin;
-    const coordinator = db.findCoordinator(reqData.applicantId);
+    const treasurer = await this.getTreasurerAdmin();
+    const secretary = await this.getSecretaryAdmin();
+    const treasurerEmail = await this.getTreasurerEmail();
+    const secretaryEmail = await this.getSecretaryEmail();
+    const coordinator = await db.findCoordinator(reqData.applicantId);
     const targetEmail = reqData.applicantEmail || (coordinator && coordinator.email) || '';
 
     if (!targetEmail) {
@@ -299,13 +305,15 @@ class MailerService {
     `;
 
     // Send to Coordinator with CC to Treasurer & Secretary for confirmation
-    return this.sendMail(targetEmail, subject, htmlContent, [this.treasurerEmail, this.secretaryEmail]);
+    return this.sendMail(targetEmail, subject, htmlContent, [treasurerEmail, secretaryEmail]);
   }
 
   // 3. Send Concentrated Receipt Upload Alert to Esther (with CC to Hagai) containing ALL receipts
   async sendReceiptNotificationToEsther(reqData, latestReceiptObj) {
-    const treasurer = this.treasurerAdmin;
-    const secretary = this.secretaryAdmin;
+    const treasurer = await this.getTreasurerAdmin();
+    const secretary = await this.getSecretaryAdmin();
+    const treasurerEmail = await this.getTreasurerEmail();
+    const secretaryEmail = await this.getSecretaryEmail();
 
     const receiptsList = Array.isArray(reqData.receipts) && reqData.receipts.length > 0
       ? reqData.receipts
@@ -431,14 +439,14 @@ class MailerService {
       </html>
     `;
 
-    return this.sendMail(this.secretaryEmail, subject, htmlContent, [this.treasurerEmail]);
+    return this.sendMail(secretaryEmail, subject, htmlContent, [treasurerEmail]);
   }
 
   // 3. Send Live Test Email to Custom Recipient
   async sendTestEmail(recipientEmail) {
-    const treasurer = this.treasurerAdmin;
-    const secretary = this.secretaryAdmin;
-    const softwareMgr = this.softwareManagerAdmin;
+    const treasurer = await this.getTreasurerAdmin();
+    const secretary = await this.getSecretaryAdmin();
+    const softwareMgr = await this.getSoftwareManagerAdmin();
 
     const subject = `מייל בדיקה מוסדות חורב ירושלים - ביטול ארוחות`;
     const htmlContent = `
@@ -499,15 +507,15 @@ class MailerService {
     try {
       const res = await this.sendMailViaGoogleWebhook(to, subject, html, cc);
       if (res.success) {
-        db.addEmailLog(this.user, subject, `נשלח בהצלחה ל-${to} (Google Gmail)`);
+        await db.logEmail(to, subject, `נשלח בהצלחה ל-${to} (Google Gmail)`);
         return { success: true, to, subject };
       } else {
-        db.addEmailLog(this.user, subject, `שגיאת שליחה: ${res.error ? res.error.message : 'שגיאת דיוור'}`);
+        await db.logEmail(to, subject, `שגיאת שליחה: ${res.error ? res.error.message : 'שגיאת דיוור'}`);
         return { success: false, error: res.error };
       }
     } catch (error) {
       console.error("[MAILER ERROR]", error.message);
-      db.addEmailLog(this.user, subject, "שגיאת שליחה: " + error.message);
+      await db.logEmail(to, subject, "שגיאת שליחה: " + error.message);
       return { success: false, error };
     }
   }
