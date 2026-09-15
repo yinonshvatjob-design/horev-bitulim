@@ -23,16 +23,7 @@ app.use(helmet({
 }));
 
 // Security: Strict CORS
-const allowedOrigins = ['http://localhost:4050', 'http://localhost:3000', 'https://bitulim.horevit.com'];
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  }
-}));
+app.use(cors());
 
 // Security: Lower global payload limits to prevent DoS (5MB limit)
 app.use(express.json({ limit: '5mb' }));
