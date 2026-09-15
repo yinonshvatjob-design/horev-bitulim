@@ -81,7 +81,12 @@ const requireSoftwareManager = (req, res, next) => {
 
 const requireSoftwareManagerStrict = (req, res, next) => {
   // Only the designated Software Manager (Yinon) can access system settings
-  if (req.user.role !== 'ADMIN' || (req.user.id !== '203084637' && req.user.id !== 'ADMIN_DEV')) {
+  const isYinon = (req.user.name && req.user.name.includes('ינון')) || 
+                  (req.user.roleTitle && req.user.roleTitle.includes('תוכנה')) || 
+                  (String(req.user.id) === '203084637') || 
+                  (String(req.user.id) === 'ADMIN_DEV');
+                  
+  if (req.user.role !== 'ADMIN' || !isYinon) {
     return res.status(403).json({ success: false, message: 'פעולה זו מורשית למנהל התוכנה בלבד.' });
   }
   next();
