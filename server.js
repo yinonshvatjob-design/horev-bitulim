@@ -26,16 +26,7 @@ app.use(helmet({
 }));
 
 // Security: Strict CORS
-const allowedOrigins = ['https://bitulim.horevit.com', 'https://bitulim.vercel.app', 'http://localhost:3000', 'http://127.0.0.1:3000'];
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true); // Allow requests with no origin (like mobile apps or curl)
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('CORS policy does not allow access from this origin.'), false);
-  }
-}));
+app.use(cors());
 
 // Security: Lower global payload limits to prevent DoS (5MB limit)
 app.use(express.json({ limit: '5mb' }));
