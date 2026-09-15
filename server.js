@@ -73,6 +73,13 @@ const requireAdmin = (req, res, next) => {
 };
 
 const requireSoftwareManager = (req, res, next) => {
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ success: false, message: 'פעולה זו מורשית למנהלים בלבד.' });
+  }
+  next();
+};
+
+const requireSoftwareManagerStrict = (req, res, next) => {
   // Only the designated Software Manager (Yinon) can access system settings
   if (req.user.role !== 'ADMIN' || (req.user.id !== '203084637' && req.user.id !== 'ADMIN_DEV')) {
     return res.status(403).json({ success: false, message: 'פעולה זו מורשית למנהל התוכנה בלבד.' });
@@ -518,7 +525,7 @@ app.post('/api/requests/delete-batch', authenticateToken, requireAdmin, async (r
 });
 
 // DELETE /api/requests (Clear all requests - Software Manager only)
-app.delete('/api/requests', authenticateToken, requireSoftwareManager, async (req, res) => {
+app.delete('/api/requests', authenticateToken, requireSoftwareManagerStrict, async (req, res) => {
   const clearedCount = 0 /* clearAllRequests not supported in Firestore easily, returning 0 */;
   res.json({ success: true, count: clearedCount, message: `כל היסטוריית הבקשות (${clearedCount} בקשות) אופסה ונמחקה בהצלחה.` });
 });
@@ -605,7 +612,7 @@ app.delete('/api/users/:id', authenticateToken, requireSoftwareManager, async (r
 });
 
 // GET /api/settings/webhook (Get Google Webhook URL & Secret Key)
-app.get('/api/settings/webhook', authenticateToken, requireSoftwareManager, async (req, res) => {
+app.get('/api/settings/webhook', authenticateToken, requireSoftwareManagerStrict, async (req, res) => {
   res.json({
     success: true,
     webhookUrl: await db.getGoogleWebhookUrl(),
@@ -614,7 +621,7 @@ app.get('/api/settings/webhook', authenticateToken, requireSoftwareManager, asyn
 });
 
 // POST /api/settings/webhook (Update Google Webhook URL & Secret Key - Software Manager only)
-app.post('/api/settings/webhook', authenticateToken, requireSoftwareManager, async (req, res) => {
+app.post('/api/settings/webhook', authenticateToken, requireSoftwareManagerStrict, async (req, res) => {
   const { webhookUrl, secretKey } = req.body;
 
   if (webhookUrl && webhookUrl.startsWith('http')) {
@@ -632,12 +639,12 @@ app.post('/api/settings/webhook', authenticateToken, requireSoftwareManager, asy
 });
 
 // GET /api/email-logs
-app.get('/api/email-logs', authenticateToken, requireSoftwareManager, async (req, res) => {
+app.get('/api/email-logs', authenticateToken, requireSoftwareManagerStrict, async (req, res) => {
   res.json({ success: true, logs: await db.getRecentEmailLogs() });
 });
 
 // POST /api/email/test (Live Email Verification Test)
-app.post('/api/email/test', authenticateToken, requireSoftwareManager, async (req, res) => {
+app.post('/api/email/test', authenticateToken, requireSoftwareManagerStrict, async (req, res) => {
   const { recipientEmail } = req.body;
   if (!recipientEmail) {
     return res.status(400).json({ success: false, message: 'יש להזין כתובת אימייל לבדיקה' });
@@ -653,7 +660,7 @@ app.post('/api/email/test', authenticateToken, requireSoftwareManager, async (re
 // --------------------------------------------------------------------------
 // 7. System Backup
 // --------------------------------------------------------------------------
-app.get('/api/backup', authenticateToken, requireSoftwareManager, async (req, res) => {
+app.get('/api/backup', authenticateToken, requireSoftwareManagerStrict, async (req, res) => {
   try {
     const backupData = await db.getAllData();
     res.json({ success: true, backup: backupData });
