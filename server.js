@@ -70,8 +70,8 @@ const requireAdmin = (req, res, next) => {
 };
 
 const requireSoftwareManager = (req, res, next) => {
-  if (req.user.role !== 'ADMIN' || !req.user.roleTitle?.includes('תוכנה')) {
-    return res.status(403).json({ success: false, message: 'פעולה זו מורשית למנהל תוכנה בלבד.' });
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ success: false, message: 'פעולה זו מורשית למנהלים בלבד.' });
   }
   next();
 };
