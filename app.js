@@ -912,6 +912,14 @@ async function handleFormSubmit(e) {
     mandatoryConfirmed
   };
 
+  const btn = document.getElementById('submitCancelBtn');
+  let origBtnText = '';
+  if (btn) {
+    origBtnText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> רגע, שולח בקשה לאישור חגי ומעדכן את אסתר...';
+  }
+
   try {
     const res = await apiFetch(`/requests`, {
       method: 'POST',
@@ -936,6 +944,11 @@ async function handleFormSubmit(e) {
     clearAllClasses();
     updateMealCardStates();
     fetchRequestsData();
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origBtnText;
+    }
   }
 }
 
@@ -1159,6 +1172,14 @@ async function approveRequest(id) {
   const approvedMeals = document.getElementById(`approvedMeals_${id}`).value;
   const adminNotes = document.getElementById(`adminNotes_${id}`).value;
 
+  const btn = document.querySelector(`button[onclick="approveRequest('${id}')"]`);
+  let origBtnText = '';
+  if (btn) {
+    origBtnText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> מאשר...';
+  }
+
   try {
     const res = await apiFetch(`/requests/${id}/approve`, {
       method: 'POST',
@@ -1190,6 +1211,11 @@ async function approveRequest(id) {
   } catch (e) {
     showToast('אושר בהצלחה!', 'success');
     fetchRequestsData();
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origBtnText;
+    }
   }
 }
 
@@ -1197,6 +1223,14 @@ async function rejectRequest(id) {
   if (AppStore.currentUser.role !== 'ADMIN') return;
 
   const adminNotes = document.getElementById(`adminNotes_${id}`).value;
+
+  const btn = document.querySelector(`button[onclick="rejectRequest('${id}')"]`);
+  let origBtnText = '';
+  if (btn) {
+    origBtnText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> דוחה...';
+  }
 
   try {
     const res = await apiFetch(`/requests/${id}/reject`, {
@@ -1217,6 +1251,11 @@ async function rejectRequest(id) {
   } catch (e) {
     showToast('נדחה!', 'info');
     fetchRequestsData();
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origBtnText;
+    }
   }
 }
 
