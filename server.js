@@ -692,7 +692,7 @@ app.get('/api/backup', authenticateToken, requireSoftwareManagerStrict, async (r
 // --------------------------------------------------------------------------
 // Start Server on Port 4050
 // --------------------------------------------------------------------------
-if (process.env.NODE_ENV !== 'production' || process.env.RUN_LOCAL) {
+if (!process.env.VERCEL) {
   const PORT = process.env.PORT || 4050;
 
   // Start Server
