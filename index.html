@@ -583,6 +583,7 @@
                   <th>שם המנהל/ת</th>
                   <th>שם משתמש (ת"ז / טלפון)</th>
                   <th>סיסמה (Password)</th>
+                  <th>טלפון נייד</th>
                   <th>כתובת אימייל</th>
                   <th>פעולות ניהול</th>
                 </tr>
@@ -612,6 +613,7 @@
                 <tr>
                   <th>תעודת זהות / טלפון</th>
                   <th>שם הרכז/ת</th>
+                  <th>טלפון נייד</th>
                   <th>אימייל</th>
                   <th>סטטוס מורשה</th>
                   <th>פעולות ניהול</th>
@@ -756,6 +758,10 @@
             <input type="text" id="newUserName" class="form-control" placeholder="לדוגמה: משה כהן" required>
           </div>
           <div class="form-group">
+            <label for="newUserPhone">מספר טלפון נייד</label>
+            <input type="text" id="newUserPhone" class="form-control" placeholder="לדוגמה: 0501234567">
+          </div>
+          <div class="form-group">
             <label for="newUserEmail">כתובת אימייל *</label>
             <input type="email" id="newUserEmail" class="form-control" placeholder="moshe@horev.org.il" required>
           </div>
@@ -784,6 +790,10 @@
           <div class="form-group">
             <label for="editUserName">שם מלא של הרכז/ת *</label>
             <input type="text" id="editUserName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="editUserPhone">מספר טלפון נייד</label>
+            <input type="text" id="editUserPhone" class="form-control">
           </div>
           <div class="form-group">
             <label for="editUserEmail">כתובת אימייל *</label>
@@ -822,6 +832,10 @@
           <div class="form-group">
             <label for="editAdminPass">סיסמה להתחברות (Password) *</label>
             <input type="text" id="editAdminPass" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="editAdminPhone">מספר טלפון נייד</label>
+            <input type="text" id="editAdminPhone" class="form-control">
           </div>
           <div class="form-group">
             <label for="editAdminEmail">כתובת אימייל לקבלת התראות *</label>

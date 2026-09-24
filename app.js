@@ -1674,6 +1674,7 @@ async function renderUsersTable() {
     <tr>
       <td><strong>${c.id}</strong></td>
       <td>${c.name}</td>
+      <td>${c.phone || '-'}</td>
       <td>${c.email}</td>
       <td><span class="badge badge-success">מורשה להגשה</span></td>
       <td>
@@ -1700,6 +1701,7 @@ function renderAdminsTable() {
       <td>
         <span style="letter-spacing: 2px; color: #6c757d;">••••••••</span>
       </td>
+      <td>${a.phone || '-'}</td>
       <td>${a.email}</td>
       <td>
         <button class="btn btn-sm btn-primary" onclick="openEditAdminModal('${a.id}')">
@@ -1719,6 +1721,7 @@ window.openEditAdminModal = function(id) {
   document.getElementById('editAdminName').value = admin.name;
   document.getElementById('editAdminId').value = admin.id;
   document.getElementById('editAdminPass').value = admin.pass || '';
+  document.getElementById('editAdminPhone').value = admin.phone || '';
   document.getElementById('editAdminEmail').value = admin.email;
   document.getElementById('editAdminModal').style.display = 'flex';
 };
@@ -1739,6 +1742,7 @@ async function handleEditAdminSubmit(e) {
   const newId = document.getElementById('editAdminId').value.trim();
   const name = document.getElementById('editAdminName').value.trim();
   const pass = document.getElementById('editAdminPass').value.trim();
+  const phone = document.getElementById('editAdminPhone').value.trim();
   const email = document.getElementById('editAdminEmail').value.trim();
   const roleTitle = document.getElementById('editAdminRoleTitle').value.trim();
 
@@ -1746,7 +1750,7 @@ async function handleEditAdminSubmit(e) {
     const res = await apiFetch(`/admins/${originalId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminId: AppStore.currentUser.id, newId, name, pass, email, roleTitle })
+      body: JSON.stringify({ adminId: AppStore.currentUser.id, id: newId, name, phone, pass, email, roleTitle })
     });
     const data = await res.json();
     if (data.success) {
@@ -1776,6 +1780,7 @@ window.openEditUserModal = function(id) {
   document.getElementById('editOriginalUserId').value = coordinator.id;
   document.getElementById('editUserId').value = coordinator.id;
   document.getElementById('editUserName').value = coordinator.name;
+  document.getElementById('editUserPhone').value = coordinator.phone || '';
   document.getElementById('editUserEmail').value = coordinator.email;
   document.getElementById('editUserModal').style.display = 'flex';
 };
@@ -1795,13 +1800,14 @@ async function handleEditUserSubmit(e) {
   const originalId = document.getElementById('editOriginalUserId').value;
   const newId = document.getElementById('editUserId').value.trim();
   const name = document.getElementById('editUserName').value.trim();
+  const phone = document.getElementById('editUserPhone').value.trim();
   const email = document.getElementById('editUserEmail').value.trim();
 
   try {
     const res = await apiFetch(`/users/${originalId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminId: AppStore.currentUser.id, id: newId, name, email })
+      body: JSON.stringify({ adminId: AppStore.currentUser.id, id: newId, name, phone, email })
     });
     const data = await res.json();
     if (data.success) {
@@ -1837,13 +1843,14 @@ async function handleAddUserSubmit(e) {
 
   const id = document.getElementById('newUserId').value.trim();
   const name = document.getElementById('newUserName').value.trim();
+  const phone = document.getElementById('newUserPhone').value.trim();
   const email = document.getElementById('newUserEmail').value.trim();
 
   try {
     const res = await apiFetch(`/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminId: AppStore.currentUser.id, id, name, email })
+      body: JSON.stringify({ adminId: AppStore.currentUser.id, id, name, phone, email })
     });
     const data = await res.json();
     if (data.success) {

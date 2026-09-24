@@ -571,7 +571,7 @@ app.get('/api/admins', authenticateToken, requireSoftwareManager, async (req, re
 // PUT /api/admins/:id (Edit admin credentials: name, ID/username, email, pass - Software Manager only)
 app.put('/api/admins/:id', authenticateToken, requireSoftwareManager, async (req, res) => {
   const { id } = req.params;
-  const { newId, name, email, pass, roleTitle } = req.body;
+  const { id: newId, name, phone, email, pass, roleTitle } = req.body;
 
   // Allow arbitrary text-based usernames for Admins by just trimming without stripping non-digits
   const cleanId = (newId || id).trim();
@@ -583,6 +583,7 @@ app.put('/api/admins/:id', authenticateToken, requireSoftwareManager, async (req
   const updatedFields = {
     id: cleanId,
     name,
+    phone: phone || '',
     email,
     pass,
     roleTitle: roleTitle || 'אדמין מוסדות חורב'
@@ -597,23 +598,23 @@ app.put('/api/admins/:id', authenticateToken, requireSoftwareManager, async (req
 
 // POST /api/users (Software Manager only)
 app.post('/api/users', authenticateToken, requireSoftwareManager, async (req, res) => {
-  const { id, name, email } = req.body;
+  const { id, name, phone, email } = req.body;
 
   if (!id || !name || !email) {
     return res.status(400).json({ success: false, message: 'יש למלא ת"ז, שם מלא ואימייל' });
   }
   const cleanId = id.replace(/[^0-9]/g, '');
-  await db.addCoordinator({ id: cleanId, name, email });
+  await db.addCoordinator({ id: cleanId, name, phone: phone || '', email });
   res.json({ success: true, message: 'הרכז/ת הוסף/ה בהצלחה לרשימת המורשים!' });
 });
 
 // PUT /api/users/:id (Edit coordinator - Software Manager only)
 app.put('/api/users/:id', authenticateToken, requireSoftwareManager, async (req, res) => {
   const { id } = req.params;
-  const { newId, name, email } = req.body;
+  const { id: newId, name, phone, email } = req.body;
 
   const cleanId = (newId || id).replace(/[^0-9]/g, '');
-  const updated = await db.updateCoordinator(id, { id: cleanId, name, email });
+  const updated = await db.updateCoordinator(id, { id: cleanId, name, phone: phone || '', email });
   if (!updated) {
     return res.status(404).json({ success: false, message: 'רכז/ת לא נמצא/ה' });
   }
