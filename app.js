@@ -62,6 +62,41 @@ function escapeHtml(unsafe) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+let tokenExpiryTimer = null;
+
+function isTokenExpired(token) {
+  if (!token) return true;
+  try {
+    const payloadBase64 = token.split('.')[1];
+    const decodedJson = atob(payloadBase64);
+    const payload = JSON.parse(decodedJson);
+    return Date.now() >= (payload.exp * 1000);
+  } catch (e) {
+    return true;
+  }
+}
+
+function setupTokenExpiryTimer(token) {
+  if (tokenExpiryTimer) clearTimeout(tokenExpiryTimer);
+  if (!token) return;
+  try {
+    const payloadBase64 = token.split('.')[1];
+    const decodedJson = atob(payloadBase64);
+    const payload = JSON.parse(decodedJson);
+    const timeUntilExpiry = (payload.exp * 1000) - Date.now();
+    
+    if (timeUntilExpiry > 0) {
+      tokenExpiryTimer = setTimeout(() => {
+        showToast('פג תוקף החיבור מטעמי אבטחה. נא להתחבר מחדש.', 'warning');
+        handleLogout();
+      }, timeUntilExpiry);
+    } else {
+      handleLogout();
+    }
+  } catch (e) {}
+}
+
 // Safe Local Storage Reader
 function getInitialUser() {
   try {
@@ -69,6 +104,14 @@ function getInitialUser() {
     if (!saved || saved === 'undefined' || saved === 'null') return null;
     const parsed = JSON.parse(saved);
     if (parsed && typeof parsed === 'object' && parsed.id && parsed.name) {
+      const authToken = localStorage.getItem('horev_auth_token');
+      if (authToken && isTokenExpired(authToken)) {
+        try { 
+          localStorage.removeItem('horev_current_user'); 
+          localStorage.removeItem('horev_auth_token');
+        } catch (err) {}
+        return null;
+      }
       return parsed;
     }
     return null;
@@ -388,7 +431,9 @@ async function handleLogin(role, id, pass = '') {
 
 window.handleLogout = function() {
   AppStore.currentUser = null;
+  if (tokenExpiryTimer) clearTimeout(tokenExpiryTimer);
   localStorage.removeItem('horev_current_user');
+  localStorage.removeItem('horev_auth_token');
   showLoginScreen();
   showToast('התנתקת בהצלחה מהמערכת', 'info');
 };
@@ -415,6 +460,11 @@ function showMainApp() {
   if (!AppStore.currentUser || !AppStore.currentUser.name) {
     showLoginScreen();
     return;
+  }
+  
+  const authToken = localStorage.getItem('horev_auth_token');
+  if (authToken) {
+    setupTokenExpiryTimer(authToken);
   }
 
   const loginScreen = document.getElementById('loginScreen');

@@ -14,6 +14,12 @@ const mailer = require('./mailer');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-horev-123';
 
+// Utility for strict server-side HTML sanitization
+const sanitizeHtml = (str) => {
+  if (typeof str !== 'string') return str;
+  return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
+
 const app = express();
 
 // Security: Helmet for HTTP Headers (CSP disabled to allow Google Fonts / CDN)
@@ -59,7 +65,7 @@ const authenticateToken = (req, res, next) => {
   if (!token) return res.status(401).json({ success: false, message: 'גישה נדחתה. לא סופק מפתח אימות (Token).' });
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ success: false, message: 'פג תוקף החיבור, או שהמפתח אינו חוקי. נא להתחבר מחדש.' });
+    if (err) return res.status(401).json({ success: false, message: 'פג תוקף החיבור, או שהמפתח אינו חוקי. נא להתחבר מחדש.' });
     req.user = user;
     next();
   });
@@ -323,14 +329,14 @@ function formatHebrewDeadline(d) {
 
   const newReq = {
     id: reqId,
-    applicantId,
-    applicantName,
-    applicantEmail,
-    group,
+    applicantId: sanitizeHtml(applicantId),
+    applicantName: sanitizeHtml(applicantName),
+    applicantEmail: sanitizeHtml(applicantEmail),
+    group: sanitizeHtml(group),
     startDate,
     endDate,
     requestedMeals,
-    reason,
+    reason: sanitizeHtml(reason),
     submittedAt: submittedAtStr,
     status: "PENDING",
     approvedRefund: 0,
@@ -391,8 +397,8 @@ app.post('/api/requests/:id/approve', authenticateToken, requireAdmin, async (re
     const updatedReq = await db.updateRequest(id, {
       status: "APPROVED",
       approvedRefund: refundAmount,
-      approvedDetails: approvedMeals || mealsStr,
-      adminNotes: adminNotes || "",
+      approvedDetails: sanitizeHtml(approvedMeals) || mealsStr,
+      adminNotes: sanitizeHtml(adminNotes) || "",
       handledBy: adminName || "חגי (מנהל)",
       handledAt: nowStr,
       timeline: updatedTimeline
@@ -445,7 +451,7 @@ app.post('/api/requests/:id/reject', authenticateToken, requireAdmin, async (req
     const updatedReq = await db.updateRequest(id, {
       status: "REJECTED",
       approvedRefund: 0,
-      adminNotes: adminNotes || "",
+      adminNotes: sanitizeHtml(adminNotes) || "",
       handledBy: adminName || "חגי (מנהל)",
       handledAt: nowStr,
       timeline: updatedTimeline
@@ -489,7 +495,13 @@ app.post('/api/requests/:id/receipt', authenticateToken, async (req, res) => {
       }
     }
 
-    const updatedReq = await db.addReceipt(id, { amount, store, notes, fileName, fileData });
+    const updatedReq = await db.addReceipt(id, {
+      amount: parseFloat(amount) || 0,
+      store: sanitizeHtml(store),
+      notes: sanitizeHtml(notes),
+      fileName: sanitizeHtml(fileName),
+      fileData
+    });
 
     // Send Notification Email to Esther with CC to Hagai
     try {
