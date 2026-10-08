@@ -6,27 +6,27 @@
       "use": "@vercel/node"
     },
     {
-      "src": "index.html",
+      "src": "public/index.html",
       "use": "@vercel/static"
     },
     {
-      "src": "app.js",
+      "src": "public/app.js",
       "use": "@vercel/static"
     },
     {
-      "src": "style.css",
+      "src": "public/style.css",
       "use": "@vercel/static"
     },
     {
-      "src": "logo.png",
+      "src": "public/logo.png",
       "use": "@vercel/static"
     },
     {
-      "src": "logo.svg",
+      "src": "public/logo.svg",
       "use": "@vercel/static"
     },
     {
-      "src": "favicon.png",
+      "src": "public/favicon.png",
       "use": "@vercel/static"
     }
   ],

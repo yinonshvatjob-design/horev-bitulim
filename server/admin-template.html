@@ -1,0 +1,153 @@
+<section id="manageUsersView" class="tab-content">
+      <!-- Admin Credentials Management Card -->
+      <div class="card card-primary mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2><i class="fa-solid fa-user-shield"></i> ניהול ועריכת אדמינים וסיסמאות (אדמיניסטרציה / מזכירות / מנהל תוכנה)</h2>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">באפשרותך לערוך ולעדכן את תעודות הזהות (שם המשתמש להתחברות), השמות, האימיילים והסיסמאות של האדמינים.</p>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="adminsTable">
+              <thead>
+                <tr>
+                  <th>תפקיד במערכת</th>
+                  <th>שם המנהל/ת</th>
+                  <th>שם משתמש (תעודת זהות)</th>
+                  <th>סיסמה (Password)</th>
+                  <th>טלפון נייד</th>
+                  <th>כתובת אימייל</th>
+                  <th>פעולות ניהול</th>
+                </tr>
+              </thead>
+              <tbody id="adminsTbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coordinators Management Card -->
+      <div class="card card-purple">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2><i class="fa-solid fa-users-gear"></i> ניהול רכזים מורשים במוסדות חורב ירושלים</h2>
+          <button class="btn btn-light btn-sm" id="showAddUserModalBtn">
+            <i class="fa-solid fa-user-plus"></i> הוסף רכז/ת חדש/ה
+          </button>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">רק רכזים הרשומים ברשימה זו יוכלו להתחבר למערכת עם תעודת הזהות שלהם להגשת ביטולים.</p>
+          
+          <div class="table-responsive">
+            <table class="table table-bordered" id="usersTable">
+              <thead>
+                <tr>
+                  <th>תעודת זהות</th>
+                  <th>שם הרכז/ת</th>
+                  <th>טלפון נייד</th>
+                  <th>אימייל</th>
+                  <th>סטטוס מורשה</th>
+                  <th>פעולות ניהול</th>
+                </tr>
+              </thead>
+              <tbody id="usersTbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+<section id="emailSettingsView" class="tab-content">
+      <div class="card card-secondary">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-envelope-circle-check"></i> הגדרות שרת מיילים Google / Gmail — מוסדות חורב ירושלים</h2>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">הגדרת חשבון הגוגל והמייל המוסדי שדרכו יישלחו התראות האימייל האוטומטיות לחגי ולרכזות.</p>
+          
+          <form id="emailConfigForm" class="col-md-10 mb-4" onsubmit="handleSaveWebhookUrl(event)">
+            <div class="form-group mb-3">
+              <label for="gmailAddressInput"><i class="fa-solid fa-at"></i> כתובת אימייל שולח (Gmail מוסדות חורב)</label>
+              <input type="email" id="gmailAddressInput" class="form-control" value="bitulim@horev.org.il" readonly disabled style="background-color: #f1f5f9; font-weight: bold; color: #1e293b;">
+              <small class="text-muted">כל ההודעות והתראות המערכת יוצאות ישירות מחשבון גוגל הרשמי של מוסדות חורב.</small>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="webhookUrlInput"><i class="fa-solid fa-link"></i> כתובת Google Apps Script Webhook URL (מנוע הדיוור)</label>
+              <input type="url" id="webhookUrlInput" class="form-control mb-3" placeholder="https://script.google.com/macros/s/.../exec" required>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="secretKeyInput"><i class="fa-solid fa-shield-halved"></i> מפתח אבטחה ייחודי (Secret Token) לחסימת גישה זרה לסקריפט</label>
+              <div class="d-flex gap-2 align-items-center flex-wrap" style="gap: 8px;">
+                <input type="text" id="secretKeyInput" class="form-control" placeholder="HOREV_SECURE_MAIL_2026_SECRET_KEY" style="flex: 1; min-width: 280px;">
+                <button type="button" class="btn btn-primary" onclick="handleSaveWebhookUrl(event)">
+                  <i class="fa-solid fa-floppy-disk"></i> שמור הגדרות אבטחת מייל
+                </button>
+              </div>
+              <small class="text-muted">מפתח זה מגן על סקריפט גוגל כך **שרק השרת שלך מורשה** להורות על שליחת מיילים!</small>
+            </div>
+            
+            <div class="alert alert-info p-3 my-3" style="background: #eef2ff; border-right: 4px solid #4f46e5; color: #312e81; border-radius: 8px;">
+              <i class="fa-solid fa-circle-info"></i> <strong>המקור היחיד והמכריע לעדכון אימיילים וסיסמאות:</strong><br>
+              כתובות האימייל והסיסמאות של המנהל (חגי), המזכירות (אסתר) ומנהלי התוכנה מנוהלות כעת <strong>במקום אחד בלבד</strong> בטבלת האדמינים במסך <strong>"ניהול רכזים ואדמינים"</strong>.
+            </div>
+          </form>
+
+          <!-- Live Email Verification Test Component -->
+          <div class="card mt-4 p-3" style="background: #f0f9ff; border: 2px dashed #0284c7; border-radius: 12px;">
+            <h4 style="color: #0369a1; margin-bottom: 0.5rem;"><i class="fa-solid fa-vial-circle-check"></i> בדיקת תקינות שליחת מייל בלייב לכתובת ספציפית (Live Email Test)</h4>
+            <p class="text-muted small mb-3">הזן כתובת אימייל כלשהי ולחץ על "שלח מייל בדיקה". המערכת תשלח הודעת ניסיון מעוצבת בלייב ישירות מ-bitulim@horev.org.il ותאשר שהמייל התקבל בתיבה!</p>
+            
+            <form id="testEmailForm" onsubmit="handleTestEmailSubmit(event)" class="d-flex gap-2 align-items-center flex-wrap mb-3">
+              <input type="email" id="testEmailRecipientInput" class="form-control" placeholder="הכנס כתובת אימייל לבדיקה (למשל: yinonshvat@gmail.com)" required style="flex: 1; min-width: 260px;">
+              <button type="button" id="sendTestEmailBtn" onclick="handleTestEmailSubmit(event)" class="btn btn-success">
+                <i class="fa-solid fa-paper-plane"></i> שלח מייל בדיקה בלייב
+              </button>
+            </form>
+
+            <div class="d-flex gap-2 flex-wrap mb-2">
+              <span class="text-muted small align-self-center"><strong>לחצני קיצור לבדיקה מהירה לפי ההגדרות:</strong></span>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="setTestEmailRecipient('treasurer')">
+                📩 שלח לבדיקה לאימייל של חגי (מנהל)
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-info" onclick="setTestEmailRecipient('secretary')">
+                📩 שלח לבדיקה לאימייל של אסתר (מזכירות)
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setTestEmailRecipient('software')">
+                📩 שלח לבדיקה לאימייל של ינון (תוכנה)
+              </button>
+            </div>
+
+            <div id="testEmailStatus" class="mt-3 p-3" style="display: none; border-radius: 8px; font-weight: 500;"></div>
+          </div>
+
+          <!-- Email Activity Log -->
+          <div class="email-log-box mt-4">
+            <h4><i class="fa-solid fa-clock-rotate-left"></i> יומן אירועי מיילים אחרונים (Activity Log)</h4>
+            <div id="emailLogContainer" class="log-entries">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <hr style="border-top: 1px dashed #cbd5e1; margin-top: 25px; margin-bottom: 25px;">
+
+          <!-- System Backup Component -->
+          <div class="card mt-4 p-3" style="background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px;">
+            <h4 style="color: #334155; margin-bottom: 0.5rem;"><i class="fa-solid fa-cloud-arrow-down"></i> גיבוי והורדת נתונים מקיפה (Full Cloud Backup)</h4>
+            <div class="alert alert-secondary d-flex align-items-center flex-wrap" style="gap: 15px; margin-bottom: 0;">
+              <div style="font-size: 2.5rem; color: #64748b;"><i class="fa-solid fa-database"></i></div>
+              <div style="flex: 1; min-width: 250px;">
+                <strong>גיבוי נתונים מקומי לוקאלי:</strong><br>
+                פעולה זו תייצא את 100% מבסיס הנתונים (מנהלים, רכזים, היסטוריית בקשות והגדרות) לקובץ JSON אחד שיישמר ישירות במחשב שלך (להזנה ל-AOMEI או כונן חיצוני).
+              </div>
+              <button class="btn btn-dark btn-lg" onclick="downloadFullBackup()">
+                <i class="fa-solid fa-download"></i> הורד גיבוי נתונים מלא עכשיו
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>

@@ -1,0 +1,1289 @@
+[
+  {
+    "id": "832fcba1-5d88-468c-913d-1dcb0e890984",
+    "tz": "25181975",
+    "full_name": "אברהם ליפשיץ",
+    "phone_number": "0506406082",
+    "email": "avilif2@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "אלון שבות",
+      "address": "התאנה 25",
+      "subjects": "גמרא, חדר כושר, סדר - גמרא בקיאות"
+    }
+  },
+  {
+    "id": "d487f72f-2dd5-4b49-9967-acb608df9840",
+    "tz": "316097542",
+    "full_name": "אורי מאיר קרוק",
+    "phone_number": "0528363564",
+    "email": "ori.kruk.7@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "ספרות"
+    }
+  },
+  {
+    "id": "b623c114-9f15-4fe7-b5bf-7d103e1d52bc",
+    "tz": "58265687",
+    "full_name": "אורלי דברי",
+    "phone_number": "0548574802",
+    "email": "orlydevary@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "40f6413f-05dc-4d87-8278-61709108fff3",
+    "tz": "206147621",
+    "full_name": "אלחנן חיים יגודה",
+    "phone_number": "",
+    "email": "8441985@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "429325f7-eeaa-429d-9012-cafd56c4732d",
+    "tz": "345812556",
+    "full_name": "אריאל מרקוס",
+    "phone_number": "0587601337",
+    "email": "markus.ariel613@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "d97102e0-5141-4721-b3cd-3e2b4106bcd0",
+    "tz": "3749561",
+    "full_name": "ד\"ר זאב פרידמן",
+    "phone_number": "0547878239",
+    "email": "frzeev@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "בן ציון 25 מיקוד 95425",
+      "subjects": "ביולוגיה-עתודה מדעית, כימיה-עתודה מדעית"
+    }
+  },
+  {
+    "id": "67eb87ab-7f93-463d-852c-80234cacebdd",
+    "tz": "57756868",
+    "full_name": "ד\"ר צבי אריכא",
+    "phone_number": "0506289255",
+    "email": "zvikaarica@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "מורגנטאו הנרי 28/2 מיקוד 9722270",
+      "subjects": "מדעי הפיסיקה"
+    }
+  },
+  {
+    "id": "76c18736-dd30-4f6b-8f15-c47a9f5a29e1",
+    "tz": "318925278",
+    "full_name": "דולב סופר",
+    "phone_number": "0545904061",
+    "email": "dolevsss2@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "חזקיהו המלך 5",
+      "subjects": "גמרא, הלכה, סדר - גמרא בקיאות, פרשת השבוע, פתיחת בוקר, תורה"
+    }
+  },
+  {
+    "id": "faff49e0-3208-4455-a355-791600e7385b",
+    "tz": "206673832",
+    "full_name": "הילל יהונתן ביבי",
+    "phone_number": "",
+    "email": "hilelbibi@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "27fd8c6e-d5db-41b4-b3f7-f7bc61b201f7",
+    "tz": "200545432",
+    "full_name": "הרב א.קירשנבוים",
+    "phone_number": "0545986629",
+    "email": "assafhorev@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "פסגות",
+      "address": "פסגות מיקוד 9062400",
+      "subjects": "באורי תפילה, גמרא, הלכה, מחשבת האמונה, משנה, פרשת השבוע, קבלת שבת"
+    }
+  },
+  {
+    "id": "d7fb77d0-5d03-49ec-8723-385243b90144",
+    "tz": "55707087",
+    "full_name": "הרב אבנר ששר",
+    "phone_number": "0526070629",
+    "email": "sasar10@walla.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "שער הפרחים 2",
+      "subjects": "מתמטיקה"
+    }
+  },
+  {
+    "id": "898223c9-20d8-414f-bd58-d0c0302d145d",
+    "tz": "59805002",
+    "full_name": "הרב אברהם שטיינר",
+    "phone_number": "0545665629",
+    "email": "maleip@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "הממציא 5 מיקוד 93123",
+      "subjects": "גמרא, נ\"ך - בקיאות, נביא, פרשת השבוע, קבלת שבת, תורה"
+    }
+  },
+  {
+    "id": "0977d7e6-01f8-4371-8d81-1fb804f4b25c",
+    "tz": "21395694",
+    "full_name": "הרב אהד אהרנפלד",
+    "phone_number": "0509003419",
+    "email": "ohadhadasa@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "מבוא חורון",
+      "address": "כפר דרום 160",
+      "subjects": "בית חינוך ומשפחה, גמרא, ספרות השו\"ת, פתיחת בוקר, תפילה"
+    }
+  },
+  {
+    "id": "1e38148a-9229-4017-ade1-20a968a075ad",
+    "tz": "33226523",
+    "full_name": "הרב אהרן כהן",
+    "phone_number": "0523570618",
+    "email": "ravitroni5@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "מן ההר 17",
+      "subjects": "כישורי חיים"
+    }
+  },
+  {
+    "id": "2fdf2cf0-86c8-4ccc-9ed1-bb171504ee33",
+    "tz": "25018417",
+    "full_name": "הרב אושרי ברוך",
+    "phone_number": "0524748286",
+    "email": "oshrib547@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "טלמון",
+      "address": "נריה 35 מיקוד 7193700",
+      "subjects": "גמרא, היסטוריה, סדר - גמרא בקיאות, ספרות, ספרות השו\"ת, פילוסופיה, פתיחת בוקר, שעת חינוך, תורה, תפילה"
+    }
+  },
+  {
+    "id": "d35faec0-52c9-4a9c-b9ae-f5c4908fab7d",
+    "tz": "29517455",
+    "full_name": "הרב איתי נגיד",
+    "phone_number": "02-6511982",
+    "email": "naitay@walla.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "הרצל 66",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "0b55b0df-def7-4e43-9d8b-38e51a587b67",
+    "tz": "303184477",
+    "full_name": "הרב איתמר צדק",
+    "phone_number": "0544966782",
+    "email": "zedek_i@walla.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "ליכטנשטיין 24/8 מיקוד 9312385",
+      "subjects": "גמרא, מדעים, מחשבת האמונה, משנה, פרשת השבוע, קבלת שבת, תורה"
+    }
+  },
+  {
+    "id": "63578d0d-a5fa-4ebc-8cc0-f23be09060a3",
+    "tz": "38707311",
+    "full_name": "הרב אליהו י.שינפלד",
+    "phone_number": "0543974863",
+    "email": "elidid@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "גבעת זאב",
+      "address": "זמיר 6/1 מיקוד 9093155",
+      "subjects": "חיי משפחה, קודש"
+    }
+  },
+  {
+    "id": "521fd1a9-aa07-4f90-97bf-d165b575d655",
+    "tz": "38757514",
+    "full_name": "הרב אליקים קובץ'",
+    "phone_number": "0545962223",
+    "email": "elikovacs@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "יוסי בן יועזר 32",
+      "subjects": "מדעים"
+    }
+  },
+  {
+    "id": "65c84080-319f-461c-a219-681d814cf8dc",
+    "tz": "60936481",
+    "full_name": "הרב אלעד ירדני",
+    "phone_number": "0506611898",
+    "email": "nahumy7@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "שמואל מאיר 7",
+      "subjects": "גמרא, הלכה - בר מצווה, חינוך גופני, פרשת השבוע, קבלת שבת, תורה"
+    }
+  },
+  {
+    "id": "bd3a7303-31e6-4230-a63f-369c09323b39",
+    "tz": "56771736",
+    "full_name": "הרב אמציה לוי",
+    "phone_number": "0533103464",
+    "email": "amatzya61@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "חי טייב 58 מיקוד 95405",
+      "subjects": "מתמטיקה, מתמטיקה-עתודה מדעית"
+    }
+  },
+  {
+    "id": "9efceeca-6743-4c38-8ad0-1f531a79bce7",
+    "tz": "29524535",
+    "full_name": "הרב גואל אהרוני",
+    "phone_number": "0526355047",
+    "email": "goelbendavid@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "כוכב יעקב",
+      "address": "ד\"נ מזרח בנימין מיקוד 90622",
+      "subjects": "משנה, מתמטיקה, נביא"
+    }
+  },
+  {
+    "id": "7a931ec9-1e83-40f5-acad-3955f51a68d8",
+    "tz": "57654667",
+    "full_name": "הרב דוד ליבוביץ",
+    "phone_number": "0543394772",
+    "email": "dudilei@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "עופרה",
+      "address": "ראובן 6 מיקוד 90627",
+      "subjects": "תורה"
+    }
+  },
+  {
+    "id": "828f4bcc-71fa-46b8-9f7c-e2633ec82a16",
+    "tz": "58031337",
+    "full_name": "הרב דוד מ.מוריה",
+    "phone_number": "0524400750",
+    "email": "davidmoriah@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "אפרתה",
+      "address": "הגפן 49 מיקוד 90435",
+      "subjects": "נביא"
+    }
+  },
+  {
+    "id": "902f1c0f-d751-47cf-b664-04fd931da356",
+    "tz": "28074342",
+    "full_name": "הרב דורון עקיבא",
+    "phone_number": "",
+    "email": "doro999@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "דב גרונר 211",
+      "subjects": "הבעה, לשון עולים"
+    }
+  },
+  {
+    "id": "506f46e2-34cb-4685-af9f-91c1c5373542",
+    "tz": "23642846",
+    "full_name": "הרב חיים מורביה",
+    "phone_number": "0528784745",
+    "email": "hmor10@walla.co.il",
+    "role": "client",
+    "metadata": {
+      "city": "מעלה מכמש",
+      "address": "ד\"נ מזרח בנימין מיקוד 90634",
+      "subjects": "גמרא, גמרא בקיאות, נביא, פרשת השבוע, קבלת שבת, תורה"
+    }
+  },
+  {
+    "id": "8d34db01-66de-4bf9-8ac8-193af875a22b",
+    "tz": "36194520",
+    "full_name": "הרב חן זהבי",
+    "phone_number": "0506738468",
+    "email": "123chen1@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "עיר דוד",
+      "subjects": "גמרא, סדר - גמרא בקיאות, ספרות השו\"ת, פתיחת בוקר, שעת חינוך, תורה, תפילה"
+    }
+  },
+  {
+    "id": "6278bcf5-05e5-4f42-9667-2fffbbd087b1",
+    "tz": "24453094",
+    "full_name": "הרב יאיר שינקולבסקי",
+    "phone_number": "0542077214",
+    "email": "Yairshe11@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "נביא"
+    }
+  },
+  {
+    "id": "3f60b036-d99e-4c64-95eb-a5f0d3f219e8",
+    "tz": "201430485",
+    "full_name": "הרב יהודה אוחנה",
+    "phone_number": "0508940031",
+    "email": "yehudam801@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "גמרא, היסטוריה, משנה, פרשת השבוע, קבלת שבת, תורה"
+    }
+  },
+  {
+    "id": "df40dff4-4547-4961-9aa4-5f20fdea66d0",
+    "tz": "55560379",
+    "full_name": "הרב יוסי אליאב",
+    "phone_number": "0524767403",
+    "email": "eliavfam@walla.com",
+    "role": "client",
+    "metadata": {
+      "city": "נווה דניאל",
+      "address": "נווה דניאל 120 מיקוד 90909",
+      "subjects": "תורה"
+    }
+  },
+  {
+    "id": "ab483251-3256-498a-8f46-e27282f138f0",
+    "tz": "25630633",
+    "full_name": "הרב יעקב הכט",
+    "phone_number": "0547664966",
+    "email": "hectyac@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "רחוב הלר 21",
+      "subjects": "ספרות"
+    }
+  },
+  {
+    "id": "3928b0cb-ba16-404b-bae0-518fee3d8837",
+    "tz": "37145182",
+    "full_name": "הרב יעקב כהן",
+    "phone_number": "0524407784",
+    "email": "yakovchn@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "בית אל",
+      "address": "ת\"ד 436",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "57502664-dff5-4bdb-942f-780b0ed7df76",
+    "tz": "57332009",
+    "full_name": "הרב יצחק דור",
+    "phone_number": "0524767401",
+    "email": "ydor@horev.org.il",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "שי 7",
+      "subjects": "פרשת השבוע"
+    }
+  },
+  {
+    "id": "1dfeb85c-9cc1-4c9f-8075-34535ebf97ae",
+    "tz": "54856364",
+    "full_name": "הרב יצחק שטיינר",
+    "phone_number": "0522281767",
+    "email": "iziksteiner@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "קויפמן 2 מיקוד 93759",
+      "subjects": "אנגלית, מתמטיקה"
+    }
+  },
+  {
+    "id": "9568caf9-0762-44db-8cc3-7abfd109e0dc",
+    "tz": "15389414",
+    "full_name": "הרב ירחם שמשוביץ",
+    "phone_number": "0544510232",
+    "email": "yeroham.simsovic@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "הרצליה",
+      "address": "סוקולוב 96",
+      "subjects": "אזרחות, היסטוריה, תאוריה"
+    }
+  },
+  {
+    "id": "b7b1d6f1-faaa-4d27-b8ba-80c0bea333f3",
+    "tz": "40119331",
+    "full_name": "הרב מיכאל קליין",
+    "phone_number": "0527649339",
+    "email": "mklain80@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "50fabdc7-c856-4abf-8cbe-48d9126311e4",
+    "tz": "28618627",
+    "full_name": "הרב מרדכי ד.כהן",
+    "phone_number": "0544866649",
+    "email": "Motkecohen6@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "פנחס קהתי 15",
+      "subjects": "גמרא, הלכה, סדר - גמרא בקיאות, פתיחת בוקר, שעת חינוך, תורה, תפילה"
+    }
+  },
+  {
+    "id": "8662acff-c70b-473f-b2a3-1f5d7544764d",
+    "tz": "12763819",
+    "full_name": "הרב משה טרשנסקי",
+    "phone_number": "0527906707",
+    "email": "horevmoshe@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "הרב ניסים יצחק 42 מיקוד 9312542",
+      "subjects": "היסטוריה"
+    }
+  },
+  {
+    "id": "924a7639-2059-4453-9b09-be8603828b0f",
+    "tz": "59641555",
+    "full_name": "הרב נחמיה י.כהן",
+    "phone_number": "0587413272",
+    "email": "mnkohen@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "זאב חקלאי 2",
+      "subjects": "גמרא בקיאות, תורה"
+    }
+  },
+  {
+    "id": "094e90e1-65c7-4551-947b-9b32de4e772e",
+    "tz": "313368367",
+    "full_name": "הרב נריה חסיד",
+    "phone_number": "0549031095",
+    "email": "neriyahas@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "מדעי המזרחנות, מזרחנות"
+    }
+  },
+  {
+    "id": "86f90a54-5e6a-4638-8805-c84e25f31419",
+    "tz": "204070197",
+    "full_name": "הרב נריה נמיר",
+    "phone_number": "0522552996",
+    "email": "nreya56@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "עמיחי",
+      "address": "נטע 9",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "1155dca8-fa75-45c9-987a-e490f4471a6a",
+    "tz": "66385527",
+    "full_name": "הרב נריה פיינגולד",
+    "phone_number": "0546135445",
+    "email": "neriyafg@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "זנגוויל 13",
+      "subjects": "גמרא, היסטוריה, מחשבת האמונה, סדר - גמרא בקיאות, סדר - הלכה, פתיחת בוקר, שעת חינוך, תורה, תפילה"
+    }
+  },
+  {
+    "id": "84907258-d8be-4be5-9084-640bc61f935a",
+    "tz": "33963430",
+    "full_name": "הרב נתן אורבך",
+    "phone_number": "077-2070270",
+    "email": "natanaue@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "הורקניה 29",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "a3ed68a6-5bb5-42e0-8bc6-37b7959880ea",
+    "tz": "205785710",
+    "full_name": "הרב נתנאל מסינג",
+    "phone_number": "0547879936",
+    "email": "netanelmessing@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "גמרא, מחשבת האמונה, סדר - גמרא בקיאות, סדר - הלכה, פתיחת בוקר, שעת חינוך, תורה, תפילה"
+    }
+  },
+  {
+    "id": "a2680162-5dab-472b-8d6f-688bed8246c8",
+    "tz": "58281403",
+    "full_name": "הרב עופר י.טויבר",
+    "phone_number": "0507810184",
+    "email": "ofertb@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "הדף היומי 601 מיקוד 97279",
+      "subjects": "בית חינוך ומשפחה, גמרא, סדר - גמרא בקיאות, ספרות השו\"ת, פתיחת בוקר, תפילה"
+    }
+  },
+  {
+    "id": "7ec08a1e-4b27-4cb6-8030-d9695da19bcb",
+    "tz": "312173628",
+    "full_name": "הרב עמית מסילתי",
+    "phone_number": "0546732232",
+    "email": "amitmesi9@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "גמרא, הלכה, סדר - גמרא בקיאות, פתיחת בוקר, שעת חינוך, תפילה"
+    }
+  },
+  {
+    "id": "4979d73c-a945-4e0b-8891-bd25ae6d7731",
+    "tz": "40975641",
+    "full_name": "הרב צביקה בולבין",
+    "phone_number": "0502525730",
+    "email": "zb0527155206@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "צבי סגל 24",
+      "subjects": "אזרחות, הבנת הנקרא, הלכה, כישורי חיים, מחשבת ישראל, מיומניות למידה, משנה, נביא, תורה, תושב\"ע"
+    }
+  },
+  {
+    "id": "37743047-1d9b-43dc-8d6e-c0acfca32efa",
+    "tz": "33212911",
+    "full_name": "הרב צביקה דנטלסקי",
+    "phone_number": "0526146948",
+    "email": "zviden0@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "הרב ניסים יצחק 2 מיקוד 9312502",
+      "subjects": "ספרות"
+    }
+  },
+  {
+    "id": "b85e6356-36f4-4689-9cd1-976075a40f8e",
+    "tz": "29702511",
+    "full_name": "הרב ציון אבירם",
+    "phone_number": "0507534422",
+    "email": "zionaviram@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "שד מאיר שמואל 5/7 מיקוד 9312705",
+      "subjects": "היסטוריה, למודי ארץ ישראל"
+    }
+  },
+  {
+    "id": "89212b16-7fdc-4ef2-965a-6dd9030d7fbf",
+    "tz": "66171638",
+    "full_name": "הרב קובי פיג'ו",
+    "phone_number": "0528201488",
+    "email": "kmpecho@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "פסגות",
+      "address": "פסגות מיקוד 9062400",
+      "subjects": "גמרא, גמרא בקיאות, מחשבת האמונה, סדר - גמרא בקיאות, סדר - הלכה, פתיחת בוקר, שעת חינוך, תורה, תפילה"
+    }
+  },
+  {
+    "id": "51c59ca5-38bb-4fb4-a2c6-447a041cb134",
+    "tz": "25352881",
+    "full_name": "הרב רונן קורש",
+    "phone_number": "0556603156",
+    "email": "koreshhorev@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "בית אל",
+      "address": "הרב שפירא 1/6 מיקוד 9063200",
+      "subjects": "גמרא, היסטוריה, הלכה, לשון, מיומניות למידה, נביא, פרשת השבוע, קבלת שבת, תורה, תושב\"ע"
+    }
+  },
+  {
+    "id": "83229596-9ea1-40c3-a3cb-344e8041f174",
+    "tz": "28536654",
+    "full_name": "הרב שלמה שלוסברג",
+    "phone_number": "0506388669",
+    "email": "s.shlosberg@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "ליכטנשטיין 21",
+      "subjects": "בית חינוך ומשפחה, גמרא, סדר - גמרא בקיאות, ספרות השו\"ת, פתיחת בוקר, תפילה"
+    }
+  },
+  {
+    "id": "dc4ffd64-1492-4cb0-b613-e4478c6cd5d4",
+    "tz": "200989911",
+    "full_name": "הרב שלמה שרים",
+    "phone_number": "0527204780",
+    "email": "shlomishrem7@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "גמרא, סדר - גמרא בקיאות, פתיחת בוקר, שעת חינוך, תורה, תפילה"
+    }
+  },
+  {
+    "id": "55b42c78-1ccb-4938-b9a2-a1114ed90796",
+    "tz": "37670692",
+    "full_name": "הרב שמואל גרינברג",
+    "phone_number": "0523814600",
+    "email": "mbibeg@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "עופרה",
+      "address": "עמונה",
+      "subjects": "גמרא, סדר - גמרא בקיאות, ספרות השו\"ת, פתיחת בוקר, קודש, שעת חינוך, תורה, תפילה"
+    }
+  },
+  {
+    "id": "1b4b27c5-1aba-4d9d-a1e7-6edba053f01d",
+    "tz": "36616530",
+    "full_name": "חדוה לב",
+    "phone_number": "",
+    "email": "chlev8000@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "51919979-dba9-466c-a95b-29aa2688cb06",
+    "tz": "204643563",
+    "full_name": "חיים יצחק רובין",
+    "phone_number": "",
+    "email": "",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "65a274e1-5e1c-439a-91ed-f05da00651c6",
+    "tz": "37696036",
+    "full_name": "חיים סופר",
+    "phone_number": "",
+    "email": "",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "d5e77820-4a90-41d8-b5a6-b1c8a821f064",
+    "tz": "13895537",
+    "full_name": "חנה אן סוזן מגורי",
+    "phone_number": "",
+    "email": "channah.magori@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "743a471f-38d7-448d-b1b2-b98834fb5cd4",
+    "tz": "34741538",
+    "full_name": "טוכמן אורי אברהם",
+    "phone_number": "0523989736",
+    "email": "orituchman85@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "",
+      "subjects": "הלכה, משנה, נביא"
+    }
+  },
+  {
+    "id": "81ce46bb-7f64-49f3-9bc0-25b802c13185",
+    "tz": "33664087",
+    "full_name": "טלי עוזרי",
+    "phone_number": "",
+    "email": "taliozeri100@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "1e81cd92-c475-44cd-944e-30f258420cd9",
+    "tz": "315249722",
+    "full_name": "יאיר זכריה",
+    "phone_number": "",
+    "email": "",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "94281359-94a4-4f10-9012-247a5eeffe73",
+    "tz": "302737580",
+    "full_name": "יוסף קליין",
+    "phone_number": "0505201718",
+    "email": "josefklain@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "feb23b66-7102-4a10-8e56-567660b135f9",
+    "tz": "12345678",
+    "full_name": "ישיבת חורב",
+    "phone_number": "",
+    "email": "y-info@yeshiva.horev.org.il",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "e52c78da-3ecb-43ed-b8e1-e0ae220f9afd",
+    "tz": "12259222",
+    "full_name": "ישעיהו פורסטנברג",
+    "phone_number": "0506236798",
+    "email": "yeshayahuf@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "050a6a10-1137-40b2-8d5d-3ca76913dd00",
+    "tz": "28635092",
+    "full_name": "מוטי שוחטמן",
+    "phone_number": "0546555806",
+    "email": "motis@horev.org.il",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "80be0750-24e3-47ef-9990-20dd7cd47f0c",
+    "tz": "51987691",
+    "full_name": "מלכה אסנת גלד",
+    "phone_number": "",
+    "email": "osnatbag@hotmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "5dd22c40-a94d-4f1c-b79b-5d7abbdbf542",
+    "tz": "308122787",
+    "full_name": "מנשה רחמים ישראל בוהרון",
+    "phone_number": "0523845995",
+    "email": "menashebo@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "בישול או נגרות"
+    }
+  },
+  {
+    "id": "b273819f-613f-49ab-9966-cdd76ecf47a9",
+    "tz": "23809999",
+    "full_name": "מר אליהו אביטל",
+    "phone_number": "0526326263",
+    "email": "eli.avital999@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "פיקרד לאו 13/2 מיקוד 9312610",
+      "subjects": "מתמטיקה"
+    }
+  },
+  {
+    "id": "2a09c778-84a9-40a4-937c-3a1718a0d87d",
+    "tz": "21982780",
+    "full_name": "מר ברוך צבי טלר",
+    "phone_number": "0584181522",
+    "email": "baruchteller@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "אנגלית"
+    }
+  },
+  {
+    "id": "a6d94a70-6585-4c20-a343-b01e400ae6e4",
+    "tz": "15611627",
+    "full_name": "מר ג'פרי מרכוס",
+    "phone_number": "0507578181",
+    "email": "geffreym@netvision.net.il",
+    "role": "client",
+    "metadata": {
+      "city": "מעלה אדומים",
+      "address": "מצפה נבו 58 מיקוד 98410",
+      "subjects": "אנגלית"
+    }
+  },
+  {
+    "id": "039cca1b-d344-438b-a50d-03f4b71232a8",
+    "tz": "310464961",
+    "full_name": "מר דוד ברמן",
+    "phone_number": "0547954910",
+    "email": "davidbehrman68@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "החי\"ש 4 מיקוד 93223",
+      "subjects": "אנגלית"
+    }
+  },
+  {
+    "id": "8bc6dccf-e24e-4746-b899-3666cc10465e",
+    "tz": "201634052",
+    "full_name": "מר הלל בן יעקב",
+    "phone_number": "0586630384",
+    "email": "hillelbyy@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "בית אל",
+      "address": "בית אל",
+      "subjects": "מתמטיקה"
+    }
+  },
+  {
+    "id": "9ba5b01f-6dc1-4cf8-8a48-a0e590dc4ec1",
+    "tz": "319452793",
+    "full_name": "מר ווינה ויקטור",
+    "phone_number": "0546228255",
+    "email": "v.y.voyna@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "אילה 421/9 מיקוד 9385373",
+      "subjects": "מתמטיקה"
+    }
+  },
+  {
+    "id": "5ae646fa-9b06-4971-99ba-bcb805445681",
+    "tz": "15709975",
+    "full_name": "מר זאב גולד",
+    "phone_number": "0545777593",
+    "email": "4goldwolf2@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "שח\"ל 64",
+      "subjects": "אנגלית"
+    }
+  },
+  {
+    "id": "2ed4dda0-2d5b-4af1-8c3d-3e5b6f950e51",
+    "tz": "26727776",
+    "full_name": "מר חיים לוגסי",
+    "phone_number": "0506284245",
+    "email": "chaiml267@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "עמיאל 3",
+      "subjects": "גאוגרפיה, מדעי כדור הארץ"
+    }
+  },
+  {
+    "id": "dec0f65a-15a9-44bc-856a-080e67379aed",
+    "tz": "69752681",
+    "full_name": "מר יאיר צין",
+    "phone_number": "0506738724",
+    "email": "ilana.zinn@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "נג'ארה 23 מיקוד 95471",
+      "subjects": "אנגלית"
+    }
+  },
+  {
+    "id": "2f1a0b9d-9243-444d-b9f5-86847a835b22",
+    "tz": "31699937",
+    "full_name": "מר יואב איתן",
+    "phone_number": "08-9263836",
+    "email": "yona_eitan@hotmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "גבע בנימין",
+      "address": "יסמין 9",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "53270746-3a7e-41e5-b621-10c9074118a8",
+    "tz": "327150181",
+    "full_name": "מר יואב בארט",
+    "phone_number": "0543934713",
+    "email": "yoavgedalia@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "אורוגאוי 27",
+      "subjects": "אנגלית"
+    }
+  },
+  {
+    "id": "7d127321-5e35-4e49-a446-e79133ca460d",
+    "tz": "13386230",
+    "full_name": "מר יונתן הורוביץ",
+    "phone_number": "0507472337",
+    "email": "yonatanhorowitz@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "הצדיק מצ'כנוב 11 מיקוד 97281",
+      "subjects": "לשון"
+    }
+  },
+  {
+    "id": "89476a75-bf4d-45e0-aa92-266d68d1d1a9",
+    "tz": "207271131",
+    "full_name": "מר יונתן מאיר סבג",
+    "phone_number": "0537159830",
+    "email": "yehonatanm.sabag@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "13337480-cc85-4e7f-85c1-34c3e8e7d841",
+    "tz": "327352944",
+    "full_name": "מר יוסי סיני",
+    "phone_number": "0528879985",
+    "email": "yosefsinai@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "יוסי בן יועזר 42/10, כניסה ב'",
+      "subjects": "אנגלית"
+    }
+  },
+  {
+    "id": "2d45c21e-0f01-43c4-850f-59f4d91597bb",
+    "tz": "36201002",
+    "full_name": "מר יחיאל נגר",
+    "phone_number": "0508755210",
+    "email": "nagarye@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "ההרדוף 584/3 מיקוד 9385053",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "4c30efbe-f2ab-4102-a202-24f48943e53e",
+    "tz": "22326391",
+    "full_name": "מר יצחק אליהו",
+    "phone_number": "0545302717",
+    "email": "yzk42000@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "סול ליפצין 28/2",
+      "subjects": "הבעה, לשון"
+    }
+  },
+  {
+    "id": "cd56dbb7-8607-48b5-86ee-7b739f75b269",
+    "tz": "57361107",
+    "full_name": "מר מאיר פנחס",
+    "phone_number": "0546526554",
+    "email": "pmeirp@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "מחשבים-עתודה מדעית, סייבר-עתודה טכנולוגית"
+    }
+  },
+  {
+    "id": "31815421-1bdb-40c4-bc25-2ed2264231f2",
+    "tz": "200339760",
+    "full_name": "מר מתן שקד",
+    "phone_number": "054-2347644",
+    "email": "matanskd@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "חולון",
+      "address": "שלום עליכם 1",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "7ee93624-2e7c-421b-897c-08a79a77db83",
+    "tz": "301730388",
+    "full_name": "מר עדו שנייד",
+    "phone_number": "0509790083",
+    "email": "idoshnaid@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "נוף איילון",
+      "address": "שוהם 5",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "e30ca321-27e0-4842-8528-4c3f524dba2d",
+    "tz": "13570478",
+    "full_name": "מר צבי שלמן",
+    "phone_number": "0529597050",
+    "email": "Zwinet2@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "הרב עוזיאל 68",
+      "subjects": "מדעי הפיסיקה, פיסיקה-עתודה מדעית"
+    }
+  },
+  {
+    "id": "f343ca49-ace4-49ed-a156-4c511baa3849",
+    "tz": "25298696",
+    "full_name": "מר ראובן סקמסקי",
+    "phone_number": "0507437079",
+    "email": "isramets@yahoo.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": "אזרחות, היסטוריה עולים חדשים, תנ\"ך 3 יחידות, תנ\"ך עולים חדשים"
+    }
+  },
+  {
+    "id": "6436d3a5-27bd-4b6f-a74b-174e9d59d7ad",
+    "tz": "28995918",
+    "full_name": "מר רונן מ.בן עמי",
+    "phone_number": "0507534411",
+    "email": "ronenba4@walla.co.il",
+    "role": "client",
+    "metadata": {
+      "city": "אלעזר",
+      "address": "נווה דקלים 9",
+      "subjects": "חינוך גופני"
+    }
+  },
+  {
+    "id": "77e74335-bbc8-49ff-a4c4-7c2fa904b970",
+    "tz": "57130296",
+    "full_name": "מר שאול חמאוי",
+    "phone_number": "0544860503",
+    "email": "shaulhamawi@walla.co.il",
+    "role": "client",
+    "metadata": {
+      "city": "דולב",
+      "address": "ד\"נ מודיעין מיקוד 71935",
+      "subjects": "פיסיקה-עתודה מדעית"
+    }
+  },
+  {
+    "id": "4cb584ed-7b5f-47ec-9d0d-05ba826a24d6",
+    "tz": "15391923",
+    "full_name": "מר שמואל גורדון",
+    "phone_number": "0542071432",
+    "email": "mrg5256@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "חי טייב 52 מיקוד 95405",
+      "subjects": "אנגלית"
+    }
+  },
+  {
+    "id": "935c02a5-5861-4733-87ea-c06e0eb01d12",
+    "tz": "206263196",
+    "full_name": "נעם ווייס",
+    "phone_number": "0523633246",
+    "email": "noamwai7@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "הקונגרס הציוני 13",
+      "subjects": "מתמטיקה"
+    }
+  },
+  {
+    "id": "3a0c12d8-405a-4e04-9993-01daf54e027f",
+    "tz": "25363813",
+    "full_name": "עדיאל רוזנברג",
+    "phone_number": "",
+    "email": "adielros@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "234040a0-8035-4232-8cf9-82c79a08751b",
+    "tz": "34208207",
+    "full_name": "עמיחי מרקוס",
+    "phone_number": "",
+    "email": "amichmar@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "8b4eba3c-4486-4969-a202-e3d85abaf959",
+    "tz": "49321516",
+    "full_name": "צפורה טרנואר",
+    "phone_number": "",
+    "email": "zipitirn@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "640faf01-d6eb-4dd3-9683-00ceaef4f59b",
+    "tz": "311523245",
+    "full_name": "רבקי אילוז",
+    "phone_number": "0587782996",
+    "email": "rivki533152@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "83d59c8e-7202-4125-8708-fb36215a08ee",
+    "tz": "17636705",
+    "full_name": "רפי סאקוויל",
+    "phone_number": "0584840145",
+    "email": "rufsak@icloud.com",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "הורקניה 8/17",
+      "subjects": "אנגלית"
+    }
+  },
+  {
+    "id": "d93f84cf-b284-422b-ba6d-4d6c033e9450",
+    "tz": "33642596",
+    "full_name": "שירה פירסט",
+    "phone_number": "",
+    "email": "shirafurst2277@gmail.com",
+    "role": "client",
+    "metadata": {
+      "city": "",
+      "address": "",
+      "subjects": ""
+    }
+  },
+  {
+    "id": "15c08800-e542-4512-811a-25584debc32c",
+    "tz": "22437008",
+    "full_name": "ת רונית לוי",
+    "phone_number": "02-6787330",
+    "email": "",
+    "role": "client",
+    "metadata": {
+      "city": "ירושלים",
+      "address": "שח\"ל 30",
+      "subjects": ""
+    }
+  }
+]

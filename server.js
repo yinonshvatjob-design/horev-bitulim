@@ -5,6 +5,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
@@ -54,7 +55,7 @@ app.use((req, res, next) => {
 });
 
 // Serve Static Frontend Assets (Web Client)
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // --------------------------------------------------------------------------
 // Security Middlewares (JWT)
@@ -77,6 +78,11 @@ const requireAdmin = (req, res, next) => {
   }
   next();
 };
+
+app.get('/api/admin/template', requireAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'server', 'admin-template.html'));
+});
+
 
 const requireSoftwareManager = (req, res, next) => {
   if (req.user.role !== 'ADMIN') {
