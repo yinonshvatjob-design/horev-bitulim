@@ -1,35 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "public/index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/app.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/style.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/logo.png",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/logo.svg",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/favicon.png",
-      "use": "@vercel/static"
-    }
-  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
