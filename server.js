@@ -84,6 +84,15 @@ app.get('/api/admin/template', requireAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'server', 'admin-template.html'));
 });
 
+app.get('/api/health/db', async (req, res) => {
+  try {
+    const r = await centralDb.query('SELECT COUNT(*) as count FROM super_admins;');
+    res.json({ success: true, count: r.rows[0].count, dbConfigured: !!process.env.DATABASE_URL });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message, dbConfigured: !!process.env.DATABASE_URL });
+  }
+});
+
 
 const requireSoftwareManager = (req, res, next) => {
   if (req.user.role !== 'ADMIN') {
@@ -127,27 +136,30 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const cleanDigits = rawInput.replace(/[^0-9]/g, '');
 
   // 1. Check if user is Super Admin in Central Database
-  if (pass) {
-    try {
-      const superAdminRes = await centralDb.query('SELECT * FROM super_admins WHERE username = $1', [rawInput.toLowerCase()]);
-      if (superAdminRes.rows.length > 0) {
-        const superAdmin = superAdminRes.rows[0];
-        const isMatch = await bcrypt.compare(pass, superAdmin.password_hash);
-        if (isMatch) {
-          const userData = {
-            id: superAdmin.username,
-            name: superAdmin.full_name,
-            email: `${superAdmin.username}@horev.org.il`,
-            role: 'ADMIN',
-            roleTitle: 'מנהל תוכנה ראשי (Super Admin)'
-          };
-          const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
-          return res.json({ success: true, token, user: userData });
-        }
+  try {
+    const superAdminRes = await centralDb.query('SELECT * FROM super_admins WHERE username = $1', [rawInput.toLowerCase()]);
+    if (superAdminRes.rows.length > 0) {
+      const superAdmin = superAdminRes.rows[0];
+      if (!pass) {
+        return res.status(401).json({ success: false, message: 'מנהל תוכנה ראשי חייב להזין סיסמה', requiresPassword: true });
       }
-    } catch (e) {
-      console.error('Error checking central super_admins:', e);
+      const isMatch = await bcrypt.compare(pass, superAdmin.password_hash);
+      if (isMatch) {
+        const userData = {
+          id: superAdmin.username,
+          name: superAdmin.full_name,
+          email: `${superAdmin.username}@horev.org.il`,
+          role: 'ADMIN',
+          roleTitle: 'מנהל תוכנה ראשי (Super Admin)'
+        };
+        const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
+        return res.json({ success: true, token, user: userData });
+      } else {
+        return res.status(401).json({ success: false, message: 'סיסמת מנהל תוכנה שגויה.' });
+      }
     }
+  } catch (e) {
+    console.error('Error checking central super_admins:', e);
   }
 
   // 2. Check in Central Cloud Database (contacts & effective permissions)
