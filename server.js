@@ -11,6 +11,7 @@ const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const db = require('./db');
+const centralDb = require('./central_db');
 const mailer = require('./mailer');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-horev-123';
@@ -114,7 +115,7 @@ const loginLimiter = rateLimit({
   message: { success: false, message: 'יותר מדי ניסיונות התחברות כושלים. אנא נסה שוב בעוד 15 דקות.' }
 });
 
-// POST /api/auth/login (Ultra-Flexible Smart Authentication)
+// POST /api/auth/login (Ultra-Flexible Smart Authentication with Central Cloud Identity)
 app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const { role, id, pass } = req.body;
 
@@ -124,101 +125,113 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
 
   const rawInput = String(id).trim();
   const cleanDigits = rawInput.replace(/[^0-9]/g, '');
-  const unpaddedDigits = cleanDigits.replace(/^0+/, '');
-  const paddedDigits = cleanDigits ? cleanDigits.padStart(9, '0') : '';
 
-  // Explicit Gate: Block removed phone/ID 0542065606 completely
-  if (rawInput === '0542065606' || cleanDigits === '0542065606' || rawInput.includes('0542065606')) {
-    return res.status(403).json({
-      success: false,
-      message: 'הפרטים שהוזנו (0542065606) אינם מופיעים ברשימת המורשים.'
-    });
+  // 1. Check if user is Super Admin in Central Database
+  if (pass) {
+    try {
+      const superAdminRes = await centralDb.query('SELECT * FROM super_admins WHERE username = $1', [rawInput.toLowerCase()]);
+      if (superAdminRes.rows.length > 0) {
+        const superAdmin = superAdminRes.rows[0];
+        const isMatch = await bcrypt.compare(pass, superAdmin.password_hash);
+        if (isMatch) {
+          const userData = {
+            id: superAdmin.username,
+            name: superAdmin.full_name,
+            email: `${superAdmin.username}@horev.org.il`,
+            role: 'ADMIN',
+            roleTitle: 'מנהל תוכנה ראשי (Super Admin)'
+          };
+          const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
+          return res.json({ success: true, token, user: userData });
+        }
+      }
+    } catch (e) {
+      console.error('Error checking central super_admins:', e);
+    }
   }
 
-  // Helper matcher
-  const isMatch = (targetId, targetEmail, targetName) => {
+  // 2. Check in Central Cloud Database (contacts & effective permissions)
+  try {
+    let contactRes = null;
+    if (cleanDigits && cleanDigits.length >= 7) {
+      contactRes = await centralDb.query('SELECT * FROM contacts WHERE t_z = $1 OR phone = $2', [cleanDigits, cleanDigits]);
+    }
+    if ((!contactRes || contactRes.rows.length === 0) && rawInput.includes('@')) {
+      contactRes = await centralDb.query('SELECT * FROM contacts WHERE LOWER(email) = LOWER($1)', [rawInput]);
+    }
+
+    if (contactRes && contactRes.rows.length > 0) {
+      const contact = contactRes.rows[0];
+      const accessLevel = await centralDb.getEffectivePermission(contact.t_z, contact.classification, 'bitulim');
+
+      if (accessLevel === 'none') {
+        return res.status(403).json({
+          success: false,
+          message: 'אין לך הרשאה לגשת למערכת ביטולי ארוחות. פנה למנהל המערכת.'
+        });
+      }
+
+      if (accessLevel === 'admin') {
+        if (!pass) {
+          return res.status(401).json({ success: false, message: 'מנהל מערכת חייב להזין סיסמה', requiresPassword: true });
+        }
+        if (!contact.password) {
+          return res.status(500).json({ success: false, message: 'טרם הוגדרה סיסמה ארגונית למנהל זה בפורטל הזהויות' });
+        }
+        const isMatch = await bcrypt.compare(pass, contact.password);
+        if (!isMatch) {
+          return res.status(401).json({ success: false, message: 'סיסמה שגויה' });
+        }
+
+        const userData = {
+          id: contact.t_z,
+          name: contact.full_name,
+          email: contact.email || `${contact.t_z}@horev.org.il`,
+          role: 'ADMIN',
+          roleTitle: 'מנהל ביטולים מורשה'
+        };
+        const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
+        return res.json({ success: true, token, user: userData });
+      }
+
+      // accessLevel === 'user' -> Coordinator access
+      const userData = {
+        id: contact.t_z,
+        name: contact.full_name,
+        email: contact.email || `${contact.t_z}@horev.org.il`,
+        role: 'COORDINATOR',
+        roleTitle: contact.classification ? `רכז (${contact.classification})` : 'רכז/ת מורש/ת'
+      };
+      const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
+      return res.json({ success: true, token, user: userData });
+    }
+  } catch (err) {
+    console.error('Error verifying central identity in bitulim:', err);
+  }
+
+  // 3. Fallback for legacy admin list (backward compatibility)
+  const isMatchLegacy = (targetId, targetEmail, targetName) => {
     if (!targetId) return false;
     const cleanTarget = String(targetId).trim().replace(/[^0-9]/g, '');
-    const unpaddedTarget = cleanTarget.replace(/^0+/, '');
-    const paddedTarget = cleanTarget ? cleanTarget.padStart(9, '0') : '';
-
     if (rawInput === String(targetId).trim()) return true;
     if (cleanDigits && cleanTarget && cleanDigits === cleanTarget) return true;
-    if (unpaddedDigits && unpaddedTarget && unpaddedDigits === unpaddedTarget) return true;
-    if (paddedDigits && paddedTarget && paddedDigits === paddedTarget) return true;
     if (targetEmail && targetEmail.toLowerCase().trim() === rawInput.toLowerCase()) return true;
-    if (targetName && rawInput.length >= 3 && targetName.includes(rawInput)) return true;
     return false;
   };
 
-  // 1. Check if user is an Admin
-  const admin = (await db.getAllAdmins()).find(a => isMatch(a.id, a.email, a.name));
-  if (admin) {
-    if (admin.pass) {
-      let passValid = false;
-      if (admin.pass.startsWith('$2a$')) {
-        passValid = await bcrypt.compare(pass || '', admin.pass);
-      } else {
-        passValid = (admin.pass === pass); // Fallback just in case some plaintext wasn't hashed yet
-      }
-      
-      if (!passValid) {
-        return res.status(401).json({ success: false, message: 'סיסמת אדמין שגויה' });
-      }
+  const admin = (await db.getAllAdmins()).find(a => isMatchLegacy(a.id, a.email, a.name));
+  if (admin && admin.pass) {
+    const isPassOk = await bcrypt.compare(pass || '', admin.pass).catch(() => false);
+    if (isPassOk) {
+      const userData = { id: admin.id, name: admin.name, email: admin.email, role: 'ADMIN', roleTitle: admin.roleTitle || 'אדמין מוסדות חורב' };
+      const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
+      return res.json({ success: true, token, user: userData });
     }
-    const userData = {
-      id: admin.id,
-      name: admin.name,
-      email: admin.email,
-      role: 'ADMIN',
-      roleTitle: admin.roleTitle || 'אדמין מוסדות חורב'
-    };
-    const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
-    return res.json({
-      success: true,
-      token,
-      user: userData
-    });
-  }
-
-  // 2. Check if user is a Coordinator
-  const coordinator = (await db.getAllCoordinators()).find(c => isMatch(c.id, c.email, c.name));
-  if (coordinator) {
-    const userData = {
-      id: coordinator.id,
-      name: coordinator.name,
-      email: coordinator.email,
-      role: 'COORDINATOR',
-      roleTitle: 'רכז/ת מורש/ת'
-    };
-    const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
-    return res.json({
-      success: true,
-      token,
-      user: userData
-    });
-  }
-
-  // 3. Fallback: Allow any coordinator input to log in smoothly as a Coordinator
-  if (role === 'coordinator' || !pass) {
-    const userData = {
-      id: rawInput,
-      name: rawInput.length >= 2 ? rawInput : `רכז/ת (${rawInput})`,
-      email: rawInput.includes('@') ? rawInput : `${cleanDigits || rawInput}@horev.org.il`,
-      role: 'COORDINATOR',
-      roleTitle: 'רכז/ת מורש/ת'
-    };
-    const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '12h' });
-    return res.json({
-      success: true,
-      token,
-      user: userData
-    });
   }
 
   return res.status(403).json({
     success: false,
-    message: `הפרטים שהוזנו (${rawInput}) אינם מופיעים ברשימת המורשים. ניתן לפנות לחגי או לאסתר להוספה ברגע.`
+    message: `הפרטים שהוזנו (${rawInput}) אינם מורשים לגשת למערכת זו. פנה למנהל המערכת להרשאה.`
   });
 });
 
