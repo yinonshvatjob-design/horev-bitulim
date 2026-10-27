@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function initApp() {
   bindEvents();
   setupDateLimits();
+  setupPwaInstall();
 
   if (AppStore.currentUser && AppStore.currentUser.id && AppStore.currentUser.name) {
     try {
@@ -2479,3 +2480,128 @@ function showToast(msg, type = 'info') {
     toast.remove();
   }, 4000);
 }
+
+// ==========================================================================
+// PWA & Mobile Install Experience (התקנה לסלולר - מוסדות חורב ירושלים)
+// ==========================================================================
+let deferredInstallPrompt = null;
+
+function setupPwaInstall() {
+  // 1. Register Service Worker for PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => {
+          console.log('Horev ServiceWorker registered with scope:', reg.scope);
+        })
+        .catch((err) => {
+          console.warn('ServiceWorker registration failed:', err);
+        });
+    });
+  }
+
+  // 2. Check if already installed as standalone app
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone || 
+                       document.referrer.includes('android-app://');
+
+  if (isStandalone) {
+    console.log('App is already running in standalone mode.');
+    return; // Do not show install buttons or banners if already installed
+  }
+
+  const installAppBtn = document.getElementById('installAppBtn');
+  const pwaInstallBanner = document.getElementById('pwaInstallBanner');
+  const pwaBannerInstallBtn = document.getElementById('pwaBannerInstallBtn');
+  const pwaBannerDismissBtn = document.getElementById('pwaBannerDismissBtn');
+
+  // Detect iOS Safari
+  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isSafari = /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|Chrome/.test(navigator.userAgent);
+
+  // 3. Listen for Android/Chrome beforeinstallprompt event
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+
+    if (installAppBtn) installAppBtn.style.display = 'inline-flex';
+
+    // Check if user previously dismissed the banner in the last 7 days
+    const bannerDismissedTime = localStorage.getItem('horev_pwa_banner_dismissed');
+    const isDismissedRecently = bannerDismissedTime && (Date.now() - parseInt(bannerDismissedTime) < 7 * 24 * 60 * 60 * 1000);
+
+    if (!isDismissedRecently && pwaInstallBanner) {
+      setTimeout(() => {
+        pwaInstallBanner.style.display = 'flex';
+      }, 1500);
+    }
+  });
+
+  // If on iOS Safari and not standalone, show install button in header and banner
+  if (isIos && isSafari) {
+    if (installAppBtn) installAppBtn.style.display = 'inline-flex';
+
+    const bannerDismissedTime = localStorage.getItem('horev_pwa_banner_dismissed');
+    const isDismissedRecently = bannerDismissedTime && (Date.now() - parseInt(bannerDismissedTime) < 7 * 24 * 60 * 60 * 1000);
+
+    if (!isDismissedRecently && pwaInstallBanner) {
+      setTimeout(() => {
+        pwaInstallBanner.style.display = 'flex';
+      }, 2000);
+    }
+  }
+
+  // 4. Handle Install Button Clicks
+  const triggerInstallFlow = async () => {
+    if (deferredInstallPrompt) {
+      // Android / Chromium Browser Flow
+      deferredInstallPrompt.prompt();
+      const choiceResult = await deferredInstallPrompt.userChoice;
+      if (choiceResult.outcome === 'accepted') {
+        showToast('תודה! האפליקציה מותקנת כעת במכשירך.', 'success');
+        if (installAppBtn) installAppBtn.style.display = 'none';
+        if (pwaInstallBanner) pwaInstallBanner.style.display = 'none';
+      }
+      deferredInstallPrompt = null;
+    } else if (isIos) {
+      // iOS Safari Flow
+      openIosInstallModal();
+    } else {
+      // General Desktop / Other browsers
+      showToast('להתקנת האפליקציה: לחצו על סמל ההתקנה (⊕) בשורת הכתובת של הדפדפן.', 'info');
+    }
+  };
+
+  if (installAppBtn) {
+    installAppBtn.addEventListener('click', triggerInstallFlow);
+  }
+
+  if (pwaBannerInstallBtn) {
+    pwaBannerInstallBtn.addEventListener('click', triggerInstallFlow);
+  }
+
+  if (pwaBannerDismissBtn) {
+    pwaBannerDismissBtn.addEventListener('click', () => {
+      if (pwaInstallBanner) pwaInstallBanner.style.display = 'none';
+      localStorage.setItem('horev_pwa_banner_dismissed', Date.now().toString());
+    });
+  }
+
+  // 5. App Installed event listener
+  window.addEventListener('appinstalled', () => {
+    showToast('פלטפורמת ביטול ארוחות הותקנה בהצלחה למסך הבית!', 'success');
+    if (installAppBtn) installAppBtn.style.display = 'none';
+    if (pwaInstallBanner) pwaInstallBanner.style.display = 'none';
+    deferredInstallPrompt = null;
+  });
+}
+
+window.openIosInstallModal = function() {
+  const modal = document.getElementById('iosInstallModal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.closeIosInstallModal = function() {
+  const modal = document.getElementById('iosInstallModal');
+  if (modal) modal.style.display = 'none';
+};

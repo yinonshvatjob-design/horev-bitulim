@@ -1478,4 +1478,199 @@ body.dark-mode .mandatory-guidelines-box {
   }
 }
 
+/* ==========================================================================
+   Mobile PWA & App Experience Styles (מוסדות חורב ירושלים)
+   ========================================================================== */
+
+/* Install App Button in Header */
+.install-app-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  padding: 0.45rem 1rem;
+  font-size: 0.88rem;
+  background-color: rgba(19, 107, 148, 0.08);
+  border-color: var(--primary);
+  color: var(--primary);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.install-app-btn:hover {
+  background-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(19, 107, 148, 0.25);
+}
+
+/* Floating PWA Install Banner for Mobile */
+.pwa-install-banner {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  left: 16px;
+  max-width: 500px;
+  margin: 0 auto;
+  z-index: 9999;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 12px 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(19, 107, 148, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  animation: slideUpBanner 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  direction: rtl;
+}
+
+@keyframes slideUpBanner {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.pwa-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-banner-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #f8fafc;
+  padding: 2px;
+  border: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.pwa-banner-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pwa-banner-text strong {
+  font-size: 0.95rem;
+  color: #0f172a;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.pwa-banner-text span {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pwa-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pwa-banner-actions .btn-primary {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #136b94, #0e5272);
+  border: none;
+  box-shadow: 0 2px 8px rgba(19, 107, 148, 0.35);
+}
+
+.pwa-banner-actions .btn-text-secondary {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pwa-banner-actions .btn-text-secondary:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* Dark mode support for banner */
+body.dark-mode .pwa-install-banner {
+  background: #1e293b;
+  border: 1px solid #334155;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .pwa-banner-text strong {
+  color: #f8fafc;
+}
+
+body.dark-mode .pwa-banner-text span {
+  color: #94a3b8;
+}
+
+body.dark-mode .pwa-banner-logo {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+/* Mobile ergonomics improvements */
+@media (max-width: 768px) {
+  /* Touch target sizes */
+  button, .btn, .nav-item, select, input[type="text"], input[type="password"], input[type="date"], input[type="number"] {
+    min-height: 44px;
+  }
+
+  /* Safe area support for notch and home bar */
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+
+  .app-header {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Better scrolling in mobile tables */
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+
+  /* Compact header on mobile screens */
+  .app-header {
+    padding: 0.5rem 0.8rem;
+  }
+
+  .brand-titles h1 {
+    font-size: 1.1rem;
+  }
+
+  .institution-logo {
+    height: 38px;
+  }
+
+  .header-actions {
+    gap: 0.4rem;
+  }
+}
+
 
