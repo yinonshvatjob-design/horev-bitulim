@@ -166,10 +166,21 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
   try {
     let contactRes = null;
     if (cleanDigits && cleanDigits.length >= 7) {
-      contactRes = await centralDb.query('SELECT * FROM contacts WHERE t_z = $1 OR phone = $2', [cleanDigits, cleanDigits]);
+      const paddedTz = cleanDigits.padStart(9, '0');
+      contactRes = await centralDb.query(
+        'SELECT * FROM contacts WHERE t_z = $1 OR t_z = $2 OR phone = $1 OR phone = $2',
+        [cleanDigits, paddedTz]
+      );
     }
     if ((!contactRes || contactRes.rows.length === 0) && rawInput.includes('@')) {
       contactRes = await centralDb.query('SELECT * FROM contacts WHERE LOWER(email) = LOWER($1)', [rawInput]);
+    }
+    // Search by name for administrators (e.g. "חגי" / "קלמנוביץ חגי")
+    if ((!contactRes || contactRes.rows.length === 0) && rawInput.length >= 2 && !cleanDigits) {
+      contactRes = await centralDb.query(
+        'SELECT * FROM contacts WHERE full_name ILIKE $1 OR full_name ILIKE $2',
+        [`%${rawInput}%`, `${rawInput}%`]
+      );
     }
 
     if (contactRes && contactRes.rows.length > 0) {
