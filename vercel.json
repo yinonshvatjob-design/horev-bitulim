@@ -18,6 +18,30 @@
       "use": "@vercel/static"
     },
     {
+      "src": "public/manifest.json",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/sw.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/icon-192.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/icon-512.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/apple-touch-icon.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/horev-logo.png",
+      "use": "@vercel/static"
+    },
+    {
       "src": "public/logo.png",
       "use": "@vercel/static"
     },
