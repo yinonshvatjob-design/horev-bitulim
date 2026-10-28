@@ -601,9 +601,20 @@ function isNonBusinessDay(d) {
 
 function getBusinessDayCutoffDeadline(startDateVal) {
   const [year, month, day] = startDateVal.split('-').map(Number);
-  // Target time: 12:00 PM on event date
-  let curr = new Date(year, month - 1, day, 12, 0, 0);
+  const target = new Date(year, month - 1, day, 9, 0, 0);
 
+  // If Sunday (day 0), rule: cutoff is Thursday at 09:00 AM (or earlier if holiday)
+  if (target.getDay() === 0) {
+    let curr = new Date(year, month - 1, day, 9, 0, 0);
+    curr.setDate(curr.getDate() - 1);
+    while (isNonBusinessDay(curr)) {
+      curr.setDate(curr.getDate() - 1);
+    }
+    return curr;
+  }
+
+  // General rule: 2 full business days prior at 09:00 AM (Friday and Saturday excluded)
+  let curr = new Date(year, month - 1, day, 9, 0, 0);
   let businessDaysNeeded = 2;
   while (businessDaysNeeded > 0) {
     curr.setDate(curr.getDate() - 1);
