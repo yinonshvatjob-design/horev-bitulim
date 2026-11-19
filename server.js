@@ -185,12 +185,22 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     if ((!contactRes || contactRes.rows.length === 0) && rawInput.includes('@')) {
       contactRes = await centralDb.query('SELECT * FROM contacts WHERE LOWER(email) = LOWER($1)', [rawInput]);
     }
-    // Search by name for administrators (e.g. "חגי" / "קלמנוביץ חגי")
+    // Search by name for administrators (e.g. "חגי", "קלמנוביץ חגי", or "חגי קלמנוביץ")
     if ((!contactRes || contactRes.rows.length === 0) && rawInput.length >= 2 && !cleanDigits) {
       contactRes = await centralDb.query(
         'SELECT * FROM contacts WHERE full_name ILIKE $1 OR full_name ILIKE $2',
         [`%${rawInput}%`, `${rawInput}%`]
       );
+      if ((!contactRes || contactRes.rows.length === 0) && rawInput.includes(' ')) {
+        const nameParts = rawInput.split(/\s+/).filter(p => p.length >= 2);
+        if (nameParts.length >= 2) {
+          const conditions = nameParts.map((_, i) => `full_name ILIKE $${i + 1}`).join(' AND ');
+          contactRes = await centralDb.query(
+            `SELECT * FROM contacts WHERE ${conditions}`,
+            nameParts.map(p => `%${p}%`)
+          );
+        }
+      }
     }
 
     if (contactRes && contactRes.rows.length > 0) {
@@ -206,13 +216,37 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
 
       if (accessLevel === 'admin') {
         if (!pass) {
-          return res.status(401).json({ success: false, message: 'מנהל מערכת חייב להזין סיסמה', requiresPassword: true });
+          return res.status(401).json({ success: false, message: 'מנהל מערכת חייב להזין סיסמה בלשונית כניסת אדמין', requiresPassword: true });
         }
-        if (!contact.password) {
-          return res.status(500).json({ success: false, message: 'טרם הוגדרה סיסמה ארגונית למנהל זה בפורטל הזהויות' });
+
+        let isMatch = false;
+        if (contact.password) {
+          isMatch = await bcrypt.compare(pass, contact.password).catch(() => false);
         }
-        const isMatch = await bcrypt.compare(pass, contact.password);
+
+        // Fallback check against local bitulim admin password (so admins like Hagai/Esther can also use their bitulim password)
         if (!isMatch) {
+          const legacyAdmins = await db.getAllAdmins();
+          const contactPhoneClean = String(contact.phone || '').replace(/[^0-9]/g, '');
+          const contactTzClean = String(contact.t_z || '').replace(/[^0-9]/g, '');
+          const contactEmailLower = String(contact.email || '').toLowerCase().trim();
+          const matchingLegacy = legacyAdmins.find(a => {
+            const aIdClean = String(a.id || '').replace(/[^0-9]/g, '');
+            const aEmailLower = String(a.email || '').toLowerCase().trim();
+            if (aIdClean && (aIdClean === contactPhoneClean || aIdClean === contactTzClean)) return true;
+            if (aEmailLower && contactEmailLower && aEmailLower === contactEmailLower) return true;
+            if (a.name && contact.full_name && contact.full_name.includes(a.name.trim())) return true;
+            return false;
+          });
+          if (matchingLegacy && matchingLegacy.pass) {
+            isMatch = await bcrypt.compare(pass, matchingLegacy.pass).catch(() => false);
+          }
+        }
+
+        if (!isMatch) {
+          if (!contact.password) {
+            return res.status(500).json({ success: false, message: 'טרם הוגדרה סיסמה ארגונית למנהל זה בפורטל הזהויות' });
+          }
           return res.status(401).json({ success: false, message: 'סיסמה שגויה' });
         }
 

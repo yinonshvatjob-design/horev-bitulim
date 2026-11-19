@@ -404,6 +404,13 @@ async function handleLogin(role, id, pass = '') {
 
     const data = await response.json();
     if (!data.success) {
+      if (data.requiresPassword && role === 'coordinator') {
+        window.switchRoleTab('admin');
+        const adminIdEl = document.getElementById('adminIdInput');
+        const adminPassEl = document.getElementById('adminPasswordInput');
+        if (adminIdEl) adminIdEl.value = id;
+        if (adminPassEl) adminPassEl.focus();
+      }
       if (alertBox) {
         alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${data.message}`;
         alertBox.style.display = 'block';
