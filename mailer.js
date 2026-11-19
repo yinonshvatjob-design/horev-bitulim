@@ -308,6 +308,135 @@ class MailerService {
     return this.sendMail(targetEmail, subject, htmlContent, [treasurerEmail, secretaryEmail]);
   }
 
+  // 2B. Send Correction Email to Coordinator (with CC to Hagai & Esther) after Editing an Approved/Rejected Request
+  async sendCorrectionToCoordinator(reqData, prevData = {}, editorName = 'האדמיניסטרציה') {
+    const treasurer = await this.getTreasurerAdmin();
+    const secretary = await this.getSecretaryAdmin();
+    const treasurerEmail = await this.getTreasurerEmail();
+    const secretaryEmail = await this.getSecretaryEmail();
+    const coordinator = await db.findCoordinator(reqData.applicantId);
+    const targetEmail = reqData.applicantEmail || (coordinator && coordinator.email) || '';
+
+    if (!targetEmail) {
+      console.error(`[MAILER WARNING] No target email found for correction on applicantId ${reqData.applicantId}`);
+      return { success: false, error: new Error('No target email address found') };
+    }
+
+    const isApproved = reqData.status === 'APPROVED';
+    const statusText = isApproved ? 'אושרה (מתוקן)' : 'נדחתה (מתוקן)';
+    const newRefund = parseFloat(reqData.approvedRefund) || 0;
+    const oldRefund = parseFloat(prevData.approvedRefund) || 0;
+    const oldStatus = prevData.status === 'APPROVED' ? 'אושר' : (prevData.status === 'REJECTED' ? 'נדחה' : 'ממתין');
+    const newStatus = isApproved ? 'אושר' : 'נדחה';
+    const mealsStr = Array.isArray(reqData.requestedMeals) ? reqData.requestedMeals.join(', ') : (reqData.requestedMeals || '');
+    const oldMeals = prevData.approvedDetails || mealsStr;
+    const newMeals = reqData.approvedDetails || mealsStr;
+
+    const changesList = [];
+    if (prevData.status && prevData.status !== reqData.status) {
+      changesList.push(`<li><strong>סטטוס הבקשה:</strong> שונה מ-"${oldStatus}" ל-<strong>"${newStatus}"</strong></li>`);
+    }
+    if (oldRefund !== newRefund) {
+      changesList.push(`<li><strong>סכום ההחזר המוקצה:</strong> עודכן מ-₪${oldRefund.toLocaleString()} ל-<strong>₪${newRefund.toLocaleString()}</strong></li>`);
+    }
+    if (oldMeals !== newMeals) {
+      changesList.push(`<li><strong>ארוחות מאושרות לביטול:</strong> עודכנו מ-"${oldMeals}" ל-<strong>"${newMeals}"</strong></li>`);
+    }
+    if ((prevData.adminNotes || '') !== (reqData.adminNotes || '')) {
+      changesList.push(`<li><strong>הערת אדמיניסטרציה:</strong> עודכנה ל-"${reqData.adminNotes || 'ללא הערה'}"</li>`);
+    }
+    if (changesList.length === 0) {
+      changesList.push(`<li><strong>פרטי האישור אומתו ועודכנו מחדש</strong> (סכום החזר: ₪${newRefund.toLocaleString()})</li>`);
+    }
+
+    const subject = `תיקון לעדכון בקשת ביטול ארוחות #${reqData.id} - ${statusText} (סכום החזר מעודכן: ₪${newRefund.toLocaleString()})`;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="he">
+      <head>
+        <meta charset="UTF-8">
+      </head>
+      <body style="font-family: 'Rubik', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b; direction: rtl; text-align: right;">
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          
+          <div style="background: #d97706; color: #ffffff; padding: 20px; text-align: center;">
+            <h2 style="margin: 0; font-size: 22px;">מוסדות חורב ירושלים - תיקון לבקשת ביטול ארוחות</h2>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.95;">בוצע תיקון ועדכון בבקשה #${reqData.id} ע"י ${editorName} — הודעה זו מחליפה את העדכון הקודם</p>
+          </div>
+
+          <div style="padding: 25px;">
+            <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px;">
+              <h4 style="margin: 0 0 8px 0; color: #b45309; font-size: 15px;">פירוט התיקונים שבוצעו:</h4>
+              <ul style="margin: 0; padding-right: 18px; color: #78350f; font-size: 14px; line-height: 1.7;">
+                ${changesList.join('')}
+              </ul>
+            </div>
+
+            <div style="background: #f1f5f9; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 13px; color: #334155;">
+              <strong>נמען ראשי (רכז/ת):</strong> ${reqData.applicantName} (${reqData.group} - <code>${targetEmail}</code>)<br>
+              <strong>תאריך אירוע:</strong> ${reqData.startDate}${reqData.startDate !== reqData.endDate ? ' עד ' + reqData.endDate : ''}<br>
+              <span style="color: #64748b;">עותק תיעוד (CC) נשלח ל-<strong>${treasurer.name}</strong> ול-<strong>${secretary.name}</strong>.</span>
+            </div>
+
+            <h3 style="color: ${isApproved ? '#059669' : '#dc2626'}; margin-top: 0;">
+              סטטוס מעודכן: ${isApproved ? 'אושר (לאחר תיקון)' : 'נדחה (לאחר תיקון)'}
+            </h3>
+
+            ${isApproved ? `
+              <div style="background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <p style="margin: 0 0 8px 0; color: #065f46;"><strong>ארוחות מאושרות לביטול (מעודכן):</strong></p>
+                <p style="margin: 0; color: #047857; font-weight: bold;">${newMeals}</p>
+                
+                <hr style="border: none; border-top: 1px dashed #a7f3d0; margin: 12px 0;">
+                
+                <p style="margin: 0; font-size: 18px; color: #065f46;">
+                  <strong>סכום החזר כספי מעודכן לרכז/ת: ₪${newRefund.toLocaleString()}</strong>
+                </p>
+              </div>
+            ` : ''}
+
+            ${reqData.adminNotes ? `
+              <div style="background: #f8fafc; border-right: 4px solid #3b82f6; padding: 12px 15px; margin-bottom: 20px;">
+                <strong>הערת אדמיניסטרציה / סיבת תיקון:</strong><br>
+                <span style="color: #334155;">"${reqData.adminNotes}"</span>
+              </div>
+            ` : ''}
+
+            ${isApproved ? `
+              <div style="background: #fff8f6; border: 2px solid #f87171; border-radius: 8px; padding: 15px; margin: 20px 0;">
+                <h4 style="color: #dc2626; margin: 0 0 10px 0;">תזכורות חובה מוסדיות לכל רכז/ת:</h4>
+                <ol style="margin: 0; padding-right: 20px; color: #991b1b; line-height: 1.6;">
+                  <li><strong>יש לשמור על כל הקבלות ולהעבירם לאסתר / חגי.</strong></li>
+                  <li><strong>האוכל שנקנה לטובת האירוע יאוחסן אך ורק בחדר המוקצה לכך בצוללת.</strong></li>
+                </ol>
+              </div>
+
+              <div style="text-align: center; margin: 25px 0;">
+                <a href="https://bitulim.horevit.com?action=upload_receipt&reqId=${reqData.id}" style="background: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                  לחץ כאן להעלאת קבלה/חשבונית לאסתר
+                </a>
+              </div>
+            ` : ''}
+
+            <div style="text-align: center; margin-top: 15px;">
+              <a href="https://bitulim.horevit.com" style="background: #1b779e; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 8px; font-weight: bold; display: inline-block;">
+                לצפייה בפרטי הבקשה המעודכנים ובציר הזמן
+              </a>
+            </div>
+          </div>
+
+          <div style="background: #f1f5f9; padding: 15px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
+            מוסדות חורב ירושלים - תורה עם דרך ארץ
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return this.sendMail(targetEmail, subject, htmlContent, [treasurerEmail, secretaryEmail]);
+  }
+
   // 3. Send Concentrated Receipt Upload Alert to Esther (with CC to Hagai) containing ALL receipts
   async sendReceiptNotificationToEsther(reqData, latestReceiptObj) {
     const treasurer = await this.getTreasurerAdmin();

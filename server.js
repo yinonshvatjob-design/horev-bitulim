@@ -33,8 +33,17 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false
 }));
 
-// Security: Strict CORS
-app.use(cors());
+// Security: Balanced CORS (Horev domains, Cloud hosts & localhost)
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true);
+    const allowed = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin) ||
+      /^https:\/\/([a-z0-9-]+\.)*(horevit\.com|horev\.org\.il|vercel\.app|onrender\.com)$/i.test(origin);
+    if (allowed) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
 
 // Security: Lower global payload limits to prevent DoS (5MB limit)
 app.use(express.json({ limit: '5mb' }));
@@ -74,13 +83,13 @@ const authenticateToken = (req, res, next) => {
 };
 
 const requireAdmin = (req, res, next) => {
-  if (req.user.role !== 'ADMIN') {
+  if (!req.user || req.user.role !== 'ADMIN') {
     return res.status(403).json({ success: false, message: 'פעולה זו מורשית למנהלים בלבד.' });
   }
   next();
 };
 
-app.get('/api/admin/template', requireAdmin, (req, res) => {
+app.get('/api/admin/template', authenticateToken, requireAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'server', 'admin-template.html'));
 });
 
@@ -89,7 +98,8 @@ app.get('/api/health/db', async (req, res) => {
     const r = await centralDb.query('SELECT COUNT(*) as count FROM super_admins;');
     res.json({ success: true, count: r.rows[0].count, dbConfigured: !!process.env.DATABASE_URL });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, dbConfigured: !!process.env.DATABASE_URL });
+    console.error('DB Health check failed:', err.message);
+    res.status(500).json({ success: false, error: 'Database check failed', dbConfigured: !!process.env.DATABASE_URL });
   }
 });
 
@@ -522,6 +532,103 @@ app.post('/api/requests/:id/reject', authenticateToken, requireAdmin, async (req
   } catch (err) {
     console.error("Reject route error:", err);
     res.status(500).json({ success: false, message: "שגיאה פנימית במערכת בעת דחיית הבקשה. פנה למנהל." });
+  }
+});
+
+// PUT /api/requests/:id/edit (Edit/Correct an already approved or rejected request & optionally send correction email)
+app.put('/api/requests/:id/edit', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, approvedRefund, approvedMeals, adminNotes, sendEmail } = req.body;
+    const adminName = req.user.name || 'מנהל מערכת';
+
+    const request = await db.getRequestById(id);
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'בקשה לא נמצאה' });
+    }
+
+    const newStatus = (status === 'APPROVED' || status === 'REJECTED') ? status : request.status;
+    const parsedRefund = parseFloat(approvedRefund);
+    const newRefund = newStatus === 'APPROVED' ? (isNaN(parsedRefund) || parsedRefund < 0 ? 0 : parsedRefund) : 0;
+    const mealsFallback = Array.isArray(request.requestedMeals) ? request.requestedMeals.join(', ') : (request.requestedMeals || '');
+    const cleanMeals = sanitizeHtml(approvedMeals || '').trim() || request.approvedDetails || mealsFallback;
+    const cleanNotes = sanitizeHtml(adminNotes || '').trim();
+    const shouldSendEmail = sendEmail !== false;
+
+    const prevData = {
+      status: request.status,
+      approvedRefund: parseFloat(request.approvedRefund) || 0,
+      approvedDetails: request.approvedDetails || mealsFallback,
+      adminNotes: request.adminNotes || ''
+    };
+
+    const nowStr = db.formatDate(new Date());
+    const diffParts = [];
+    if (prevData.status !== newStatus) {
+      const oldStHe = prevData.status === 'APPROVED' ? 'אושר' : (prevData.status === 'REJECTED' ? 'נדחה' : 'ממתין');
+      const newStHe = newStatus === 'APPROVED' ? 'אושר' : 'נדחה';
+      diffParts.push(`סטטוס: ${oldStHe} ⬅️ ${newStHe}`);
+    }
+    if (prevData.approvedRefund !== newRefund) {
+      diffParts.push(`סכום מוקצה: ₪${prevData.approvedRefund.toLocaleString()} ⬅️ ₪${newRefund.toLocaleString()}`);
+    }
+    if (prevData.approvedDetails !== cleanMeals) {
+      diffParts.push(`ארוחות מאושרות: ${cleanMeals}`);
+    }
+    if (prevData.adminNotes !== cleanNotes) {
+      diffParts.push(`הערות: ${cleanNotes || 'ללא'}`);
+    }
+    const summaryDesc = diffParts.length > 0 ? diffParts.join(' | ') : `עודכן ללא שינוי בסכום (₪${newRefund.toLocaleString()})`;
+
+    const updatedTimeline = [
+      ...(request.timeline || []),
+      {
+        time: nowStr,
+        title: `תיקון ועריכה ע"י ${adminName}`,
+        desc: summaryDesc,
+        type: "warning"
+      }
+    ];
+
+    if (shouldSendEmail) {
+      updatedTimeline.push({
+        time: nowStr,
+        title: "שליחת מייל תיקון לרכז/ת",
+        desc: `נשלח מייל תיקון מעודכן ל-${request.applicantEmail} (עם עותק להנהלה ולמזכירות)`,
+        type: "info"
+      });
+    }
+
+    const updatedReq = await db.updateRequest(id, {
+      status: newStatus,
+      approvedRefund: newRefund,
+      approvedDetails: cleanMeals,
+      adminNotes: cleanNotes,
+      handledBy: adminName,
+      handledAt: nowStr,
+      timeline: updatedTimeline
+    });
+
+    let mailWarning = '';
+    if (shouldSendEmail) {
+      try {
+        await mailer.sendCorrectionToCoordinator(updatedReq, prevData, adminName);
+      } catch (mailErr) {
+        console.error("Correction mailer send error:", mailErr.message);
+        mailWarning = ' (שים לב: אירעה שגיאה בשליחת המייל)';
+      }
+    }
+
+    res.json({
+      success: true,
+      request: updatedReq,
+      message: shouldSendEmail
+        ? `הבקשה #${id} תוקנה בהצלחה, המאזן עודכן ונשלח מייל תיקון לרכז/ת!${mailWarning}`
+        : `הבקשה #${id} תוקנה בהצלחה והמאזן עודכן (ללא שליחת מייל).`
+    });
+  } catch (err) {
+    console.error("Edit request route error:", err);
+    res.status(500).json({ success: false, message: "שגיאה פנימית בעת עריכת הבקשה. פנה למנהל." });
   }
 });
 

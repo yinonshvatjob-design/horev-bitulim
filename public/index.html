@@ -647,6 +647,61 @@
     </div>
   </div>
 
+  <!-- MODAL: Edit / Correct Approved or Rejected Request -->
+  <div id="editRequestModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-to-square"></i> תיקון ועריכת בקשה #<span id="editReqModalId"></span></h3>
+        <button class="close-modal-btn" data-close="editRequestModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="editReqSummaryBox" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 0.88rem; line-height: 1.6;">
+          <!-- Populated dynamically -->
+        </div>
+        <form id="editRequestForm">
+          <input type="hidden" id="editReqIdInput">
+
+          <div class="form-group">
+            <label for="editReqStatusInput">סטטוס הבקשה *</label>
+            <select id="editReqStatusInput" class="form-control" onchange="toggleEditReqStatusFields()">
+              <option value="APPROVED">אושר (מוקצה תקציב)</option>
+              <option value="REJECTED">נדחה (ללא תקציב — ₪0)</option>
+            </select>
+          </div>
+
+          <div id="editReqApprovedFields">
+            <div class="form-group">
+              <label for="editReqRefundInput">סכום החזר מוקצה (₪) *</label>
+              <input type="number" id="editReqRefundInput" class="form-control" min="0" step="1" placeholder="לדוגמה: 450">
+              <small id="editReqReceiptsHint" class="text-muted" style="display: block; margin-top: 4px;"></small>
+            </div>
+
+            <div class="form-group">
+              <label for="editReqMealsInput">ארוחות מאושרות לביטול</label>
+              <input type="text" id="editReqMealsInput" class="form-control" placeholder="לדוגמה: ארוחת צהריים, ארוחת ערב">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="editReqNotesInput">הערות אדמין / סיבת התיקון</label>
+            <textarea id="editReqNotesInput" class="form-control" rows="2" placeholder="הערה שתופיע גם במייל התיקון ובציר הזמן"></textarea>
+          </div>
+
+          <div class="form-group" style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 12px; margin-top: 12px;">
+            <label style="display: flex; align-items: center; gap: 8px; margin: 0; cursor: pointer; font-weight: 600; color: #92400e;">
+              <input type="checkbox" id="editReqSendEmailCb" checked style="width: 18px; height: 18px;">
+              <span>שלח מייל תיקון מעודכן לרכז/ת (עם עותק להנהלה ולמזכירות)</span>
+            </label>
+          </div>
+
+          <button type="submit" id="saveEditReqBtn" class="btn btn-primary btn-block mt-3">
+            <i class="fa-solid fa-floppy-disk"></i> שמור תיקון ועדכן מאזן
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: Add New Coordinator -->
   <div id="addUserModal" class="modal-overlay" style="display: none;">
     <div class="modal-card">
@@ -836,6 +891,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
   <!-- Main JavaScript File -->
-  <script src="app.js?v=40.0"></script>
+  <script src="app.js?v=41.0"></script>
 </body>
 </html>

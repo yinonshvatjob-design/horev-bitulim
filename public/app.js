@@ -221,6 +221,7 @@ function bindEvents() {
   try {
     // Receipt & Delete Form Submits
     document.getElementById('uploadReceiptForm')?.addEventListener('submit', handleUploadReceiptSubmit);
+    document.getElementById('editRequestForm')?.addEventListener('submit', handleEditRequestSubmit);
     document.getElementById('selectAllRequestsCb')?.addEventListener('change', (e) => {
       document.querySelectorAll('.req-select-cb').forEach(cb => cb.checked = e.target.checked);
       updateSelectedCount();
@@ -1474,9 +1475,16 @@ function renderReports() {
         <td>${receiptDetailCell}</td>
         <td><button class="btn btn-sm btn-outline-primary py-0" onclick="openTimelineModal('${r.id}')"><i class="fa-solid fa-timeline"></i></button></td>
         <td>
-          <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteSingleRequest('${r.id}')" title="מחק">
-            <i class="fa-solid fa-trash"></i>
-          </button>
+          <div style="display: flex; gap: 4px; justify-content: center; align-items: center;">
+            ${r.status !== 'PENDING' ? `
+              <button class="btn btn-sm btn-outline-warning py-0" onclick="openEditRequestModal('${r.id}')" title="תיקון ועריכת אישור / סכום מוקצה">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+            ` : ''}
+            <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteSingleRequest('${r.id}')" title="מחק">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
         </td>
       </tr>
     `;
@@ -1530,6 +1538,117 @@ function resetFilters() {
   if (startDateEl) startDateEl.value = '';
   if (endDateEl) endDateEl.value = '';
   renderReports();
+}
+
+window.toggleEditReqStatusFields = function() {
+  const statusEl = document.getElementById('editReqStatusInput');
+  const approvedFields = document.getElementById('editReqApprovedFields');
+  if (!statusEl || !approvedFields) return;
+  approvedFields.style.display = statusEl.value === 'APPROVED' ? 'block' : 'none';
+};
+
+window.openEditRequestModal = function(reqId) {
+  if (!AppStore.currentUser || AppStore.currentUser.role !== 'ADMIN') return;
+  const r = AppStore.requests.find(item => item.id === reqId);
+  if (!r) {
+    showToast('הבקשה לא נמצאה', 'danger');
+    return;
+  }
+
+  const receiptsList = Array.isArray(r.receipts) && r.receipts.length > 0
+    ? r.receipts
+    : (r.receipt ? [r.receipt] : []);
+  const actualReceiptsTotal = receiptsList.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+  const mealsFallback = Array.isArray(r.requestedMeals) ? r.requestedMeals.join(', ') : (r.requestedMeals || '');
+
+  document.getElementById('editReqModalId').textContent = r.id;
+  document.getElementById('editReqIdInput').value = r.id;
+  document.getElementById('editReqStatusInput').value = r.status === 'REJECTED' ? 'REJECTED' : 'APPROVED';
+  document.getElementById('editReqRefundInput').value = parseFloat(r.approvedRefund) || 0;
+  document.getElementById('editReqMealsInput').value = r.approvedDetails || mealsFallback;
+  document.getElementById('editReqNotesInput').value = r.adminNotes || '';
+  document.getElementById('editReqSendEmailCb').checked = true;
+
+  const summaryBox = document.getElementById('editReqSummaryBox');
+  if (summaryBox) {
+    summaryBox.innerHTML = `
+      <div><strong>רכז/ת:</strong> ${escapeHtml(r.applicantName)} (${escapeHtml(r.group)})</div>
+      <div><strong>תאריך אירוע:</strong> ${escapeHtml(r.startDate)}${r.startDate !== r.endDate ? ' עד ' + escapeHtml(r.endDate) : ''}</div>
+      <div><strong>הקצאה נוכחית:</strong> <span style="color:#1e40af; font-weight:700;">₪${(parseFloat(r.approvedRefund) || 0).toLocaleString()}</span>
+        ${actualReceiptsTotal > 0 ? ` | <strong>קבלות שהוגשו עד כה:</strong> <span style="color:#059669; font-weight:700;">₪${actualReceiptsTotal.toLocaleString()}</span>` : ''}
+      </div>
+    `;
+  }
+
+  const hintEl = document.getElementById('editReqReceiptsHint');
+  if (hintEl) {
+    hintEl.textContent = actualReceiptsTotal > 0
+      ? `שים לב: לבקשה זו כבר הוגשו קבלות בסך ₪${actualReceiptsTotal.toLocaleString()}. המאזן יחושב מחדש אוטומטית.`
+      : 'שינוי הסכום יסנכרן מיד את המאזן הכולל בדוח.';
+  }
+
+  window.toggleEditReqStatusFields();
+  document.getElementById('editRequestModal').style.display = 'flex';
+};
+
+async function handleEditRequestSubmit(e) {
+  e.preventDefault();
+  if (!AppStore.currentUser || AppStore.currentUser.role !== 'ADMIN') return;
+
+  const reqId = document.getElementById('editReqIdInput').value;
+  const status = document.getElementById('editReqStatusInput').value;
+  const approvedRefund = status === 'APPROVED' ? (parseFloat(document.getElementById('editReqRefundInput').value) || 0) : 0;
+  const approvedMeals = document.getElementById('editReqMealsInput').value.trim();
+  const adminNotes = document.getElementById('editReqNotesInput').value.trim();
+  const sendEmail = document.getElementById('editReqSendEmailCb').checked;
+
+  const saveBtn = document.getElementById('saveEditReqBtn');
+  const origBtnHtml = saveBtn ? saveBtn.innerHTML : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> שומר תיקון ומסנכרן...';
+  }
+
+  try {
+    const res = await apiFetch(`/requests/${encodeURIComponent(reqId)}/edit`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        status,
+        approvedRefund,
+        approvedMeals,
+        adminNotes,
+        sendEmail
+      })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      showToast(data.message || 'שגיאה בשמירת התיקון', 'danger');
+      return;
+    }
+
+    // Update memory store immediately & re-sync all views and KPI balances
+    const idx = AppStore.requests.findIndex(item => item.id === reqId);
+    if (idx !== -1 && data.request) {
+      AppStore.requests[idx] = data.request;
+    }
+
+    document.getElementById('editRequestModal').style.display = 'none';
+    renderReports();
+    renderPendingApprovals();
+    renderMyRequests();
+    updatePendingCounter();
+    showToast(data.message || 'הבקשה תוקנה בהצלחה והמאזן עודכן!', 'success');
+  } catch (err) {
+    console.error('Edit request error:', err);
+    showToast('שגיאת תקשורת בעת שמירת התיקון', 'danger');
+  } finally {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = origBtnHtml;
+    }
+  }
 }
 
 async function exportToExcel() {
